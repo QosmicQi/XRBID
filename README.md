@@ -6,8 +6,9 @@ From the directory where you would like to download XRBID, run in your command l
 git clone https://github.com/QosmicQi/XRBID
 ```
 
-Navigate into the XRBID directory and run: 
+Navigate into the XRBID directory and install the modules through the setup file: 
 ```
+cd XRBID
 sudo python setup.py install  
 ```
 
