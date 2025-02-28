@@ -7,5 +7,5 @@ setup(
 	url='https://github.com/QosmicQi/XRBID',
 	author='Qiana Hunt',
 	author_email='qiana.hunt@uleth.ca',
-	py_modules=['XRBID']
+	py_modules=['Align', 'AutoPhots', 'CMDs', 'DataFrameMod', 'Headers', 'HRs', 'ImageSearch', 'Sources', 'WriteScript']
 )
