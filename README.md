@@ -13,7 +13,8 @@ sudo python setup.py install
 ```
 
 This should install XRBID and all of the modules it contains into python. Now from python, you should be able to call on these modules, i.e.
-```python
+```
+python
 from XRBID import Sources
 from XRBID.DataFrameMod import Find
 ```
