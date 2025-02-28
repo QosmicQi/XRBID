@@ -20,10 +20,10 @@ cd = os.chdir
 pwd = os.getcwd
 pd.options.mode.chained_assignment = None
 
-from DataFrameMod import Find, BuildFrame
-from Sources import LoadSources
-from Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
-from DataFrameMod import SaveDF
+from XRBID.DataFrameMod import Find, BuildFrame
+from XRBID.Sources import LoadSources
+from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
+#from XRBID.DataFrameMod import SaveDF
 
 default_aps = [0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
 
