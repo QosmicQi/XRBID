@@ -1,0 +1,80 @@
+Traceback (most recent call last):
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import numpy as np
+from reproject import reproject_interp    # May need to install first
+
+# Calling FITS files as the RGB filters (using the mosaics from Chapter 5)
+hdu_r = fits.open('M101_acs_wfc_f814w_example.fits')
+hdu_g = fits.open('M101_acs_wfc_f555w_example.fits')
+hdu_b = fits.open('M101_acs_wfc_f435w_example.fits')
+data_g = hdu_g['SCI'].data   # Pulling data from FITS HDU
+
+
+# Resizing images that don't match the base HDU, hdu_g (required)
+if hdu_r['SCI'].data.shape != hdu_g['SCI'].data.shape:
+  data_r, _ = reproject_interp(hdu_r['SCI'], hdu_g['SCI'].header)
+else: data_r = hdu_r['SCI'].data
+if hdu_b['SCI'].data.shape != hdu_g['SCI'].data.shape:
+  data_b, _ = reproject_interp(hdu_b['SCI'], hdu_g['SCI'].header)
+else: data_b = hdu_b['SCI'].data
+
+
+# Applying mag clipping and converting data to log
+# Defining the min and max mag curtoff of RGB image, per filter
+# These are obtained through trial and error.
+
+clipmin_r = 0.2
+clipmax_r = 3.0   
+clipmin_g = 0.1
+clipmax_g = 2.0   
+clipmin_b = 0.05
+clipmax_b = 1.0   
+
+r = np.log10(np.clip(data_r, clipmin_r, clipmax_r))
+g = np.log10(np.clip(data_g, clipmin_g, clipmax_g))
+b = np.log10(np.clip(data_b, clipmin_b, clipmax))
+
+# Rescaling the filters based on their individual min and max values
+r_scaled = (r-np.nanmin(r))/(np.nanmax(r)-np.nanmin(r))
+g_scaled = (g-np.nanmin(g))/(np.nanmax(g)-np.nanmin(g))
+b_scaled = (b-np.nanmin(b))/(np.nanmax(b)-np.nanmin(b))
+rgb_scaled = np.dstack((r_scaled,g_scaled,b_scaled))
+
+# Plotting RGB image
+plt.figure(figsize=(4,4))
+ax = plt.subplot(projection=WCS(hdu_g['PRIMARY'].header))
+plt.imshow(rgb_scaled)
+plt.axis("off")
+plt.show()
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[2], line 33[0m
+[1;32m     31[0m r [38;5;241m=[39m np[38;5;241m.[39mlog10(np[38;5;241m.[39mclip(data_r, clipmin_r, clipmax_r))
+[1;32m     32[0m g [38;5;241m=[39m np[38;5;241m.[39mlog10(np[38;5;241m.[39mclip(data_g, clipmin_g, clipmax_g))
+[0;32m---> 33[0m b [38;5;241m=[39m np[38;5;241m.[39mlog10(np[38;5;241m.[39mclip(data_b, clipmin_b, [43mclipmax[49m))
+[1;32m     35[0m [38;5;66;03m# Rescaling the filters based on their individual min and max values[39;00m
+[1;32m     36[0m r_scaled [38;5;241m=[39m (r[38;5;241m-[39mnp[38;5;241m.[39mnanmin(r))[38;5;241m/[39m(np[38;5;241m.[39mnanmax(r)[38;5;241m-[39mnp[38;5;241m.[39mnanmin(r))
+
+[0;31mNameError[0m: name 'clipmax' is not defined
+
