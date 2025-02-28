@@ -489,10 +489,7 @@ document.write(`
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> calibrators found.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
 Saving testdata/M101_calibrators.reg
 </pre></div>
 </div>
@@ -525,15 +522,22 @@ Saving testdata/M101_calibrators.reg
 </section>
 <section id="calculating-positional-uncertainty">
 <span id="sec-calcpu"></span><h2>Calculating Positional Uncertainty<a class="headerlink" href="#calculating-positional-uncertainty" title="Link to this heading">#</a></h2>
-<p>Because of different instrumental resolutions and inherent uncertainties, it isn’t possible to know the <em>exact</em> location of an X-ray source on the <em>HST</em> optical image, but the positional uncertainty defines a region within which we are reasonably certain the X-ray source falls. This is defined by 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii, representing the region within which the source has a 608% and 95% chance of being found.</p>
+<p>Because of different instrumental resolutions and inherent uncertainties, it isn’t possible to know the <em>exact</em> location of an X-ray source on the <em>HST</em> optical image, but the positional uncertainty defines a region within which we are reasonably certain the X-ray source falls. This is defined by 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii, representing the region within which the source has a 68% and 95% chance of being found.</p>
 <p>There are two components that go in to the positional uncertainty estimation: the X-ray positional uncertainty, and the standard deviation on the astrometric correction above. The X-ray positional uncertainty is due to the fact that the PSF of <em>CXO</em> increasingly degrades for sources that are an increasing distance from the telescope’s main pointing at the time of the observation. That is, the farther the X-ray source is from the center of the image, the harder it is to tell where those detected X-rays came from.</p>
-<p>The X-ray positional uncertainty is obtained using formulas from <span id="id1">[<a class="reference internal" href="title.html#id9" title="Minsun Kim, Dongwoo Kim, Belinda Jane Wilkes, Paul Joseph Green, Eunhyeuk Kim, Craig S Anderson, Wayne Barkhouse, Nancy Remage Evans, Zeljko Ivezic, Margarita Karovska, Vinay Kashyap, Myung Gyoon Lee, Peter Maksym, Amy E. Mossman, John David Silverman, and Harvey Dale Tananbaum. Chandra Multiwavelength Project X‐Ray Point Source Catalog. In Chandra Multiwavelength Project X‐Ray Point Source Catalog. 2007.">KKW+07</a>]</span>:</p>
+<p>The X-ray positional uncertainty is obtained using Equations 12 and 14 from <span id="id1">[<a class="reference internal" href="title.html#id9" title="Minsun Kim, Dongwoo Kim, Belinda Jane Wilkes, Paul Joseph Green, Eunhyeuk Kim, Craig S Anderson, Wayne Barkhouse, Nancy Remage Evans, Zeljko Ivezic, Margarita Karovska, Vinay Kashyap, Myung Gyoon Lee, Peter Maksym, Amy E. Mossman, John David Silverman, and Harvey Dale Tananbaum. Chandra Multiwavelength Project X‐Ray Point Source Catalog. In Chandra Multiwavelength Project X‐Ray Point Source Catalog. 2007.">KKW+07</a>]</span>:</p>
 <figure class="align-default">
 <a class="reference internal image-reference" href="../_images/kim07_pu.png"><img alt="../_images/kim07_pu.png" src="../_images/kim07_pu.png" style="width: 600px;" />
 </a>
 </figure>
 <p>The source counts and the off-axis angle are <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_b</span></code> and <code class="docutils literal notranslate"><span class="pre">theta</span></code> or <code class="docutils literal notranslate"><span class="pre">theta_mean</span></code> from <a class="reference internal" href="csc-data.html#chap-csc-data"><span class="std std-ref">Retrieving X-ray Data from the CSC</span></a>, which I renamed <code class="docutils literal notranslate"><span class="pre">Counts</span></code> and <code class="docutils literal notranslate"><span class="pre">Theta</span></code> in my <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
-<p>The positional uncertainties from the standard deviations are added in quadrature to the X-ray uncertainties, meaning you sum the squares and take the square root. So for the</p>
+<p>The positional uncertainties from the standard deviations are added in quadrature to the X-ray uncertainties, meaning you sum the squares of the uncertainties and take the square root. So for 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span>, you’d combine the positional uncertainties from the equations above (let’s call them <code class="docutils literal notranslate"><span class="pre">sig1_kim</span></code> and <code class="docutils literal notranslate"><span class="pre">sig2_kim</span></code>) with those from the standard deviations on the astrometric correction (<code class="docutils literal notranslate"><span class="pre">xstd</span></code> and <code class="docutils literal notranslate"><span class="pre">ystd</span></code>) thus:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="n">sig_astro</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">xstd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ystd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sig1</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">sig1_kim</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sig_astro</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sig2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">sig2_kim</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sig_astro</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 2sig is literally twice 1sig for the std-derived p.u.</span>
+</pre></div>
+</div>
 <p>All of these steps are handled by <code class="docutils literal notranslate"><span class="pre">Align.CalcPU()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -549,7 +553,7 @@ Saving testdata/M101_calibrators.reg
 </div>
 </div>
 </div>
-<p>This can be saved directly into to your <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">CalcPU</span></code> calculates the total 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainty from both the X-ray data and the input standard deviations on the astrometric correction. This can be saved directly into to your <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -884,6 +888,7 @@ Saving testdata/M101_cscsources_2sig.reg
 </div>
 </div>
 </div>
+<p>You now have the RA and Dec of each source (ideally updated based on the results from your astrometric correction) and the positional uncertainty radii of each one. Now when you plot these region files on your <em>HST</em> image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, you will see <em>exactly</em> where each XRB is expected to be found and which optical sources are associated with them. From here, we can get into the optical analysis, including: selecting the correct optical counterpart, extracting their photometric properties, and comparing those properties to theoretical models to estimate the donor star mass!</p>
 </section>
 </section>
 
