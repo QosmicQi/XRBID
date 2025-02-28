@@ -23,8 +23,8 @@ import os
 cd = os.chdir
 pwd = os.getcwd
 
-from Headers import heads, tabheads, tabheads_split, Greenx, Greeny, Redx, Redy, Bluex, Bluey, Radius, DaoNo, headers_dict, ID, Class, Class2, Conf, Notes, X, Y
-from DataFrameMod import BuildFrame, Find, Convert_to_Number
+from XRBID.Headers import heads, tabheads, tabheads_split, Greenx, Greeny, Redx, Redy, Bluex, Bluey, Radius, DaoNo, headers_dict, ID, Class, Class2, Conf, Notes, X, Y
+from XRBID.DataFrameMod import BuildFrame, Find, Convert_to_Number
 
 ###-----------------------------------------------------------------------------------------------------
 
