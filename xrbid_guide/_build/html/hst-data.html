@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Retrieving Optical Images from the HLA &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'hst-data';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating Mosaics with AstroDrizzle" href="astrodrizzle.html" />
+    <link rel="prev" title="Retrieving X-ray Data from the CSC" href="csc-data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="title.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/XRB.png" class="logo__image only-light" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>
+    <script>document.write(`<img src="_static/XRB.png" class="logo__image only-dark" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="title.html">
+                    XRBID: A Guide to Direct X-ray Binary Analysis
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="chapters/intro.html">Overview of Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Retrieving Optical Images from the HLA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fhst-data.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/hst-data.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Retrieving Optical Images from the HLA</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hla-image-search-manual">HLA Image Search (Manual)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="retrieving-optical-images-from-the-hla">
+<span id="chap-hst-data"></span><h1>Retrieving Optical Images from the HLA<a class="headerlink" href="#retrieving-optical-images-from-the-hla" title="Link to this heading">#</a></h1>
+<p>There are two ways to retrieve data from the HLA. The first is manually, and the second requires you to query the HLA from within <code class="docutils literal notranslate"><span class="pre">python</span></code>. The benefit to the latter technique is that this makes data retrieval practically automatic, although it does require a lot of user input that may take longer than it’s worth, depending on your workflow. It also allows you to pull data directly from from archive without having to download it to your computer, which is an enormous memory saver! However, with the way I’ve written my query, I’ve found it may not capture all <em>HST</em> images available on the HLA. I haven’t figured out how to solve for that issue quite yet. The only solution I have for now is to double-check everything with the manual process, and download any data that may be missing from the automatic query onto your computer to incorporate into your workflow.</p>
+<p>First, I will demonstrate the  manual way to retrieve <em>HST</em> data. Then, I will give my new code for automatic data retrieval. Again, use the latter with caution, as it takes a long time and doesn’t always return all of the data available!</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you intend to make a mosaic, this step is not necessary. Instead, I would recommend using the HLA to identify proposal IDs for the images that you want to use, then skip ahead to the <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> step!</p>
+</div>
+<section id="hla-image-search-manual">
+<span id="sec-hla-search"></span><h2>HLA Image Search (Manual)<a class="headerlink" href="#hla-image-search-manual" title="Link to this heading">#</a></h2>
+<p>To pull images from the HLA, <a class="reference external" href="https://hla.stsci.edu">go to the website</a> and type in the name of your galaxy. If the galaxy has been observed with <em>HST</em>, a list of observations will appear under the <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> tab. For my research, I require observations using the WCF3/UVIS<a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> or ACS/WFC<a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> detectors. I narrow down the observations by specifying the detector under the <code class="docutils literal notranslate"><span class="pre">Detector</span></code> tab (to my knowledge, this can only be done one at a time).</p>
+<figure class="align-default" id="fig-hla">
+<img alt="_images/hla.png" src="_images/hla.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Example search using the Hubble Legacy Archive.</span><a class="headerlink" href="#fig-hla" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>It’s useful to view what the actual images look like before downloading them. To do this, switch from the <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> tab to the <code class="docutils literal notranslate"><span class="pre">Images</span></code> tab. Select the appropriate images (you’ll more than likely want the ones with science data) and add them to your cart by clicking the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Data:</span> <span class="pre">FITS-Science</span></code> link beneath each image.  This will add them to the shopping cart tab, which you can use to retrieve your FITS data files once all desired images are selected.</p>
+</section>
+<section id="python-hla-query-with-pyvo">
+<span id="sec-pyvo-search"></span><h2><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="headerlink" href="#python-hla-query-with-pyvo" title="Link to this heading">#</a></h2>
+<p>The code that I use for querying the HLA through <code class="docutils literal notranslate"><span class="pre">python</span></code> is included in the script <code class="docutils literal notranslate"><span class="pre">ImageSearch.py</span></code>. This is heavily based on <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, which you should have already installed during the setup phase, and is mostly useful when you have a small number of sources to analyze.</p>
+<p>To use <code class="docutils literal notranslate"><span class="pre">ImageSearch.FindHST()</span></code>, you will need to provide the function with either a list containing the RA and Dec of a single source (in units degrees), or a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the coordinates of multiple sources. So, for example, either :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FindHST</span><span class="p">([</span><span class="o">&lt;</span><span class="n">RA</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Dec</span><span class="o">&gt;</span><span class="p">],</span> <span class="n">galaxy</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">galaxy</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">savefile</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FindHST</span><span class="p">(</span><span class="o">&lt;</span><span class="n">DataFrame</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">galaxy</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">galaxy</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">savefile</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will work, as long as the coordinates, galaxy name, and some output file name are given. In either case, <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code> will search the HLA for any optical image containing the coordinates given and present them as a list – first searching for ACS/WFC observations, then searching for WFC3/UVIS observations. Upon user request, it will plot the images with the coordinate of the source marked as a red <code class="docutils literal notranslate"><span class="pre">X</span></code> and prompt the user to input the indices of the best image files to save. You will want to select at least one image for each of the filters you’re interested in, where applicable. It will then save the image information to a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file matching your designated <code class="docutils literal notranslate"><span class="pre">savefile</span></code> name. This <code class="docutils literal notranslate"><span class="pre">.csv</span></code> will include a URL that can be used to read in the image file directly from the HLA without having to download the image to your computer!</p>
+<p>If you just want to use <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code> to look for all images associated with the galaxy, not necessarily for each individual XRB, you can do so by providing the coordinates of the galaxy and setting the search radius to the radius of the galaxy, in arcseconds. This will likely return many potential images, so in this case it’s recommended to save the initial HLA search using the <code class="docutils literal notranslate"><span class="pre">savesearch</span></code> parameter and decide in conjunction with the HLA website which images are appropriate from that image list. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ImageSearch</span> <span class="kn">import</span> <span class="n">FindHST</span>
+<span class="o">%</span><span class="n">run</span> <span class="n">ImageSearch</span><span class="o">.</span><span class="n">py</span>
+
+<span class="n">FindHST</span><span class="p">([</span><span class="mf">210.802368</span><span class="p">,</span> <span class="mf">54.359667</span><span class="p">],</span> <span class="n">galaxy</span><span class="o">=</span><span class="s1">&#39;M101&#39;</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> \
+        <span class="n">savefile</span><span class="o">=</span><span class="s1">&#39;Obslog_M101.csv&#39;</span><span class="p">,</span> <span class="n">savesearch</span><span class="o">=</span><span class="s1">&#39;M101_HLAsearch.csv&#39;</span><span class="p">)</span>
+        
+<span class="c1"># This code will produce a table with nearly 200 images. You can choose to go through each one sequentially, </span>
+<span class="c1"># or use the M101_HLAsearch.csv + HLA to identify the best images manually</span>
+</pre></div>
+</div>
+<p>On the other hand, if you read in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> instead of a single pair of coordinates, then you will want to only use sources from a single galaxy at a time, and you’ll want to have a header containing some form of a source ID, which the code will prompt you to provide (for example, <code class="docutils literal notranslate"><span class="pre">CSC</span> <span class="pre">ID</span></code>). Currently, this code can only handle a single galaxy at a time, but this can be fairly easily updated to search for a galaxy header in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> in the future.</p>
+<p>The downside of this procedure (as opposed to the manual HLA search) is that if you’re reading in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing all X-ray sources in a galaxy, then you will need to confirm the appropriate <em>HST</em> image for every XRB individually, which can take a lot of time for galaxies with many XRBs. However, you will not need to download the actual <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files to access them, which saves a ton of memory and makes reading in each image faster. This procedure also saves all of the <em>HST</em> information about the observation that you could need, which is an added bonus that comes in handy when you’re writing a paper on your results!</p>
+</section>
+<section id="python-hla-query-with-astroquery">
+<span id="sec-astroquery-search"></span><h2><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code><a class="headerlink" href="#python-hla-query-with-astroquery" title="Link to this heading">#</a></h2>
+<p>As an alternative to <code class="docutils literal notranslate"><span class="pre">PyVO</span></code>, one can use <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> to find and download HST data. <code class="docutils literal notranslate"><span class="pre">PyVO</span></code> is still a requirement for <code class="docutils literal notranslate"><span class="pre">astroquery</span></code>, so even if you decide not to use the <code class="docutils literal notranslate"><span class="pre">PyVO</span></code> method above, you’ll probably still need to install it. I use <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> in Chapter \ref{chap:astrodriz} as part of my drizzling workflow, as it will find the FLC files needed for the drizzling and mosaic creation for you. For more information, see Chapter \ref{sec:astrodriz-files}.</p>
+</section>
+<section id="handling-hst-data">
+<h2>Handling <em>HST</em> Data<a class="headerlink" href="#handling-hst-data" title="Link to this heading">#</a></h2>
+<p>The image data files from <em>HST</em> is given in <code class="docutils literal notranslate"><span class="pre">FITS</span></code> format<a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>. This may be read in as an <code class="docutils literal notranslate"><span class="pre">HDU</span></code><a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> object with some form of <code class="docutils literal notranslate"><span class="pre">python</span></code> code resembling:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="o">&lt;</span><span class="n">FITS</span> <span class="n">file</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">)</span>
+<span class="n">hdu</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The last line of that code will print a name and type of data stored in the <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, as well as the index you can use to access the data (<code class="docutils literal notranslate"><span class="pre">No.</span></code>). The <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code> element contains information regarding the image observation and reduction (e.g. the instrument configuration, calibrations applied, exposure time, etc.), and can be accessed with <code class="docutils literal notranslate"><span class="pre">.header</span></code> via <code class="docutils literal notranslate"><span class="pre">hdu[0].header</span></code>, where the index used is the index of the primary data, or <code class="docutils literal notranslate"><span class="pre">hdu['PRIMARY'].header</span></code>.</p>
+<p>Importantly, the image from which the photometry is extracted is (usually) stored under <code class="docutils literal notranslate"><span class="pre">SCI</span></code>. The header information under <code class="docutils literal notranslate"><span class="pre">SCI</span></code> may also contain a lot of good information, including image statistics like the signal-to-noise (if the image reduction team was thorough in their record keeping), so it’s a good idea to take a look. Keep in mind, if you choose to create a mosaic and set <code class="docutils literal notranslate"><span class="pre">build=False</span></code> in <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> (see Chapter \ref{sec:astrodriz}), the science data will be stored under <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code> rather than under its own extension.</p>
+<p>If you used the automatic HLA search method (<code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>), then you can read in the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file associated with each source using <code class="docutils literal notranslate"><span class="pre">ImageSearch.GetFITS()</span></code> (Chapter \ref{sec:script-imagesearch}), which requires you provide the name of the file saved by <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>, the source of interest, the detector (in my case, ACS/WFC or WFC3/UVIS), and the filter (e.g. F814W, F555W, etc). <code class="docutils literal notranslate"><span class="pre">GetFITS()</span></code> reads in the image URL and returns an <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, so instead of the code above (which you would use if you saved a <code class="docutils literal notranslate"><span class="pre">FITS</span></code> directly to your computer), you can instead use something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ImageSearch</span> <span class="kn">import</span> <span class="n">GetFITS</span>
+<span class="o">%</span><span class="n">run</span> <span class="n">ImageSearch</span><span class="o">.</span><span class="n">py</span>
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">GetFITS</span><span class="p">(</span><span class="n">infile</span><span class="o">=&lt;</span><span class="n">FindHST</span> <span class="n">savefile</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">source_id</span><span class="o">=&lt;</span><span class="n">source</span> <span class="n">ID</span><span class="o">&gt;</span><span class="p">,</span>
+              <span class="n">detector</span><span class="o">=&lt;</span><span class="s1">&#39;ACS/WFC&#39;</span> <span class="ow">or</span> <span class="s1">&#39;WFC3/UVIS&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=&lt;</span><span class="nb">filter</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>From the <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, a monochromatic image can be plotted using <code class="docutils literal notranslate"><span class="pre">imshow()</span></code> from <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot</span></code>. For these particular data, since light from a galaxy is logarithmic, you will also need to define a normalization parameter, <code class="docutils literal notranslate"><span class="pre">norm</span></code>. I tend to use <code class="docutils literal notranslate"><span class="pre">matplotlib.colors.Normalize()</span></code> with some specified <code class="docutils literal notranslate"><span class="pre">vmin</span></code> and <code class="docutils literal notranslate"><span class="pre">vmax</span></code> to change the scaling until the image looks right. For example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.wcs</span> <span class="kn">import</span> <span class="n">WCS</span> <span class="c1"># defining the coordinate system, e.g. RA/Dec</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">info</span><span class="p">())</span> <span class="c1"># Display the hdu info to get more information about what it contains</span>
+
+<span class="c1"># Setting up the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="c1"># hdu[&#39;SCI&#39;].header usually contains info needed to set up the image projection</span>
+<span class="c1"># But you may need to check your specific hdu file</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">WCS</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+          <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Filename: M101_acs_wfc_f435w_example.fits
+No.    Name      Ver    Type      Cards   Dimensions   Format
+  0  PRIMARY       1 PrimaryHDU     789   ()      
+  1  SCI           1 ImageHDU        86   (5302, 5318)   float32   
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>None
+</pre></div>
+</div>
+<img alt="_images/f119a1bacfe86f4de8f86c98a49eb7f36e69c2a446312be489d254e7fbb5e255.png" src="_images/f119a1bacfe86f4de8f86c98a49eb7f36e69c2a446312be489d254e7fbb5e255.png" />
+</div>
+</div>
+<p>To get a color image, you can use <code class="docutils literal notranslate"><span class="pre">make_lupton_rgb()</span></code> from <code class="docutils literal notranslate"><span class="pre">astropy.visualization</span></code> to generate a scaleable RGB color image, create your own logarithmic scaling algorithm, or simply use either
+<code class="docutils literal notranslate"><span class="pre">ImageSearch.MakePostage()</span></code> or <code class="docutils literal notranslate"><span class="pre">ImageSearch.PlotField()</span></code> from Chapter \ref{sec:script-imagesearch} (which does basically the same, but is a semi-automatic plotting function that will lead you through each of the steps). Below is an example of creating a color image using a custom logarithmic scaling algorithm, which is my preferred method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">reproject</span> <span class="kn">import</span> <span class="n">reproject_interp</span>    <span class="c1"># May need to install first</span>
+
+<span class="c1"># Calling FITS files as the RGB filters</span>
+<span class="n">hdu_r</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f814w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_g</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f555w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_b</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">data_g</span> <span class="o">=</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>   <span class="c1"># Pulling data from FITS HDU</span>
+
+<span class="c1"># Resizing images that don&#39;t match the base HDU, hdu_g (required)</span>
+<span class="k">if</span> <span class="n">hdu_r</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+  <span class="n">data_r</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reproject_interp</span><span class="p">(</span><span class="n">hdu_r</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">],</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span> <span class="n">data_r</span> <span class="o">=</span> <span class="n">hdu_r</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="k">if</span> <span class="n">hdu_b</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+  <span class="n">data_b</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reproject_interp</span><span class="p">(</span><span class="n">hdu_b</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">],</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span> <span class="n">data_b</span> <span class="o">=</span> <span class="n">hdu_b</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+<span class="c1"># Defining the min and max brightness cutoff of RGB image, per filter</span>
+<span class="c1"># These are obtained through trial and error.</span>
+<span class="n">clipmin_r</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">clipmax_r</span> <span class="o">=</span> <span class="mf">3.0</span>   
+<span class="n">clipmin_g</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">clipmax_g</span> <span class="o">=</span> <span class="mf">2.0</span>   
+<span class="n">clipmin_b</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">clipmax_b</span> <span class="o">=</span> <span class="mf">1.0</span>   
+
+<span class="c1"># Applying mag clipping and converting data to log</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">data_r</span><span class="p">,</span> <span class="n">clipmin_r</span><span class="p">,</span> <span class="n">clipmax_r</span><span class="p">))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">data_g</span><span class="p">,</span> <span class="n">clipmin_g</span><span class="p">,</span> <span class="n">clipmax_g</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">data_b</span><span class="p">,</span> <span class="n">clipmin_b</span><span class="p">,</span> <span class="n">clipmax_b</span><span class="p">))</span>
+
+<span class="c1"># Rescaling the filters based on their individual min and max values</span>
+<span class="n">r_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="n">g_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+<span class="n">b_scaled</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="n">rgb_scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">r_scaled</span><span class="p">,</span><span class="n">g_scaled</span><span class="p">,</span><span class="n">b_scaled</span><span class="p">))</span>
+
+<span class="c1"># Plotting RGB image</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">WCS</span><span class="p">(</span><span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;PRIMARY&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb_scaled</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: FITSFixedWarning: The WCS transformation has more axes (2) than the image it is associated with (0) [astropy.wcs.wcs]
+</pre></div>
+</div>
+<img alt="_images/270411719e611878f5a717e24cee942c9b241308948f3bbd85144eac4b78b80c.png" src="_images/270411719e611878f5a717e24cee942c9b241308948f3bbd85144eac4b78b80c.png" />
+</div>
+</div>
+<hr class="footnotes docutils" />
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>For my research, I focus specifically on wide and medium WCF3/UVIS filters because they have models that I can use for the color-magnitude diagram. More on that in Chapter \ref{chap:cmd}</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>All filters are usable for ACS/WFC, as models for all (including LP) are provided.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://pyvo.readthedocs.io/en/latest/">https://pyvo.readthedocs.io/en/latest/</a></p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/heasarc/fits_overview.html">https://heasarc.gsfc.nasa.gov/docs/heasarc/fits_overview.html</a></p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>For more information on <code class="docutils literal notranslate"><span class="pre">HDU</span></code> handling, see the official tutorial here: <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/index.html">https://docs.astropy.org/en/latest/io/fits/index.html</a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="csc-data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="astrodrizzle.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hla-image-search-manual">HLA Image Search (Manual)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Qiana Hunt
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

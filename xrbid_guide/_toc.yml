@@ -1,0 +1,14 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: chapters/title
+chapters:
+- file: chapters/intro
+- file: chapters/starting
+- file: chapters/csc-data
+- file: chapters/hst-data
+- file: chapters/astrodrizzle
+- file: chapters/photometry
+- file: chapters/astrometry
+- file: chapters/errors
