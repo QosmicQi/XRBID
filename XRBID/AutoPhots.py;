@@ -20,7 +20,7 @@ from photutils.detection import DAOStarFinder as DaoFind
 from photutils.aperture import CircularAperture
 from photutils.background import Background2D, MedianBackground
 
-from WriteScript import WriteReg
+from XRBID.WriteScript import WriteReg
 
 from acstools import acszpt # for zeropoint retrieval
 
