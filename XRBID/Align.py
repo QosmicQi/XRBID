@@ -16,8 +16,8 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
-from Sources import GetCoords
-from WriteScript import WriteReg
+from XRBID.Sources import GetCoords
+from XRBID.WriteScript import WriteReg
 
 #print("Changes to Align.py successful.")
 
