@@ -1,9 +1,9 @@
 # About XRBID
 XRBID is a custom `python` package created primarily to facilitate the identification of *HST* optical sources associated with X-ray binaries observed by *Chandra*. 
 
-For more information on this process or how these packages are used for practical research, visit the [XRBID Guidebook](https://qosmicqi.github.io/XRBID/chapters/intro.html)
+For more information on this process or how these packages are used for practical research, visit the [XRBID Guidebook](https://qosmicqi.github.io/XRBID/chapters/intro.html).
 
-# Installing XRBID in `python`
+# Installing XRBID
 
 From the directory where you would like to download XRBID, run in your command line terminal: 
 
