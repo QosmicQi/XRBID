@@ -6,6 +6,6 @@ setup(
 	version=__version__,
 	url='https://github.com/QosmicQi/XRBID',
 	author='Qiana Hunt',
-	author_email='qiana.hunt@uleth.ca'
+	author_email='qiana.hunt@uleth.ca',
 	py_modules=['XRBID']
 )
