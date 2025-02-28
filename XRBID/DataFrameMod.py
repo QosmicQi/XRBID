@@ -15,7 +15,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
-from Headers import heads, lowerheads, Class2, CSCID, Crossrefs, RA, Dec, ID, Bounds, X, Y
+from XRBID.Headers import heads, lowerheads, Class2, CSCID, Crossrefs, RA, Dec, ID, Bounds, X, Y
 
 imext = [0., 13500.] # extent of 
 
