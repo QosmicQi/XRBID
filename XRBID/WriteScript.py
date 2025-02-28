@@ -10,10 +10,10 @@ import numpy as np
 from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
-from DataFrameMod import FindUnique
+from XRBID.DataFrameMod import FindUnique
 import math
-from Sources import GetCoords
-from DataFrameMod import BuildFrame
+from XRBID.Sources import GetCoords
+from XRBID.DataFrameMod import BuildFrame
 
 X = "x" 
 Y = "y"
