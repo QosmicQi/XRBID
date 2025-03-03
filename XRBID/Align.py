@@ -411,7 +411,7 @@ def CorrectAstrometry(base_coords, cat_coords, autoresid=True, returnshifts=True
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CalcPU(df=False, theta=False, counts=False, std=[0,0]): 
+def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False): 
 	
 	"""
 
@@ -429,6 +429,15 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0]):
 	counts		[list, float]	: (optional) New counts of each X-ray source. 
 	std		[list] ([0,0])	: The standard deviation of the X-ray source son the HST image, in units
 					  arcseconds, along the x and y axis (e.g. [xstd,ystd]).
+	sig2search	[str] (False)	: In the event that an observation does not have a valid theta or counts
+					  value, allows the code to search for a default 2-sigma value under the 
+					  input header name. For example, CSC provides a 2-sigma major and minor 
+					  radii for the error ellipse of each source. By setting sig2search equal
+					  to the header under which the major radius is saved, user can request
+					  CalcPU to pull the major radius as the default 2-sigm positional 
+					  uncertainty for all sources for which the Kim et al. 2007 calculation
+					  cannot be made. This prevents the code for returning artificially small 
+					  radii when the positional uncertainty cannot be calculated. 
 
 	RETURNS
 	---------
@@ -450,15 +459,19 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0]):
 		oaa = theta[i]
 		C = log(counts[i]) 
 	
-		# 68% confidence
-		if  0 < C <= 2.1227: sig1.append(10**(0.1137*oaa - 0.4600*C - 0.2398))
-		elif 2.1227 < C <= 3.3000: sig1.append(10**(0.1031*oaa -0.1945*C - 0.8034))
-		else: sig1.append(0)
-
 		# 95% confidence
 		if 0 < C <= 2.1393: sig2.append(10**(0.1145*oaa - 0.4958*C + 0.1932))	
 		elif 2.1393 < C <= 3.3: sig2.append(10**(0.0968*oaa - 0.2064*C - 0.4260))
-		else: sig2.append(0)
+		elif sig2search: sig2.append(df[sig2search][i])
+		else: 	
+			print("Invalid observation for source", i, ". Setting radius to 0.")
+			sig2.append(0)
+
+		# 68% confidence
+		if  0 < C <= 2.1227: sig1.append(10**(0.1137*oaa - 0.4600*C - 0.2398))
+		elif 2.1227 < C <= 3.3000: sig1.append(10**(0.1031*oaa -0.1945*C - 0.8034))
+		elif sig2search: sig1.append(df[sig2search][i]*0.5)
+		else: sig1.append(0)
 
 	# Calculating the errors from the standard deviations
 	sig_std = sqrt(std[0]**2 + std[1]**2)
