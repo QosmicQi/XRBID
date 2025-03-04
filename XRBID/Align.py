@@ -6,7 +6,6 @@
 
 import re
 import numpy as np
-from numpy import log10 as log
 from numpy import median, mean, std, sqrt
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -457,7 +456,7 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False):
 	# Calculating the Kim07 X-ray based uncertainties
 	for i in range(len(theta)):
 		oaa = theta[i]
-		C = log(counts[i]) 
+		C = np.log10(counts[i]) 
 	
 		# 95% confidence
 		if 0 < C <= 2.1393: sig2.append(10**(0.1145*oaa - 0.4958*C + 0.1932))	
