@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -439,7 +439,8 @@ All other results can be left as is, or you may remove the properties that you w
 <span class="n">cd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span>
 <span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span>
 
-<span class="c1"># I saved these functions to a directory called &#39;pyfiles&#39;. Navigating to that folder first</span>
+<span class="c1"># On my computer, I saved these functions to a directory called &#39;pyfiles&#39;. </span>
+<span class="c1"># Navigating to that folder first.</span>
 <span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">Sources</span> <span class="kn">import</span> <span class="n">NewSources</span>
 <span class="o">%</span><span class="k">run</span> Sources.py   # run commands are only needed in an ipynb
@@ -448,7 +449,7 @@ All other results can be left as is, or you may remove the properties that you w
 
 <span class="n">NewSources</span><span class="p">(</span><span class="s2">&quot;testdata/cscresults_M101.vot&quot;</span><span class="p">)</span> <span class="c1"># I saved my .vot to a directory called &#39;testdata&#39;</span>
 
-<span class="c1">### This can also be done in the command line terminal, but without the second line. ###</span>
+<span class="c1">### This can also be done in the command line terminal, but without the %run command. ###</span>
 </pre></div>
 </div>
 </div>
@@ -770,7 +771,7 @@ All other results can be left as is, or you may remove the properties that you w
 <p>3492 rows × 28 columns</p>
 </div></div></div>
 </div>
-<p>This will read in the table exactly as written. Keep in mind, the code will need to point towards where <code class="docutils literal notranslate"><span class="pre">Sources.py</span></code> and your <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file(s) are saved. If you want to rename the headers or save the <code class="docutils literal notranslate"><span class="pre">Dataframe</span></code> to a file, you can do so using:</p>
+<p>This will read in the table exactly as written. Keep in mind, the code will need to point towards where <code class="docutils literal notranslate"><span class="pre">Sources.py</span></code> and your <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file(s) are saved on your computer! If you want to rename the headers or save the <code class="docutils literal notranslate"><span class="pre">Dataframe</span></code> to a file, you can do so using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NewSources</span><span class="p">(</span><span class="s2">&quot;testdata/cscresults_M101.vot&quot;</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
            <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;testdata/cscresults_M101.frame&quot;</span><span class="p">)</span>
 </pre></div>
