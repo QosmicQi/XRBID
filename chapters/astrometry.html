@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -487,9 +487,7 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
+9 calibrators found.
 Saving testdata/M101_calibrators.reg
 </pre></div>
 </div>
@@ -563,12 +561,6 @@ Saving testdata/M101_calibrators.reg
 <span class="n">display</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">)</span>
 
 <span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;testdata/M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
-
-<span class="c1"># Saving the 1 and 2 sigma region files for DS9 use.</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_cscsources_1sig.reg&#39;</span><span class="p">)</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_cscsources_2sig.reg&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -882,13 +874,378 @@ Saving testdata/M101_calibrators.reg
   </tbody>
 </table>
 <p>3492 rows × 30 columns</p>
-</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving testdata/M101_cscsources_1sig.reg
-Saving testdata/M101_cscsources_2sig.reg
+</div></div></div>
+</div>
+<p>Depending on what information you chose to pull from <code class="docutils literal notranslate"><span class="pre">CSCview</span></code>, you may see that some sources have multiple observations listed in your DataFrame. These different observations may have different 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii associated with them. To get the best localization of each X-ray source, we should select the observation with the smallest 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. I use the code below to select what I think is likely the best observation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="n">FindUnique</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">M101_best</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span> 
+    <span class="c1"># Search for all instances of each source</span>
+    <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="s2">&quot;CSC ID = &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+    
+    <span class="c1"># Specifically focus on those with a valid number of counts</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">])</span>
+        
+    <span class="c1"># If none of the events have a valid count, try to avoid sources where counts = NaN</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts != NaN&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts != NaN&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Otherwise, all instances with counts = 0 have the same measurements, so it doesn&#39;t matter</span>
+    <span class="k">else</span><span class="p">:</span> <span class="k">pass</span><span class="p">;</span>
+    
+    <span class="c1"># Take the source with the smallest 2sig. If there&#39;s more than one, take the first on the list.</span>
+    <span class="n">Tempbest</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;2Sig =&lt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">Temp</span><span class="p">[</span><span class="s2">&quot;2Sig&quot;</span><span class="p">])))</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1"># Add the chosen source observation to the new DataFrame</span>
+    <span class="n">M101_best</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">Tempbest</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">M101_best</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Separation</th>
+      <th>CSC ID</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>ExpTime</th>
+      <th>Theta</th>
+      <th>Err Ellipse Major</th>
+      <th>Err Ellipse Minor</th>
+      <th>Err Ellipse Angle</th>
+      <th>Significance</th>
+      <th>...</th>
+      <th>HM Ratio lolim</th>
+      <th>HM Ratio hilim</th>
+      <th>MS Ratio</th>
+      <th>MS Ratio lolim</th>
+      <th>MS Ratio hilim</th>
+      <th>Counts</th>
+      <th>Counts lolim</th>
+      <th>Counts hilim</th>
+      <th>1Sig</th>
+      <th>2Sig</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>98379.672624</td>
+      <td>1.280763</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.616490</td>
+      <td>-0.485322</td>
+      <td>234.492581</td>
+      <td>216.678502</td>
+      <td>252.306660</td>
+      <td>0.493011</td>
+      <td>0.988256</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.951564</td>
+      <td>2CXO J140312.7+542055</td>
+      <td>210.803345</td>
+      <td>54.348663</td>
+      <td>141298.623812</td>
+      <td>NaN</td>
+      <td>0.548072</td>
+      <td>0.380093</td>
+      <td>86.863933</td>
+      <td>2.648649</td>
+      <td>...</td>
+      <td>-0.080575</td>
+      <td>1.000000</td>
+      <td>-0.999375</td>
+      <td>-1.000000</td>
+      <td>-0.715178</td>
+      <td>7.427581</td>
+      <td>0.000000</td>
+      <td>53.172550</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.480949</td>
+      <td>2CXO J140312.5+542053</td>
+      <td>210.802221</td>
+      <td>54.348072</td>
+      <td>98379.672624</td>
+      <td>1.321652</td>
+      <td>0.296164</td>
+      <td>0.295733</td>
+      <td>84.016491</td>
+      <td>19.554042</td>
+      <td>...</td>
+      <td>0.026858</td>
+      <td>0.158026</td>
+      <td>-0.316052</td>
+      <td>-0.364147</td>
+      <td>-0.265459</td>
+      <td>252.846172</td>
+      <td>234.295673</td>
+      <td>271.396671</td>
+      <td>0.492957</td>
+      <td>0.988086</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5.227586</td>
+      <td>2CXO J140313.1+542052</td>
+      <td>210.804553</td>
+      <td>54.347994</td>
+      <td>132129.439441</td>
+      <td>2.762119</td>
+      <td>0.880650</td>
+      <td>0.578584</td>
+      <td>29.467809</td>
+      <td>3.421053</td>
+      <td>...</td>
+      <td>0.130543</td>
+      <td>0.906309</td>
+      <td>-0.868207</td>
+      <td>-0.973766</td>
+      <td>-0.718926</td>
+      <td>23.229213</td>
+      <td>16.216620</td>
+      <td>30.241806</td>
+      <td>0.561749</td>
+      <td>1.188360</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>9.124404</td>
+      <td>2CXO J140313.5+542053</td>
+      <td>210.806667</td>
+      <td>54.348188</td>
+      <td>98379.672624</td>
+      <td>1.410741</td>
+      <td>0.633314</td>
+      <td>0.466131</td>
+      <td>58.539300</td>
+      <td>1.739130</td>
+      <td>...</td>
+      <td>0.194254</td>
+      <td>1.000000</td>
+      <td>-0.999375</td>
+      <td>-1.000000</td>
+      <td>-0.370394</td>
+      <td>7.040343</td>
+      <td>2.992146</td>
+      <td>11.088540</td>
+      <td>0.593981</td>
+      <td>1.300029</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>550</th>
+      <td>883.411465</td>
+      <td>2CXO J140138.8+541527</td>
+      <td>210.411860</td>
+      <td>54.257747</td>
+      <td>142703.894177</td>
+      <td>NaN</td>
+      <td>8.647887</td>
+      <td>6.103176</td>
+      <td>111.468541</td>
+      <td>4.277778</td>
+      <td>...</td>
+      <td>-0.113054</td>
+      <td>0.935041</td>
+      <td>-0.792005</td>
+      <td>-0.932542</td>
+      <td>-0.617739</td>
+      <td>38.579199</td>
+      <td>25.521624</td>
+      <td>51.636773</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>551</th>
+      <td>884.529187</td>
+      <td>2CXO J140450.6+541721</td>
+      <td>211.211172</td>
+      <td>54.289330</td>
+      <td>139822.610581</td>
+      <td>9.951487</td>
+      <td>1.357801</td>
+      <td>1.057531</td>
+      <td>95.305118</td>
+      <td>8.976584</td>
+      <td>...</td>
+      <td>-0.099313</td>
+      <td>0.204247</td>
+      <td>-0.374766</td>
+      <td>-0.472829</td>
+      <td>-0.270456</td>
+      <td>155.562531</td>
+      <td>135.448493</td>
+      <td>174.718757</td>
+      <td>0.793067</td>
+      <td>1.558488</td>
+    </tr>
+    <tr>
+      <th>552</th>
+      <td>886.380054</td>
+      <td>2CXO J140216.3+543313</td>
+      <td>210.567813</td>
+      <td>54.553731</td>
+      <td>131222.705704</td>
+      <td>13.887674</td>
+      <td>2.480733</td>
+      <td>2.445301</td>
+      <td>115.654637</td>
+      <td>6.783292</td>
+      <td>...</td>
+      <td>-0.025609</td>
+      <td>0.271705</td>
+      <td>-0.222361</td>
+      <td>-0.322923</td>
+      <td>-0.118051</td>
+      <td>149.738677</td>
+      <td>121.454705</td>
+      <td>176.358886</td>
+      <td>1.676834</td>
+      <td>3.103807</td>
+    </tr>
+    <tr>
+      <th>553</th>
+      <td>890.405834</td>
+      <td>2CXO J140445.4+541452</td>
+      <td>211.189426</td>
+      <td>54.247897</td>
+      <td>81018.165114</td>
+      <td>NaN</td>
+      <td>4.581313</td>
+      <td>2.651713</td>
+      <td>135.472019</td>
+      <td>4.411765</td>
+      <td>...</td>
+      <td>0.005621</td>
+      <td>0.434104</td>
+      <td>0.999375</td>
+      <td>0.501562</td>
+      <td>1.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>36.202173</td>
+      <td>0.487466</td>
+      <td>0.974933</td>
+    </tr>
+    <tr>
+      <th>554</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>14276.493764</td>
+      <td>3.416463</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>7.591890</td>
+      <td>4.313574</td>
+      <td>10.870206</td>
+      <td>0.738103</td>
+      <td>1.710737</td>
+    </tr>
+  </tbody>
+</table>
+<p>555 rows × 30 columns</p>
+</div></div></div>
+</div>
+<p>You now have the RA and Dec of each source (ideally updated based on the results from your astrometric correction) and the best positional uncertainty radii of each one. Save these radii as region files that can be plotted over the <em>HST</em> image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> using <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the 1 and 2 sigma region files for DS9 use.</span>
+<span class="c1"># The 2sig region files have the CSC ID printed above each source.</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
+         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
+         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving testdata/M101_bestrads_2sig.reg
+Saving testdata/M101_bestrads_1sig.reg
 </pre></div>
 </div>
 </div>
 </div>
-<p>You now have the RA and Dec of each source (ideally updated based on the results from your astrometric correction) and the positional uncertainty radii of each one. Now when you plot these region files on your <em>HST</em> image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, you will see <em>exactly</em> where each XRB is expected to be found and which optical sources are associated with them. From here, we can get into the optical analysis, including: selecting the correct optical counterpart, extracting their photometric properties, and comparing those properties to theoretical models to estimate the donor star mass!</p>
+<p>Now when you plot these region files on your <em>HST</em> image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, you will see <em>exactly</em> where each XRB is expected to be found and which optical sources are associated with them. From here, we can get into the optical analysis, including: selecting the correct optical counterpart, extracting their photometric properties, and comparing those properties to theoretical models to estimate the donor star mass!</p>
+<figure class="align-default" id="fig-positional-uncertainties">
+<a class="reference internal image-reference" href="../_images/positional_uncertainties.png"><img alt="../_images/positional_uncertainties.png" src="../_images/positional_uncertainties.png" style="width: 750px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Examples of the 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainties of <em>CXO</em> sources on an <em>HST</em> image, after applying the astrometric correction. By eye, the central source is clearly associated with a background galaxy, while the others are likely genuine XRBs.</span><a class="headerlink" href="#fig-positional-uncertainties" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
 </section>
 
