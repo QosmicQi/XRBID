@@ -15,5 +15,5 @@ From this point on, the methodolgy for identifying the best candidate counterpar
 
 ## Incorporating Other Catalogs 
 
-One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they've identified. You should then create a DS9 region file with `WriteScript.WriteReg()`. This will become important as you attempt to classify the optical counterparts of each X-ray source. 
+One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they've identified. You should then create a DS9 region file of those sources with `WriteScript.WriteReg()`. This will become important as you attempt to classify the optical counterparts of each X-ray source. 
 
