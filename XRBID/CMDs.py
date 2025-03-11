@@ -23,7 +23,6 @@ pd.options.mode.chained_assignment = None
 from XRBID.DataFrameMod import Find, BuildFrame
 from XRBID.Sources import LoadSources
 from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
-#from XRBID.DataFrameMod import SaveDF
 
 default_aps = [0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
 
@@ -820,7 +819,7 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 			Mags = BuildFrame(headers=[ID_header, X, Y, V, B, I, U, VI, BV, BI], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], V_corr, B_corr, I_corr, V_corr-I_corr, B_corr-V_corr, B_corr-I_corr])
 
-		SaveDF(Mags, savefile)
+		Mags.to_csv(savefile)
 
 	try: 
 		frame[headers[0]] = V_corr
@@ -902,7 +901,7 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 			Mags = BuildFrame(headers=[ID_header, X, Y, header], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], corr])
 
-		SaveDF(Mags, savefile)
+		Mags.to_csv(savefile)
 
 	try: 
 		frame[header] = corr.tolist()[0]

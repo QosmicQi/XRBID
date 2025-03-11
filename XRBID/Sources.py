@@ -1,9 +1,10 @@
 ###################################################################################
 ##########		For reading DataFrames for CSC sources		########### 
-##########		Last update: Nov. 26, 2024 			########### 
-##########		Update desc: Standardized parameters,		########### 
-##########		  added descriptions, and removed unused	########### 
-##########		  or obsolete code, added MakePostage()		########### 
+##########		Last update: March 4, 2025 			########### 
+##########		Update desc: Updated DaoClean and Crossref	########### 
+##########		  to generalize the code, allowing greater	########### 
+##########		  flexibility. Revamped GetDaoPhots to match	########### 
+##########		  new, cleaner method. 				########### 
 ###################################################################################
 
 import re
@@ -355,20 +356,28 @@ def SourceList(savefile, df=None, columns=['ID']):
 
 ###-----------------------------------------------------------------------------------------------------
 
-def DaoClean(daosources=None, sources=None, wiggle=0): 
+def DaoClean(daosources=None, sources=None, sourceid="ID", coordsys="img", coordheads=False, radheader="Radius", wiggle=0): 
 
 	"""
 	Cleaning the DaoFind sources to exclude any candidate that falls outside of the radius of the 
 	X-ray sources, taking into account given wiggle room (in pixels). Sources should be read in as
-	a dataframe with image coordinates (X, Y) and 2-sig radius saved under header Radius.
+	a dataframe with image coordinates (X, Y) and 2-sig radius saved under header Radius. The best
+	practice is to save both the image and fk5 coordinates from the DaoFind region files to a single
+	DataFrame per field/filter, to allow better flexibility. 
 	
 	PARAMETERS
 	----------
-	daosources	[df.DataFrame]	: DataFrame containing the coordinates of sources identified DaoFind,
-					  where the coordinates should be saved under the headers 'X' and 'Y'
-	sources		[df.DataFrame]	: DataFrame containing the X-ray sources, with 2sigma radii saved under
-					  the header 'Radius' and coordinates under 'X' and 'Y'
-	wiggle		[float] (0)	: Additional pixels to add to the search radius, giving a more lenient search
+	daosources	[df.DataFrame]	: DataFrame containing the coordinates of sources identified by DaoFind.
+	sources		[df.DataFrame]	: DataFrame containing the X-ray sources (or others of interest), their
+					  coordinates, and their 2sig radii. 
+	sourceid	[str] ('ID')	: Name of the header under which the ID of each source is stored.
+	coordsys	[str] ('img')	: Coordinate system defining the units of the coordinates and the 2sigma radius. 
+					  Options are 'img' (pix, default) or 'fk5' (coordinates in degs, radii in arcsecs). 
+	coordheads	[list] 		: Name of the headers under which the coordinates are saved. These should be the same 
+					  between daosources and sources. If coordheaders is not given, assumes ['X','Y'] if
+					  the unit is 'img' and ['RA', 'Dec'] if the unit is 'fk5'. 
+	radheader	[str] ('Radius'): Name of header under which the 2sig radius is saved. 
+	wiggle		[float] (0)	: Additional pixels/degrees to add to the search radius for a less stringent search.
 	
 	RETURNS
 	---------
@@ -378,53 +387,57 @@ def DaoClean(daosources=None, sources=None, wiggle=0):
 	"""
 
 
-	try: daosources = daosources.copy()
+	try: 
+		daosources = daosources.copy()
+		sources = sources.copy()
 	except: pass;
 
 	# Retrieving headers from the DataFrames
 	daoheads = daosources.columns.values.tolist()
 	headlist = daosources.columns.values.tolist()
-	headlist.append("ID")
+	headlist.append(sourceid)
 
-	### Cleaning daofind sources to only include those around our sample sources
+	arcsec2deg = 0.000277778
+
+	# If the coordinate system is fk5, assumes the radius is in arcseconds and converts to degrees
+	if coordsys == 'fk5': 
+		print("WARNING: Due to the way HST images are stretched and plotted, you may find using the fk5 coordinate system gives odd results. It is recommended to use image (pixel) coordinates. If fk5 are used, please check results manually.")
+		sources[radheader] = sources[radheader]*arcsec2deg
+		if not coordheads: # checks if the coordinate header is given. If not, set to [RA, Dec]
+			coordheads = ['RA', 'Dec']
+	elif coordsys == 'img': 
+		if not coordheads: coordheads = ['x', 'y']
+	else: print('Coordinate system not recognized.')
+
+	# Cleaning daofind sources to only include those around our sample sources
 	daocleaned = np.empty((0,len(headlist)))
 
 	print("Cleaning DAOFind sources. This will take a few minutes. Please wait.. ")
 	for i in range(len(sources)): 
 		# Properties of each Lehmer source
-		temprad = sources[Radius][i]
-		xtemp = sources[X][i]
-		ytemp = sources[Y][i]
-		tempid = sources[ID][i]
+		temprad = sources[radheader][i]
+		xtemp = sources[coordheads[0]][i]
+		ytemp = sources[coordheads[1]][i]
+		tempid = sources[sourceid][i]
 
-		if xtemp >=0 and ytemp >= 0:
-			# Search area around each source
-			#print(temprad, xtemp, ytemp)
-			tempxmax = xtemp+temprad+wiggle
-			tempxmin = xtemp-temprad-wiggle
-			tempymax = ytemp+temprad+wiggle
-			tempymin = ytemp-temprad-wiggle
+		# Search area around each source
+		print(temprad, xtemp, ytemp)
+		tempxmax = xtemp+temprad+wiggle
+		tempxmin = xtemp-temprad-wiggle
+		tempymax = ytemp+temprad+wiggle
+		tempymin = ytemp-temprad-wiggle
 
-		#print(tempxmax, tempxmin, tempymax, tempymin)
-		# Finding the coordinates of daofind sources within the square area of the Lehmer source
-		try: 
-			tempdao = Find(daosources, ["green x >= " + str(tempxmin), "green x <= " + str(tempxmax), \
-				                 "green y >= " + str(tempymin), "green y <= " + str(tempymax)])
+		# Finding the coordinates of daofind sources within the square area of each source
+		# Then refine search to look within the search radius of
+		# (This method is quicker than comparing all daosources to the source radius)
+		tempdao = Find(daosources, [coordheads[0] + " >= " + str(tempxmin), coordheads[0] + " <= " + str(tempxmax), \
+				            coordheads[1] + " >= " + str(tempymin), coordheads[1] + " <= " + str(tempymax)])
 
-			for j in range(len(tempdao)): 
-				if sqrt((tempdao[Greenx][j] - xtemp)**2 + (tempdao[Greeny][j] - ytemp)**2) <= temprad+wiggle:
-					tempstack = [tempdao[k][j] for k in daoheads]
-					tempstack.append(tempid)
-					daocleaned = np.vstack((daocleaned, tempstack))
-		except: 
-			tempdao = Find(daosources, ["x >= " + str(tempxmin), "x <= " + str(tempxmax), \
-				                 "y >= " + str(tempymin), "y <= " + str(tempymax)])
-
-			for j in range(len(tempdao)): 
-				if sqrt((tempdao[X][j] - xtemp)**2 + (tempdao[Y][j] - ytemp)**2) <= temprad+wiggle:
-					tempstack = [tempdao[k][j] for k in daoheads]
-					tempstack.append(tempid)
-					daocleaned = np.vstack((daocleaned, tempstack))
+		for j in range(len(tempdao)): 
+			if sqrt((tempdao[coordheads[0]][j] - xtemp)**2 + (tempdao[coordheads[1]][j] - ytemp)**2) <= temprad+wiggle:
+				tempstack = [tempdao[k][j] for k in daoheads]
+				tempstack.append(tempid)
+				daocleaned = np.vstack((daocleaned, tempstack))
 
 	print("DONE WITH CLEANING. CREATING DATAFRAME...")
 
@@ -435,149 +448,7 @@ def DaoClean(daosources=None, sources=None, wiggle=0):
 
 ###-----------------------------------------------------------------------------------------------------
 
-def GetDaoPhots(df=None, ann="10-3", gal="M83", getcoords=True): 
-
-	"""
-	Retreiving the photometry for each Dao No source in a given DataFrame. 
-	Returns V, B, I, V-I, B-V, and B-I photometry (already adjusted) from 
-	phots_f#_ann##-#.frame files. 	
-	
-	Example use: 
-	A DataFrame is created containing the optical photometry of all DaoFind sources in HST field 1,
-	with a background annulus of radius 3 to 10 pixels, and saved as phots_f1_ann10-3.frame.
-	DaoClean() returns a second DataFrame with the IDs (Dao No) of candidate optical counterparts. 
-	Running GetDaoPhots on the second DataFrame 
-
-	PARAMETERS
-	----------
-	df	[df.DataFrame]	: DataFrame containing the coordinates of sources identified DaoFind,
-					  where the coordinates should be saved under the headers 'X' and 'Y'
-	sources		[df.DataFrame]	: DataFrame containing the X-ray sources, with 2sigma radii saved under
-					  the header 'Radius' and coordinates under 'X' and 'Y'
-	wiggle		[float] (0)	: Additional pixels to add to the search radius, giving a more lenient search
-	
-	RETURNS
-	---------
-	GoodSources	[df.DataFrame]	: DataFrame equivalent to 'daosources' with only sources that fall within
-					  the radii of the sources in the DataFrame 'sources.'
-
-	
-	"""
-
-	sources = df.copy()
-
-	print("Loading Daofind source magnitudes. May take a few minutes.")
-	
-	# Loading the sources for each field
-
-	Dao1 = LoadSources("daomags_f1_ann"+ann+".frame")
-	Dao2 = LoadSources("daomags_f2_ann"+ann+".frame")
-	Dao3 = LoadSources("daomags_f3_ann"+ann+".frame")
-	Dao4 = LoadSources("daomags_f4_ann"+ann+".frame")
-	Dao5 = LoadSources("daomags_f5_ann"+ann+".frame")
-	Dao6 = LoadSources("daomags_f6_ann"+ann+".frame")
-	Dao7 = LoadSources("daomags_f7_ann"+ann+".frame")
-
-	# Creating a searchable list of daosource DataFrames
-	Daos = [Dao1, Dao2, Dao3, Dao4, Dao5, Dao6, Dao7]
-
-	# List for gathering necessary values
-	v = []
-	b = []
-	i = []
-	vi = []
-	bv = []
-	bi = []
- 
-	if getcoords: 
-		Coords1 = GetCoords(gal+"_f1_f555w_daosources.reg") 
-		Coords2 = GetCoords(gal+"_f2_f547m_daosources.reg") 
-		Coords3 = GetCoords(gal+"_f3_f547m_daosources.reg") 
-		Coords4 = GetCoords(gal+"_f4_f547m_daosources.reg") 
-		Coords5 = GetCoords(gal+"_f5_f547m_daosources.reg") 
-		Coords6 = GetCoords(gal+"_f6_f547m_daosources.reg") 
-		Coords7 = GetCoords(gal+"_f7_f547m_daosources.reg")
-		Coords = [Coords1, Coords2, Coords3, Coords4, Coords5, Coords6, Coords7]
-		xcoords = []
-		ycoords = []
-
-	print("\nGetting source magnitudes...\n")
-
-	# Going through each of the sources in the given DataFrame
-	for j in range(len(sources)):
-		
-		# Gathering the field and Dao No. of current source
-		f = str(sources["Field"][j])
-		dao = sources["Dao No"][j]
-
-
-		# Choosing the correct Daosources using the field number
-		# Daos is a list of the Daomags
-		DaoTemp = Daos[int(f) - 1]
-		
-		# Choosing the sourcce from Dao No. (daomags does not have Dao No.)
-		# DaoTemp = Find(Dao, "Dao No = " + dao)
-		
-		# Gathering and calculating magnitudes
-		try: 
-			v.append(DaoTemp["V"][dao])
-			b.append(DaoTemp["B"][dao])
-			i.append(DaoTemp["I"][dao])
-			vi.append(v[-1] - i[-1])
-			bv.append(b[-1] - v[-1])
-			bi.append(b[-1] - i[-1])
-			# For some reason, this is wrong in the file, and I don't understand why
-			#vi.append(DaoTemp["V-I"][dao])
-			#bv.append(DaoTemp["B-V"][dao])
-			#bi.append(DaoTemp["B-I"][dao])
-		except: # If no sources is given (in case of LMXB), set as NaN
-			v.append(np.nan)
-			b.append(np.nan)
-			i.append(np.nan)
-			vi.append(np.nan)
-			bv.append(np.nan)
-			bi.append(np.nan)
-
-		# Gather coords if requested
-		if getcoords: 
-			try:
-				xcoords.append(Coords[int(f)-1][0][int(dao)])
-				ycoords.append(Coords[int(f)-1][1][int(dao)])
-			except: 
-				xcoords.append(np.nan)
-				ycoords.append(np.nan)
-
-	print("Done!")
-	if getcoords: 
-		return v, b, i, vi, bv, bi, xcoords, ycoords
-	else: return v, b, i, vi, bv, bi
-
-###-----------------------------------------------------------------------------------------------------
-
-def ListFiles(search='*'): 
-
-	""" 
-	For getting a list of files from the current directory.
-
-	PARAMETERS
-	----------
-	search	[str] ('*')	:  Search criteria to narrow down the list of files
-	
-	RETURNS
-	---------
-	temp 	[list]		: List of files matching the search criteria
-
-	"""
-
-	temp = []
-	for file in glob.glob(search): 
-		temp.append(file)
-	temp.sort()
-	return temp
-
-###-----------------------------------------------------------------------------------------------------
-
-def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt", search_radius=30, catalogs=None, verbose=True, getcoords=False, coordsys="img", coordheads=None): 
+def Crossref(df=None, regions=False, catalogs=False, coords=False, sourceid="ID", search_radius=3, coordsys="img", coordheads=False, outfile="crossref_results.txt", verbose=True): 
 
 	"""
 	From input DataFrame and/or region files (in image coordinate format), finds overlaps within a given 
@@ -588,6 +459,31 @@ def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt",
 
 	NOTE: There is an error in this where if the first region file doesn't have a counterpart in the first 
 	entry of the overlap file, the first entry may be split into multiple entries. Check file.
+
+	PARAMETERS
+	-----------
+	df		[pd.DataFrame]	: DataFrame containing the coordinates of the sources for which the counterparts 
+					  will be found in the given region files or catalogs. 
+	regions 	[list]		: List of filenames for regions to cross-reference sources from. This should be
+					  in the same coordinate system as the units in df. 
+	catalogs	[list]		: Name of the catalogs associated with the input region files. This will be used to
+					  define the ID header for sources in each region file. If none is given, then the  
+					  region file name is used as the respective source ID header.
+	coords 		[list]		: List of coordinates to cross-reference; can be given instead of regions. 
+	sourceid	[str] ('ID')	: Name of header containing the ID of each source in df. 
+	search_radius	[list] (3)	: Search radius (in appropriate units for the coordinate system) around each source in df. 
+					  Can be read in as a single value or a list of values (for unique radii).
+	coordsys	[str] ('img')	: Coordinate system of the region files. NOTE: there may be issues reading in 'fk5'. 
+				   	  'img' (pixel) coordinates are recommended. 
+	coordheads	[list]		: Name of header under which coordinates are stored. Will assume ['x','y'] if coordsys='img'
+					  or ['RA','Dec'] if coordsys is 'fk5'. 
+	verbose 	[bool] (True)	: Set to False to avoid string outputs. 
+	outfile		[str]		: Name of output file to save matches to. By default, saves to a file called 'crossref_results.txt'
+
+	RETURNS
+	---------
+	Matches		[pd.DataFrame]	: DataFrame containing the original ID of each source, its coordinates,  and the ID of all 
+					  corresponding matches in each of the input region files or coordinates. 
 	
 	"""
 
@@ -619,39 +515,37 @@ def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt",
 	blockend = 0
 	if verbose: print("Finding cross-references between sources. This will take a few minutes. Please wait.. ")
 	for i in range(len(sources)): # for each source in the DataFrame
-		# Properties of each Lehmer source
+		# Properties of each source
 		if coordsys == "img" and coordheads == None: 
 			try: 
 				xtemp = sources[X][i]
 				ytemp = sources[Y][i]
 			except: 
-				xtemp = sources["x (mosaic)"][i]
-				ytemp = sources["y (mosaic)"][i]
+				xtemp = sources["x"][i]
+				ytemp = sources["y"][i]
 		elif coordsys == "fk5" and coordheads == None: 
 			xtemp = sources["RA"][i]
 			ytemp = sources["Dec"][i]
 		elif coordheads: 
-			xtemp = sources[coordheads[0]]
-			ytemp = sources[coordheads[1]]
+			xtemp = sources[coordheads[0]][i]
+			ytemp = sources[coordheads[1]][i]
 
-		tempid = sources[ID][i]
+		tempid = sources[sourceid][i]
 		tempn = 0  
 		# tempn keeps track of the number of overlap sources identified in the current list for the current base source (used as index)
 
-		#if xtemp >=0 and ytemp >= 0: # Removed because I want to print all crossrefs, not just 'valid' sources within the image.
 		# Search area around each source
 		tempxmax = xtemp+search_radius[i]
 		tempxmin = xtemp-search_radius[i]
 		tempymax = ytemp+search_radius[i]
 		tempymin = ytemp-search_radius[i]
 
-		#print(tempxmax, tempxmin, tempymax, tempymin)
-
-		# Adding each new source to the list
+		# Adding each new source to the list, starting as a list of "None" values
 		# If no counterparts are found, the source will appear with "None" for counterparts.
 		tempids = [None]*(len(idlist) + 1)
-		tempids[0] = tempid 
-		masterlist.append(tempids)
+		tempids[0] = tempid 			# adding original source ID to the front
+		tempids = [xtemp, ytemp] + tempids 	# adding original coordinates to the front
+		masterlist.append(tempids)		# saving to the full source list
 
 		# Searching each list of sources from each region file to identify overlaps
 		for j in range(len(idlist)): # Number of lists (region files) to search through 
@@ -667,16 +561,17 @@ def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt",
 						# The following will cycle through all indices from blockend to blockend+tempn 
 						# to see where the last open space is
 						for n in range(tempn+1):
-							if masterlist[blockend+n][j+1] == None: 
-								masterlist[blockend+n][j+1] = idlist[j][k]
+							if masterlist[blockend+n][j+3] == None: 
+								masterlist[blockend+n][j+3] = idlist[j][k]
 								break; # After the last open space, break the chain.
 							else: pass;
 					except: 
 						# Exception will be raised once we reach the end of the current list without finding a free space. 
 						# Add a new line, if that's the case.
 						tempids = [None]*(len(idlist) + 1) # keeps track of the ids associated with the identified source
-						tempids[0] = tempid
-						tempids[j+1] = idlist[j][k]
+						tempids[0] = tempid	# adding current source id to front of list
+						tempids = [xtemp, ytemp] + tempids	# adding current coordinates to list
+						tempids[j+3] = idlist[j][k]
 						masterlist.append(tempids)
 
 					tempn = tempn + 1 # adds a count to the identified sources for this file.
@@ -688,10 +583,14 @@ def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt",
 	# If catalogs not given, use the name of the region files as the headers of the DataFrame
 	if not catalogs:
 		catalogs = []
-		for i in regions: catalogs.append(i.split(".reg")[0]) 
+		try: 
+			for r in regions: catalogs.append(r.split(".reg")[0]) 
+		except: 
+			for i in len(range(xlist)): catalogs.append("ID "+str(i))
+	else: catalogs = [cat+" ID" for cat in catalogs]
 
 	# Adding catalogs to the headers to be read into the DataFrame
-	headlist = [ID]
+	headlist = [coordheads[0], coordheads[1], sourceid]
 	for i in catalogs: headlist.append(i)
 
 	vallist = []
@@ -699,10 +598,63 @@ def Crossref(df=None, regions=None, coords=None, outfile="crossref_results.txt",
 	temp_array = np.array(masterlist).T
 	for i in range(len(temp_array)): vallist.append(temp_array[i].tolist())
 
-	GoodSources = BuildFrame(headers=headlist, values=vallist)
-	GoodSources.to_csv(outfile)
+	Matches = BuildFrame(headers=headlist, values=vallist)
+	Matches.to_csv(outfile)
 
-	return GoodSources
+	return Matches
+
+
+###-----------------------------------------------------------------------------------------------------
+
+def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=0): 
+
+	"""
+	Retrieving the photometry for each daosource by their IDs as listed in a given DataFrame. 
+	Usually, this is run after running DaoClean() on X-ray sources, followed by Crossref()
+	to identify all daosource IDs across all filters for each point source from DaoClean().
+
+	PARAMETERS
+	----------
+	df		[pd.DataFrame]	: DataFrame containing the source ID of each point source in the filters of interest.
+	photfiles	[list]		: List of the files containing the photometry to pull. This assumes the file is saved
+					  as it is given by photutils aperture photometry, with the ID of each point source listed
+					  under the header 'id'. 
+	idheads		[list]		: List of the headers under which each ID is found, in the order the associated photometric
+					  file is given in photfiles.
+	filters		[list]		: List of the name of the filters for each file in photfiles.
+	magheader	[str]		: Name of the header under which the photometry of each point source is stored in each photfile. 
+					  By default, sets the header to 'aperture_mag', but if you performed and saved an aperture correction
+					  (through AutoPhots.RunPhots or manually), you may wish to set this to 'aperture_mag_corr'.
+	dmod		[float]		: Distance modulus (equal to 5*np.log10(distance)-5) used to convert from apparent to absolute 
+					  magnitudes. Defaults to 0 to assume magnitudes are already converted, or to return photometry in
+					  apparent mags.
+	
+	RETURNS
+	---------
+	df_phots	[pd.DataFrame]	: Returns df with the magnitudes and colors pulled from photfiles appended as additional headers.
+	
+	"""
+
+	df_phots = df.copy()
+	
+	# Starting by adding each fitler to the DataFrame as a header under which the photometry will be pulled
+	# Then searching the associated photometric file for the measurements of the identified point source
+	for i,f in enumerate(filters): 
+		# Defining new header for current filter
+		df_phots[f] = [np.nan]*len(df_phots) 	# defaults to np.nan if no ID is found. 
+
+		print("Searching", photfiles[i])
+
+		# Reading in photometry for the current filter
+		tempphots = pd.read_csv(photfiles[i], delimiter=" ", comment="#")
+		
+		# For each ID in source DataFrame, search for the corresponding photometry in temphots
+		for j,tempid in enumerate(df_phots[idheads[i]]): 
+			tempph = Find(tempphots, "id = " + str(tempid))
+			try: df_phots[f][j] = tempph[magheader][0] - dmod	# pulling the photometry from the appropriate header
+			except: pass;	# if there is no ID given for this particular line in DataFrame, keep photometric value as np.nan
+		
+	return df_phots
 
 ###-----------------------------------------------------------------------------------------------------
 
@@ -716,8 +668,6 @@ def GalComponents(sources, rad=[0], locs=["Disk", "Outskirt"], theta=0, center=N
 	If a given element in the rad list is a list of multiple radii, assume an ellipse at an angle theta and run the ellipse 
 	function InEllipse. GalComponents returns the same DataFrame with an added header, Location, which details which component 
 	the source appears within.
-
-
 	"""
 
 
@@ -775,7 +725,7 @@ def GalComponents(sources, rad=[0], locs=["Disk", "Outskirt"], theta=0, center=N
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CheckBounds(df, imext=imext, remove=False, search=["x", "y"], resetbounds=False, ID=ID):
+def CheckBounds(df, imext=imext, remove=False, search=["x", "y"], resetbounds=False, ID="ID"):
 
 	""" 
 	Checking whether sources in the given DataFrame is inside the bounds in the image. 
