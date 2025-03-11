@@ -95,13 +95,27 @@ https://github.com/git-guides/install-git
 
 ## Starting `python`
 
-I've found it easiest to run the analysis out of a `iPython` notebook, which allows you to edit and run individual cells of code so that you can repeat each step of the analysis independently. To open `python` in as a notebook, open your command line and enter: 
+If everything is installed properly, you should be able to start up `python` from the command line by simply typing: 
+
+```
+python
+```
+
+When it opens, it will print some version and licensing information. The cursor where each new line of code starts will follow after `>>>` instead of `(base)` or `(stenv)`. 
+
+I've found it easiest to run the analysis out of a `iPython` notebook, which allows you to edit and run individual cells of code so that you can repeat each step of the analysis independently. To open `python` in as a notebook rather than in the command line, open your command line and enter: 
 ```
 jupyter notebook &
 ```
-(where the optional `&` opens the notebook separately from the command line, keeping the command line free for continued use). If you wish to run it out of the `stenv` environment, be sure to run `conda activate stenv` first. 
+(where the optional `&` opens the notebook separately from the command line, keeping the command line free for continued use). 
+
 
 This command will open an interface in a new browser window/tab with a list of files in the directory from withing which you called the command. You can select a pre-existing notebook (which have the suffix `.ipynb`), or create a new one using the `New > Notebook` option in the menu on the right. This will open a new `.ipynb` for you to work within. 
+
+
+```{note}
+If you wish to run it out of the `stenv` environment, be sure to run `conda activate stenv` first, regardless of whether you're running your code out of the command line or an `iPython` notebook. 
+```
 
 Alternatively, you can run this entire project out of Google Colaboratory, a `python` compiler that runs out of Google Drive. This has the benefit of being able to run from anywhere from any computer, regardless of the operating system. However, the downside is that it's much slower than running `python` on your laptop and is prone to timing out if too much memory is used at once. To open `python` in Google, enter your Google Drive, navigate to your preferred directory, select `+ New > More > + Connect more apps` and find Google Colab on the list (it has an orange CO logo). Afer installing it once, you'll be able to find the app under `+ New > More` without having to install it again. From there, you can install all necessary astronomy packages into Google Colab using `!pip install` within one of the cells. You should only have to do this once per package, which should then be accessible to any other Google Colab notebook you make. 
 

@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -482,12 +482,21 @@ document.write(`
 </section>
 <section id="starting-python">
 <h2>Starting <code class="docutils literal notranslate"><span class="pre">python</span></code><a class="headerlink" href="#starting-python" title="Link to this heading">#</a></h2>
-<p>I’ve found it easiest to run the analysis out of a <code class="docutils literal notranslate"><span class="pre">iPython</span></code> notebook, which allows you to edit and run individual cells of code so that you can repeat each step of the analysis independently. To open <code class="docutils literal notranslate"><span class="pre">python</span></code> in as a notebook, open your command line and enter:</p>
+<p>If everything is installed properly, you should be able to start up <code class="docutils literal notranslate"><span class="pre">python</span></code> from the command line by simply typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
+</pre></div>
+</div>
+<p>When it opens, it will print some version and licensing information. The cursor where each new line of code starts will follow after <code class="docutils literal notranslate"><span class="pre">&gt;&gt;&gt;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">(base)</span></code> or <code class="docutils literal notranslate"><span class="pre">(stenv)</span></code>.</p>
+<p>I’ve found it easiest to run the analysis out of a <code class="docutils literal notranslate"><span class="pre">iPython</span></code> notebook, which allows you to edit and run individual cells of code so that you can repeat each step of the analysis independently. To open <code class="docutils literal notranslate"><span class="pre">python</span></code> in as a notebook rather than in the command line, open your command line and enter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupyter</span> <span class="n">notebook</span> <span class="o">&amp;</span>
 </pre></div>
 </div>
-<p>(where the optional <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> opens the notebook separately from the command line, keeping the command line free for continued use). If you wish to run it out of the <code class="docutils literal notranslate"><span class="pre">stenv</span></code> environment, be sure to run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">stenv</span></code> first.</p>
+<p>(where the optional <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> opens the notebook separately from the command line, keeping the command line free for continued use).</p>
 <p>This command will open an interface in a new browser window/tab with a list of files in the directory from withing which you called the command. You can select a pre-existing notebook (which have the suffix <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code>), or create a new one using the <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">&gt;</span> <span class="pre">Notebook</span></code> option in the menu on the right. This will open a new <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> for you to work within.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you wish to run it out of the <code class="docutils literal notranslate"><span class="pre">stenv</span></code> environment, be sure to run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">stenv</span></code> first, regardless of whether you’re running your code out of the command line or an <code class="docutils literal notranslate"><span class="pre">iPython</span></code> notebook.</p>
+</div>
 <p>Alternatively, you can run this entire project out of Google Colaboratory, a <code class="docutils literal notranslate"><span class="pre">python</span></code> compiler that runs out of Google Drive. This has the benefit of being able to run from anywhere from any computer, regardless of the operating system. However, the downside is that it’s much slower than running <code class="docutils literal notranslate"><span class="pre">python</span></code> on your laptop and is prone to timing out if too much memory is used at once. To open <code class="docutils literal notranslate"><span class="pre">python</span></code> in Google, enter your Google Drive, navigate to your preferred directory, select <code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">New</span> <span class="pre">&gt;</span> <span class="pre">More</span> <span class="pre">&gt;</span> <span class="pre">+</span> <span class="pre">Connect</span> <span class="pre">more</span> <span class="pre">apps</span></code> and find Google Colab on the list (it has an orange CO logo). Afer installing it once, you’ll be able to find the app under <code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">New</span> <span class="pre">&gt;</span> <span class="pre">More</span></code> without having to install it again. From there, you can install all necessary astronomy packages into Google Colab using <code class="docutils literal notranslate"><span class="pre">!pip</span> <span class="pre">install</span></code> within one of the cells. You should only have to do this once per package, which should then be accessible to any other Google Colab notebook you make.</p>
 </section>
 <section id="starting-csc-and-complementary-programs">
