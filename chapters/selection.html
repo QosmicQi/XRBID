@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Errors and How to Fix Them &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+    <title>Selecting Optical Counterparts &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
   
   
   
@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -57,10 +57,13 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/errors';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/selection';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Selecting Optical Counterparts" href="selection.html" />
+    <link rel="next" title="Errors and How to Fix Them" href="errors.html" />
+    <link rel="prev" title="Astrometric Corrections" href="astrometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -186,8 +189,8 @@
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Selecting Optical Counterparts</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Errors and How to Fix Them</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Selecting Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
 </ul>
 
     </div>
@@ -259,7 +262,7 @@
       
       
       
-      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/errors.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/selection.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -289,7 +292,7 @@
       
       
       
-      <li><a href="../_sources/chapters/errors.md" target="_blank"
+      <li><a href="../_sources/chapters/selection.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -360,7 +363,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -371,11 +376,19 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Errors and How to Fix Them</h1>
+    <h1>Selecting Optical Counterparts</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incorporating-other-catalogs">Incorporating Other Catalogs</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -385,18 +398,20 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="errors-and-how-to-fix-them">
-<span id="chap-errors"></span><h1>Errors and How to Fix Them<a class="headerlink" href="#errors-and-how-to-fix-them" title="Link to this heading">#</a></h1>
-<p>Here is a list of errors I’ve encountered while running these programs and what I did to fix them. This is by no means a comprehensive list, but you may find it useful all the same.</p>
-<ul class="simple">
-<li><p>When trying to run <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">astroquer.mast</span> <span class="pre">as</span> <span class="pre">Observation</span></code>, I encountered an error stating that <code class="docutils literal notranslate"><span class="pre">StructuredUnit</span></code> could not be imported from <code class="docutils literal notranslate"><span class="pre">astropy.units</span></code>.
-<strong>SOLUTION:</strong> In the command line, run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">update</span> <span class="pre">astropy</span></code>. Then, reopen <code class="docutils literal notranslate"><span class="pre">python</span></code> or the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> and run again the import.</p></li>
-<li><p>While running <code class="docutils literal notranslate"><span class="pre">TweakReg</span></code>, I encountered an error that read: <code class="docutils literal notranslate"><span class="pre">OSError:</span> <span class="pre">Empty</span> <span class="pre">or</span> <span class="pre">corrupt</span> <span class="pre">FITS</span> <span class="pre">file</span></code>.
-<strong>SOLUTION:</strong> At least one of the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files in your input list is bad. If you run each individual file through <code class="docutils literal notranslate"><span class="pre">TweakReg</span></code>, you may eventually find one (or more) that returns
-<code class="docutils literal notranslate"><span class="pre">ValueError:</span> <span class="pre">Input</span> <span class="pre">file</span> <span class="pre">'&lt;filename&gt;'</span> <span class="pre">is</span> <span class="pre">neither</span> <span class="pre">a</span> <span class="pre">GEIS</span> <span class="pre">file</span> <span class="pre">nor</span> <span class="pre">a</span> <span class="pre">FITS</span> <span class="pre">file.</span></code> Remove these from your item list. You can also attempt to open each FITS file in a for loop using a try and except block to find the bad files; this is a quicker method.</p></li>
-<li><p>When trying to run a bash script obtained by running WriteDS9, received the error <code class="docutils literal notranslate"><span class="pre">application-specific</span> <span class="pre">initialization</span> <span class="pre">failed:</span> <span class="pre">couldn't</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">display</span> <span class="pre">&quot;:0&quot;</span></code>.
-<strong>SOLUTION:</strong> Try opening an XQuartz terminal either through the application or by typing <code class="docutils literal notranslate"><span class="pre">xterm</span> <span class="pre">&amp;</span></code> into the terminal. The bash script should be executable through that new terminal. If you receive an additional error <code class="docutils literal notranslate"><span class="pre">application-specific</span> <span class="pre">initialization</span> <span class="pre">failed:</span> <span class="pre">couldn't</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">display</span> <span class="pre">&quot;:1&quot;</span></code>, run <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DISPLAY=:0</span></code> and try again. If all else fails, feed your errors into ChatGPT and follow the instructions given.</p></li>
-</ul>
+  <section class="tex2jax_ignore mathjax_ignore" id="selecting-optical-counterparts">
+<span id="chap-selection"></span><h1>Selecting Optical Counterparts<a class="headerlink" href="#selecting-optical-counterparts" title="Link to this heading">#</a></h1>
+<p>From this point on, the methodolgy for identifying the best candidate counterpart for each XRB and becomes fairly open ended. While there are still specific steps that need to be taken, there are a countless number of ways to do so! Here, I detail the steps I typically take to optimize my workflow. The details of ones workflow do not matter as long as you accomplish the following:</p>
+<ol class="arabic simple">
+<li><p>Identify optical counterparts that fall within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of each X-ray source;</p></li>
+<li><p>Within this population, identify contaminants (i.e. foreground stars, background galaxies), clusters, and point-sources (i.e. candidate donor stars);</p></li>
+<li><p>Extract the photometry from clusters and point-sources;</p></li>
+<li><p>Estimate the masses of point-sources and ages of clusters to determine the most likely mass classification (low, intermediate, or high) of each XRB; and</p></li>
+<li><p>Flag possible supernova remnants (SNR).</p></li>
+</ol>
+<section id="incorporating-other-catalogs">
+<h2>Incorporating Other Catalogs<a class="headerlink" href="#incorporating-other-catalogs" title="Link to this heading">#</a></h2>
+<p>One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they’ve identified. You should then create a DS9 region file with <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>. This will become important as you attempt to classify the optical counterparts of each X-ray source.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -430,13 +445,22 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="selection.html"
+       href="astrometry.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Selecting Optical Counterparts</p>
+        <p class="prev-next-title">Astrometric Corrections</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="errors.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Errors and How to Fix Them</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -444,6 +468,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incorporating-other-catalogs">Incorporating Other Catalogs</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

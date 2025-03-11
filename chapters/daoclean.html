@@ -1,0 +1,1000 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Identifying Optical Counterparts to XRBs &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/daoclean';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="title.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/XRB.png" class="logo__image only-light" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>
+    <script>document.write(`<img src="../_static/XRB.png" class="logo__image only-dark" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="title.html">
+                    XRBID: A Guide to Direct X-ray Binary Analysis
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Selecting Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/daoclean.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/daoclean.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Identifying Optical Counterparts to XRBs</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#isolating-candidate-counterparts-with-daoclean">Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-referencing-daofind-sources-across-filters">Cross-referencing <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> Sources across filters</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="chap-daoclean">
+<span id="identifying-optical-counterparts-to-xrbs"></span><h1>Identifying Optical Counterparts to XRBs<a class="headerlink" href="#chap-daoclean" title="Link to this heading">#</a></h1>
+<p>Now that we’ve identified all <em>HST</em> optical point sources with <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> and calculated the best positions and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii of each <em>CXO</em> X-ray source, we can finally select all candidate optical counterparts for each XRB. This is done by isolating all sources that fall within the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius of each X-ray source. One can do so manually, but the easiest way is to run <code class="docutils literal notranslate"><span class="pre">Sources.DaoClean()</span></code>.</p>
+<section id="isolating-candidate-counterparts-with-daoclean">
+<span id="sec-daoclean"></span><h2>Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code><a class="headerlink" href="#isolating-candidate-counterparts-with-daoclean" title="Link to this heading">#</a></h2>
+<p>Before running <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code>, you will need to place the coordinates of each <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> point source into a new <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This can be done by using <code class="docutils literal notranslate"><span class="pre">DataFrameMod.BuildFrame()</span></code> or <code class="docutils literal notranslate"><span class="pre">Sources.LoadSources()</span></code> on the <code class="docutils literal notranslate"><span class="pre">.ecsv</span></code> data file that was produced by <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> (in my case, this was saved as, for example, <code class="docutils literal notranslate"><span class="pre">photometry_M101_f555w_acs_full.ecsv</span></code>), <em>but only if you did not apply an additional shift to your region file</em>. In my case, I decided to apply a shift during the <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> phase, because the region files that were produced did not align well to the <em>HST</em> images for reason unknown. Because my region files are shifted, and because my X-ray coordinates were aligned to these shifted regions, I need to create a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> using the coordinates of those shifted region files. While we’re at it, one may find it’s a good idea to compile both the <code class="docutils literal notranslate"><span class="pre">img</span></code> and <code class="docutils literal notranslate"><span class="pre">fk5</span></code> coordinates into a single <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, for greater flexibility later down the line.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">chdir</span> <span class="k">as</span> <span class="n">cd</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">getcwd</span> <span class="k">as</span> <span class="n">pwd</span>
+
+<span class="c1"># Remember to switch to the directory where your python files are saved, if needed</span>
+<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetCoords</span><span class="p">,</span> <span class="n">GetIDs</span><span class="p">,</span> <span class="n">DaoClean</span>
+<span class="o">%</span><span class="k">run</span> Sources.py
+<span class="kn">from</span> <span class="nn">DataFrameMod</span> <span class="kn">import</span> <span class="n">BuildFrame</span>
+<span class="o">%</span><span class="k">run</span> DataFrameMod.py
+
+<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span> <span class="c1"># moving to dir where data is stored</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;M101_daofind_f555w_acs_img.reg&quot;</span><span class="p">)</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">GetIDs</span><span class="p">(</span><span class="s2">&quot;M101_daofind_f555w_acs_img.reg&quot;</span><span class="p">)</span>
+<span class="n">ra</span><span class="p">,</span><span class="n">dec</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;M101_daofind_f555w_acs_fk5.reg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Compiling into a single DataFrame</span>
+<span class="n">DaoFrame</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;DaoID&#39;</span><span class="p">,</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span><span class="s1">&#39;Dec&#39;</span><span class="p">],</span> 
+                      <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">ids</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">ra</span><span class="p">,</span><span class="n">dec</span><span class="p">])</span>
+<span class="n">DaoFrame</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_daofind_acs_coords.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoFrame</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Retrieving coordinates from M101_daofind_f555w_acs_img.reg
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Retrieving IDs from M101_daofind_f555w_acs_img.reg
+Retrieving coordinates from M101_daofind_f555w_acs_fk5.reg
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">18</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="n">ra</span><span class="p">,</span><span class="n">dec</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;M101_daofind_f555w_acs_fk5.reg&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span> <span class="c1"># Compiling into a single DataFrame</span>
+<span class="ne">---&gt; </span><span class="mi">18</span> <span class="n">DaoFrame</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;DaoID&#39;</span><span class="p">,</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span><span class="s1">&#39;Dec&#39;</span><span class="p">],</span> 
+<span class="g g-Whitespace">     </span><span class="mi">19</span>                       <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">ids</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">ra</span><span class="p">,</span><span class="n">dec</span><span class="p">])</span>
+<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="n">DaoFrame</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_daofind_acs_coords.frame&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span> <span class="n">display</span><span class="p">(</span><span class="n">DaoFrame</span><span class="p">)</span>
+
+<span class="nn">File ~/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/pyfiles/DataFrameMod.py:476,</span> in <span class="ni">BuildFrame</span><span class="nt">(headers, values, infile, sources, size, headers_index, savefile, ascii_file)</span>
+<span class="g g-Whitespace">    </span><span class="mi">474</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">:</span> 
+<span class="g g-Whitespace">    </span><span class="mi">475</span> 	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)):</span> 
+<span class="ne">--&gt; </span><span class="mi">476</span> 		<span class="n">df</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">478</span> <span class="k">if</span> <span class="n">savefile</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">savefile</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">480</span> <span class="k">return</span> <span class="n">df</span>
+
+<span class="nn">File ~/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/pandas/core/tools/numeric.py:173,</span> in <span class="ni">to_numeric</span><span class="nt">(arg, errors, downcast, dtype_backend)</span>
+<span class="g g-Whitespace">    </span><span class="mi">170</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid error value specified&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">171</span> <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">172</span>     <span class="c1"># GH#54467</span>
+<span class="ne">--&gt; </span><span class="mi">173</span>     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span>         <span class="s2">&quot;errors=&#39;ignore&#39; is deprecated and will raise in a future version. &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span>         <span class="s2">&quot;Use to_numeric without passing `errors` and catch exceptions &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>         <span class="s2">&quot;explicitly instead&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">177</span>         <span class="ne">FutureWarning</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span>         <span class="n">stacklevel</span><span class="o">=</span><span class="n">find_stack_level</span><span class="p">(),</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span> <span class="n">check_dtype_backend</span><span class="p">(</span><span class="n">dtype_backend</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="n">is_series</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> allows the user to attempt to do the radius search using the <code class="docutils literal notranslate"><span class="pre">fk5</span></code> (degree) coordinate system. However, because how this system works, you’ll find that the search may return unexpected results (e.g. returning <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> sources within an ellipse around XRBs instead of a circle). It is recommended that one used the <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinate system instead, which returns more predictable results.</p>
+</div>
+<p>As noted above, it is best to run DaoClean using the <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinate system, which gives coordinates and radii in pixel units relative to the reference image. In <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, open one of the region files containing the corrected coordinates of the X-ray sources and resave it using image coordinates. Then read in the image coordinates and save it to your X-ray source DataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">M101_best</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+
+<span class="n">xsources</span><span class="p">,</span> <span class="n">ysources</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;M101_bestrads_2sig_img.reg&quot;</span><span class="p">)</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xsources</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ysources</span>
+
+<span class="c1"># Convert the radius from arcseconds to pixels. The conversion is 0.05 for ACS/WFC and 0.03962 for WFC3/UVIS</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;2Sig (pix)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;2Sig&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.05</span> 
+<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from M101_csc_bestrads.frame...
+Retrieving coordinates from M101_bestrads_2sig_img.reg
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Separation</th>
+      <th>CSC ID</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>ExpTime</th>
+      <th>Theta</th>
+      <th>Err Ellipse Major</th>
+      <th>Err Ellipse Minor</th>
+      <th>Err Ellipse Angle</th>
+      <th>Significance</th>
+      <th>...</th>
+      <th>MS Ratio lolim</th>
+      <th>MS Ratio hilim</th>
+      <th>Counts</th>
+      <th>Counts lolim</th>
+      <th>Counts hilim</th>
+      <th>1Sig</th>
+      <th>2Sig</th>
+      <th>x</th>
+      <th>y</th>
+      <th>2Sig (pix)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>98379.672624</td>
+      <td>1.280763</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.616490</td>
+      <td>-0.485322</td>
+      <td>234.492581</td>
+      <td>216.678502</td>
+      <td>252.306660</td>
+      <td>0.493011</td>
+      <td>0.988256</td>
+      <td>11333.8500</td>
+      <td>12549.3440</td>
+      <td>19.765113</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.951564</td>
+      <td>2CXO J140312.7+542055</td>
+      <td>210.803345</td>
+      <td>54.348663</td>
+      <td>49085.676020</td>
+      <td>4.725025</td>
+      <td>0.548072</td>
+      <td>0.380093</td>
+      <td>86.863933</td>
+      <td>2.648649</td>
+      <td>...</td>
+      <td>-1.000000</td>
+      <td>-0.715178</td>
+      <td>209.970149</td>
+      <td>192.843759</td>
+      <td>227.096539</td>
+      <td>0.516471</td>
+      <td>1.038077</td>
+      <td>11286.9600</td>
+      <td>12528.5350</td>
+      <td>20.761533</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.480949</td>
+      <td>2CXO J140312.5+542053</td>
+      <td>210.802221</td>
+      <td>54.348072</td>
+      <td>98379.672624</td>
+      <td>1.321652</td>
+      <td>0.296164</td>
+      <td>0.295733</td>
+      <td>84.016491</td>
+      <td>19.554042</td>
+      <td>...</td>
+      <td>-0.364147</td>
+      <td>-0.265459</td>
+      <td>252.846172</td>
+      <td>234.295673</td>
+      <td>271.396671</td>
+      <td>0.492957</td>
+      <td>0.988086</td>
+      <td>11334.1110</td>
+      <td>12486.0170</td>
+      <td>19.761726</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5.227586</td>
+      <td>2CXO J140313.1+542052</td>
+      <td>210.804553</td>
+      <td>54.347994</td>
+      <td>132129.439441</td>
+      <td>2.762119</td>
+      <td>0.880650</td>
+      <td>0.578584</td>
+      <td>29.467809</td>
+      <td>3.421053</td>
+      <td>...</td>
+      <td>-0.973766</td>
+      <td>-0.718926</td>
+      <td>23.229213</td>
+      <td>16.216620</td>
+      <td>30.241806</td>
+      <td>0.561749</td>
+      <td>1.188360</td>
+      <td>11236.2880</td>
+      <td>12480.3160</td>
+      <td>23.767200</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>9.124404</td>
+      <td>2CXO J140313.5+542053</td>
+      <td>210.806667</td>
+      <td>54.348188</td>
+      <td>98379.672624</td>
+      <td>1.410741</td>
+      <td>0.633314</td>
+      <td>0.466131</td>
+      <td>58.539300</td>
+      <td>1.739130</td>
+      <td>...</td>
+      <td>-1.000000</td>
+      <td>-0.370394</td>
+      <td>7.040343</td>
+      <td>2.992146</td>
+      <td>11.088540</td>
+      <td>0.593981</td>
+      <td>1.300029</td>
+      <td>11147.5470</td>
+      <td>12494.3280</td>
+      <td>26.000572</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>550</th>
+      <td>883.411465</td>
+      <td>2CXO J140138.8+541527</td>
+      <td>210.411860</td>
+      <td>54.257747</td>
+      <td>132129.439441</td>
+      <td>12.087047</td>
+      <td>8.647887</td>
+      <td>6.103176</td>
+      <td>111.468541</td>
+      <td>4.277778</td>
+      <td>...</td>
+      <td>-0.932542</td>
+      <td>-0.617739</td>
+      <td>76.034629</td>
+      <td>52.273807</td>
+      <td>99.795450</td>
+      <td>1.921653</td>
+      <td>4.517698</td>
+      <td>27753.7720</td>
+      <td>6032.4759</td>
+      <td>90.353960</td>
+    </tr>
+    <tr>
+      <th>551</th>
+      <td>884.529187</td>
+      <td>2CXO J140450.6+541721</td>
+      <td>211.211172</td>
+      <td>54.289330</td>
+      <td>139822.610581</td>
+      <td>9.951487</td>
+      <td>1.357801</td>
+      <td>1.057531</td>
+      <td>95.305118</td>
+      <td>8.976584</td>
+      <td>...</td>
+      <td>-0.472829</td>
+      <td>-0.270456</td>
+      <td>155.562531</td>
+      <td>135.448493</td>
+      <td>174.718757</td>
+      <td>0.793067</td>
+      <td>1.558488</td>
+      <td>-5851.2446</td>
+      <td>8301.6458</td>
+      <td>31.169764</td>
+    </tr>
+    <tr>
+      <th>552</th>
+      <td>886.380054</td>
+      <td>2CXO J140216.3+543313</td>
+      <td>210.567813</td>
+      <td>54.553731</td>
+      <td>131222.705704</td>
+      <td>13.887674</td>
+      <td>2.480733</td>
+      <td>2.445301</td>
+      <td>115.654637</td>
+      <td>6.783292</td>
+      <td>...</td>
+      <td>-0.322923</td>
+      <td>-0.118051</td>
+      <td>149.738677</td>
+      <td>121.454705</td>
+      <td>176.358886</td>
+      <td>1.676834</td>
+      <td>3.103807</td>
+      <td>21117.9750</td>
+      <td>27312.5690</td>
+      <td>62.076131</td>
+    </tr>
+    <tr>
+      <th>553</th>
+      <td>890.405834</td>
+      <td>2CXO J140445.4+541452</td>
+      <td>211.189426</td>
+      <td>54.247897</td>
+      <td>139819.410649</td>
+      <td>10.703677</td>
+      <td>4.581313</td>
+      <td>2.651713</td>
+      <td>135.472019</td>
+      <td>4.411765</td>
+      <td>...</td>
+      <td>0.501562</td>
+      <td>1.000000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.487466</td>
+      <td>0.974933</td>
+      <td>-4952.8736</td>
+      <td>5313.5560</td>
+      <td>19.498651</td>
+    </tr>
+    <tr>
+      <th>554</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>14276.493764</td>
+      <td>3.416463</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>7.591890</td>
+      <td>4.313574</td>
+      <td>10.870206</td>
+      <td>0.738103</td>
+      <td>1.710737</td>
+      <td>-5181.2993</td>
+      <td>19329.5700</td>
+      <td>34.214743</td>
+    </tr>
+  </tbody>
+</table>
+<p>555 rows × 33 columns</p>
+</div></div></div>
+</div>
+<p>Now everything should be ready to run through <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DaoCleanFrame</span> <span class="o">=</span> <span class="n">DaoClean</span><span class="p">(</span><span class="n">daosources</span><span class="o">=</span><span class="n">DaoFrame</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+                         <span class="n">coordsys</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">coordheader</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">radheader</span><span class="o">=</span><span class="s2">&quot;2Sig (pix)&quot;</span><span class="p">)</span> 
+
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">)</span>
+
+<span class="c1"># NOTE: there is currently an issue with writing region files with &#39;img&#39; coordinate system. </span>
+<span class="c1"># Instead, using the fk5 coordinate system to save the region file.</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> <span class="n">coordsys</span><span class="o">=</span><span class="s1">&#39;fk5&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_daoclean_f555w_acs_fk5.reg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">DaoCleanFrame</span> <span class="o">=</span> <span class="n">DaoClean</span><span class="p">(</span><span class="n">daosources</span><span class="o">=</span><span class="n">DaoFrame</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+<span class="g g-Whitespace">      </span><span class="mi">2</span>                          <span class="n">coordsys</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">coordheader</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">radheader</span><span class="o">=</span><span class="s2">&quot;2Sig (pix)&quot;</span><span class="p">)</span> 
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">display</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1"># NOTE: there is currently an issue with writing region files with &#39;img&#39; coordinate system. </span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="c1"># Instead, using the fk5 coordinate system to save the region file.</span>
+
+<span class="ne">TypeError</span>: DaoClean() got an unexpected keyword argument &#39;sourceid&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Check the results of the search by plotting both the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii of X-ray sources and the <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> sources on the <em>HST</em> image on <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. If it looks like the search is missing sources as though the search radius is too small, you can modify the <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> parameters to increase the search radius with <code class="docutils literal notranslate"><span class="pre">wiggle</span></code> (in pixels or degrees). This will make the search a little less strict, so you can include sources a whose centroids fall <em>just</em> outside of the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius of each X-ray source, if needed.</p>
+<p>(sec:crossref) =</p>
+</section>
+<section id="cross-referencing-daofind-sources-across-filters">
+<h2>Cross-referencing <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> Sources across filters<a class="headerlink" href="#cross-referencing-daofind-sources-across-filters" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> was used to create separatel lists of point sources across each of the <em>HST</em> filters ({ref}(sec:runphots). In order to do a full color analysis of the optical counterparts of each X-ray source, we will need to figure out which point source in each filter is associated with the same object. This can be done with <code class="docutils literal notranslate"><span class="pre">Sources.Crossref()</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">Sources.Crossref()</span></code> isn’t actually very different, functionally, from <code class="docutils literal notranslate"><span class="pre">Sources.DaoClean()</span></code>, except <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> will search through multiple region files (AKA catalogs) at once and add as many extra lines to the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as needed to accommodate all possible associations. Also, <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> will only keep information on the coordinates and ID of each source, and the IDs of sources that may be associated with it in the other catalogs. It is not recommended to use <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> instead of <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> to find daosources associated with each XRB, because several sources may be found within each XRB 2-<span class="math notranslate nohighlight">\(\sigma\)</span>, and they way the IDs of point sources in each catalog are organized may give the false impressions that they are associated with one another across catalogs (e.g. in a single line in the resulting <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, you could have an F555W ID from one nearby point source, an F435W ID from another, and an F814W from a third). This is only mitigated by reducing the search radius, which I do in <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> below.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">Sources</span> <span class="kn">import</span> <span class="n">Crossref</span>
+<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span>
+
+<span class="n">DaoCleanMatch</span> <span class="o">=</span> <span class="n">Crossref</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;M101_daofind_f435w_acs_img.reg&#39;</span><span class="p">,</span>
+                                                 <span class="s1">&#39;M101_daofind_f814w_acs_img.reg&#39;</span><span class="p">],</span> 
+                         <span class="n">catalogs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;F435W&#39;</span><span class="p">,</span> <span class="s1">&#39;F814W&#39;</span><span class="p">],</span> <span class="n">coordheads</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> 
+                         <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;DaoID&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;M101_daoclean_matches.frame&quot;</span><span class="p">)</span>
+
+<span class="c1"># Renaming the DaoID header to &quot;F555W ID&quot;, to match the output of the other filters</span>
+<span class="n">DaoCleanMatch</span> <span class="o">=</span> <span class="n">DaoCleanMatch</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;DaoID&#39;</span><span class="p">:</span> <span class="s1">&#39;F555W ID&#39;</span><span class="p">})</span>
+<span class="n">DaoCleanMatch</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note, it’s possible that each source above is associated with more than one source in one of the catalogs (region file) its being cross-referenced with. For example, a source that’s saturated in one filter may appear as multiple sources in a filter that’s separated. <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> keeps track of every possible association, so it’s likely that <code class="docutils literal notranslate"><span class="pre">DaoCleanMatch</span></code> ends up longer than <code class="docutils literal notranslate"><span class="pre">DaoCleanFrame</span></code>. Keeping the search radius low (the default is 3 pixels) is one way to prevent this as much as possible, which is what we’d want in this case.</p>
+<p>It’s also useful for the next step to add the CSC ID back onto the DataFrame, which can be done as so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adding the CSC IDs of each source the daosources are associated with</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">)):</span> 
+    <span class="c1"># Searches for the CSC ID associated with each F555W ID (DaoID in DaoCleanFrame)</span>
+    <span class="n">tempid</span> <span class="o">=</span> <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;F555W ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> 
+    <span class="n">tempcsc</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> <span class="s2">&quot;DaoID = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tempid</span><span class="p">))[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempcsc</span>
+    
+<span class="n">DaoCleanMatch</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we need to pull the photometry associated with each ID in each filter. This can be done with <code class="docutils literal notranslate"><span class="pre">Sources.GetDaoPhots()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">GetDaoPhots</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">daofiles</span><span class="p">,</span> 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#isolating-candidate-counterparts-with-daoclean">Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-referencing-daofind-sources-across-filters">Cross-referencing <code class="docutils literal notranslate"><span class="pre">DaoFind</span></code> Sources across filters</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Qiana Hunt
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
