@@ -22,14 +22,32 @@ This should install XRBID and all of the modules it contains into python. Now fr
 python
 from XRBID import Sources
 from XRBID.DataFrameMod import Find
+# etc.
 ```
-
-etc. 
 
 # Installing XRBID on Google Colab
 
 If you are running your analysis through Google Drive with Google Colab, then you can install the necessary packages by opening a new Colab `iPython` notebook and running the following in an empty cell: 
 
 ```
-!pip install git+https://github.com/username/repository.git
+!git clone https://github.com/QosmicQi/XRBID.git
+%cd XRBID
+!pip install -e .
 ```
+
+Test the installation by importing the module and its functions into your notebook. 
+
+# Updating XRBID
+As this module is under active development, you should update it from time to time, especially following bug fixes. In your terminal, run: 
+
+```
+pip install --upgrade git+https://github.com/QosmicQi/XRBID.git
+```
+
+or, if you're using Google Colab: 
+
+```
+!pip install --upgrade git+https://github.com/QosmicQi/XRBID.git
+```
+
+If that doesn't work, you can always uninstall XRBID and start from scratch using the instructions above. 
