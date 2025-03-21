@@ -26,17 +26,6 @@ from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
 
 default_aps = [0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
 
-#min1 = pd.read_csv("masstrackmin_1Msun.frame", verbose=False)
-#min2 = pd.read_csv("masstrackmin_2Msun.frame", verbose=False)
-#min3 = pd.read_csv("masstrackmin_3Msun.frame", verbose=False)
-#min5 = pd.read_csv("masstrackmin_5Msun.frame", verbose=False)
-#min8 = pd.read_csv("masstrackmin_8Msun.frame", verbose=False)
-#min20 = pd.read_csv("masstrackmin_20Msun.frame", verbose=False)
-#min40 = pd.read_csv("masstrackmin_40Msun.frame", verbose=False)
-
-#min_masses = [min1, min2, min3, min5, min8, min20, min40]
-#min_masses = [min3, min5, min8, min20]
-
 # Labels associated with each line. Sources BELOW each line (but above the previous) get this label
 mass_labels = ["Low", "Intermediate", "Intermediate", "High"]
 
@@ -45,7 +34,7 @@ mass_labels = ["Low", "Intermediate", "Intermediate", "High"]
 
 ###-----------------------------------------------------------------------------------------------------
 
-def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir="/home/qiana/Documents/Research/"): 
+def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir=False): 
 
 	"""Makes a CMD from a given set of points, either from a list or an input dataframe.
 
@@ -77,7 +66,9 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	instrument [str] ("ACS"): 		Name of the instrument used, to determine which models to call. 
 	color_correction [list] ([0,0]): 	Corrections on the x and y position of the sources. Defaults to no correction. 
 	labelpoints [list] (False): 		Labels to add to each point. If none are given, defaults to False and no labels added. 
-	file_dir [str]: 			The directory within which the models may be found.
+	file_dir [str]: 			The directory within which the models may be found. By default, the 
+						code attempts to find this automatically, but if it fails, it will 
+						prompt the user to input the directory manually. 
 
 	RETURNS: 
 	f, ax: 		Arguments defining the figure, which can be used to add more points to the CMD after the initial plotting.
@@ -87,9 +78,16 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	# Setting the style of my plots
 	#fontparams = {'font.family':'stix'}
 	#labelparams = {'family':'stix', 'size':fontsize}
+	
+	curr_dir = pwd()
+
+	if not file_dir: 
+		module_directory = os.path.dirname(os.path.abspath(__file__)) # Finding where the module is saved
+		file_dir = os.path.join(module_directory, '/pyfiles')
 
 	temp_dir = pwd()
-	cd(file_dir)
+	try: cd(file_dir)
+	except: print("Directory containg CMD models not found. Please input file_dir manually")
 
 	# Reading in the appropriate models based on the instrument given.
 	if instrument.upper() =="WFC3":
@@ -107,6 +105,8 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 	masses = [mass1, mass3, mass5, mass8, mass20] # list of DataFrames of each mass model
 	mass_labels = ["1 M$_\odot$", "3 M$_\odot$", "5 M$_\odot$", "8 M$_\odot$", "20 M$_\odot$"]
+
+	cd(curr_dir) 
 
 	if savefile: save = True
 
