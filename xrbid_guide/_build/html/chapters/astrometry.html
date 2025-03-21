@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/astrometry';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Errors and How to Fix Them" href="errors.html" />
+    <link rel="next" title="Classifiying XRB Donor Stars" href="selection.html" />
     <link rel="prev" title="HST Source Identification and Photometry" href="photometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -189,6 +189,7 @@
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Astrometric Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
 </ul>
 
@@ -404,12 +405,12 @@ document.write(`
 <p>Because we are combining the data from two different instruments, there are corrections that must be made to the coordinates of the X-ray sources such that it is propely in line with the coordinate system of <em>HST</em>. There will be some intrinsic amount of uncertainty in the XRBs’ coordinates due to the differences in the X-ray and optical resolution of their respective instruments. These are accounted for by defining 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> regions around each XRB, which trace out the regions within which we are 68% and 95% sure that the source falls. These regions are calculated using the information obtained through the astrometric correction process — namely, the standard deviation of the median offset between optical and X-ray coordinates. This Chapter outlines how to conduct an astrometric correction and calculate the 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainty regions around each XRB.</p>
 <section id="calibrator-selection">
 <h2>Calibrator Selection<a class="headerlink" href="#calibrator-selection" title="Link to this heading">#</a></h2>
-<p>To calibrate between X-ray and optical source coordinates, we need to select a sample of optical sources that we are reasonably certain are producing the X-ray emissions we detect. These include background galaxies (AGN and quasars), foreground stars, and isolated globular clusters (for example, <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 10</span></a>). To find these sources, we must plot the coordinates of each X-ray source onto the <em>HST</em> image. We then identify the X-ray sources and their optical counterparts that are best suited for the assessment. You will want to pull the coordinates for each selected X-ray source, and (if you choose to do a by-hand correction) their associated optical source.</p>
+<p>To calibrate between X-ray and optical source coordinates, we need to select a sample of optical sources that we are reasonably certain are producing the X-ray emissions we detect. These include background galaxies (AGN and quasars), foreground stars, and isolated globular clusters (for example, <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 11</span></a>). To find these sources, we must plot the coordinates of each X-ray source onto the <em>HST</em> image. We then identify the X-ray sources and their optical counterparts that are best suited for the assessment. You will want to pull the coordinates for each selected X-ray source, and (if you choose to do a by-hand correction) their associated optical source.</p>
 <figure class="align-default" id="fig-astrometric-calibrators">
 <a class="reference internal image-reference" href="../_images/astrometric_calibrators.png"><img alt="../_images/astrometric_calibrators.png" src="../_images/astrometric_calibrators.png" style="width: 750px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 10 </span><span class="caption-text">Examples of X-ray sources that can be used as calibrators for the astrometric correction. The first 3 images are of AGN and quasars, based on their shapes and/or extremely red colors. The 4th is a foreground star, identifiable by the diffraction spikes. The last is a (somewhat) isolated globular cluster, based on the shape, color, and size relative to typical stars in M101.</span><a class="headerlink" href="#fig-astrometric-calibrators" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Examples of X-ray sources that can be used as calibrators for the astrometric correction. The first 3 images are of AGN and quasars, based on their shapes and/or extremely red colors. The 4th is a foreground star, identifiable by the diffraction spikes. The last is a (somewhat) isolated globular cluster, based on the shape, color, and size relative to typical stars in M101.</span><a class="headerlink" href="#fig-astrometric-calibrators" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
@@ -433,32 +434,32 @@ document.write(`
 <span class="o">%</span><span class="k">run</span> DataFrameMod.py
 <span class="kn">from</span> <span class="nn">Align</span> <span class="kn">import</span> <span class="n">CorrectAstrometry</span>
 <span class="o">%</span><span class="k">run</span> Align.py
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span>
+<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span>
 
 <span class="c1"># Reading in sources from the DataFrame containing all of the X-ray sources</span>
 <span class="c1"># You can use pd.read_csv() instead of LoadSources, if you prefer</span>
-<span class="n">M101_CSC</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;testdata/cscresults_M101.frame&quot;</span><span class="p">)</span>
+<span class="n">M101_CSC</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;cscresults_M101.frame&quot;</span><span class="p">)</span>
 
 <span class="c1"># Find X-ray sources with a unique CSC ID,</span>
 <span class="c1"># in case multiple rows in the the DataFrame have the same CSC ID</span>
 <span class="n">M101_unique</span> <span class="o">=</span> <span class="n">FindUnique</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)</span>
 
 <span class="c1"># Saving M101 to a region file that can be opened in DS9</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_unique</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;testdata/M101_cscsources.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_unique</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;M101_cscsources.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
          <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from testdata/cscresults_M101.frame...
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from cscresults_M101.frame...
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving testdata/M101_cscsources.reg
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving M101_cscsources.reg
 </pre></div>
 </div>
 </div>
 </div>
-<p>The code above reads in the region file containing the X-ray sources (created in <a class="reference internal" href="csc-data.html#sec-csc-dataframe"><span class="std std-ref">Converting from VOTable to Pandas DataFrame</span></a>) and saves a region file of these sources called <code class="docutils literal notranslate"><span class="pre">M101_cscsources.reg</span></code>. Open whatever image you want to align these sources to in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> (I use the F555W mosaic file created in <a class="reference internal" href="astrodrizzle.html#sec-astrodrizzle"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>) with <code class="docutils literal notranslate"><span class="pre">Region</span> <span class="pre">&gt;</span> <span class="pre">Open</span></code>. Then, inspect the image to select a handful of good astrometric calibrator sources (see <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 10</span></a>).</p>
+<p>The code above reads in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (CSV) file containing the X-ray sources (created in <a class="reference internal" href="csc-data.html#sec-csc-dataframe"><span class="std std-ref">Converting from VOTable to Pandas DataFrame</span></a>) and saves a region file of these sources called <code class="docutils literal notranslate"><span class="pre">M101_cscsources.reg</span></code>. Open whatever image you want to align these sources to in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> (I use the F555W mosaic file created in <a class="reference internal" href="astrodrizzle.html#sec-astrodrizzle"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>) with <code class="docutils literal notranslate"><span class="pre">Region</span> <span class="pre">&gt;</span> <span class="pre">Open</span></code>. Then, inspect the image to select a handful of good astrometric calibrator sources (see <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 11</span></a>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># List of source names to use as calibrators in the Astrometric Correction</span>
@@ -481,14 +482,16 @@ document.write(`
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">),</span> <span class="s2">&quot;calibrators found.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Saving these as a region file, in case we want to double-check</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;testdata/M101_calibrators&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;M101_calibrators&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
-9 calibrators found.
-Saving testdata/M101_calibrators.reg
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
+Saving M101_calibrators.reg
 </pre></div>
 </div>
 </div>
@@ -539,10 +542,10 @@ Saving testdata/M101_calibrators.reg
 <p>All of these steps are handled by <code class="docutils literal notranslate"><span class="pre">Align.CalcPU()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="p">(</span><span class="s1">&#39;pyfiles&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">Align</span> <span class="kn">import</span> <span class="n">CalcPU</span>
 <span class="o">%</span><span class="k">run</span> Align.py
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span>
+<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span>
 
 <span class="c1"># Takes in DataFrame or Off-axis Angle/Counts and returns 1 and 2sig</span>
 <span class="c1"># NOTE: theta needs to be in arcminutes, which is the default CSC unit</span>
@@ -560,7 +563,7 @@ Saving testdata/M101_calibrators.reg
 <span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig2</span>
 <span class="n">display</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">)</span>
 
-<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;testdata/M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
+<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -886,14 +889,14 @@ Saving testdata/M101_calibrators.reg
     <span class="c1"># Search for all instances of each source</span>
     <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="s2">&quot;CSC ID = &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
     
+    <span class="c1"># If none of the events have a valid count, try to avoid sources where counts = NaN</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts != NaN&quot;</span><span class="p">,</span> <span class="s2">&quot;Theta != NaN&quot;</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts != NaN&quot;</span><span class="p">,</span> <span class="s2">&quot;Theta != NaN&quot;</span><span class="p">])</span>
+    
     <span class="c1"># Specifically focus on those with a valid number of counts</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
         <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">])</span>
         
-    <span class="c1"># If none of the events have a valid count, try to avoid sources where counts = NaN</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts != NaN&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
-        <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts != NaN&quot;</span><span class="p">)</span>
-    
     <span class="c1"># Otherwise, all instances with counts = 0 have the same measurements, so it doesn&#39;t matter</span>
     <span class="k">else</span><span class="p">:</span> <span class="k">pass</span><span class="p">;</span>
     
@@ -903,7 +906,10 @@ Saving testdata/M101_calibrators.reg
     <span class="c1"># Add the chosen source observation to the new DataFrame</span>
     <span class="n">M101_best</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">Tempbest</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">M101_best</span>
+<span class="c1"># Saving results to a DataFrame file</span>
+<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -980,8 +986,8 @@ Saving testdata/M101_calibrators.reg
       <td>2CXO J140312.7+542055</td>
       <td>210.803345</td>
       <td>54.348663</td>
-      <td>141298.623812</td>
-      <td>NaN</td>
+      <td>49085.676020</td>
+      <td>4.725025</td>
       <td>0.548072</td>
       <td>0.380093</td>
       <td>86.863933</td>
@@ -992,11 +998,11 @@ Saving testdata/M101_calibrators.reg
       <td>-0.999375</td>
       <td>-1.000000</td>
       <td>-0.715178</td>
-      <td>7.427581</td>
-      <td>0.000000</td>
-      <td>53.172550</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>209.970149</td>
+      <td>192.843759</td>
+      <td>227.096539</td>
+      <td>0.516471</td>
+      <td>1.038077</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1100,8 +1106,8 @@ Saving testdata/M101_calibrators.reg
       <td>2CXO J140138.8+541527</td>
       <td>210.411860</td>
       <td>54.257747</td>
-      <td>142703.894177</td>
-      <td>NaN</td>
+      <td>132129.439441</td>
+      <td>12.087047</td>
       <td>8.647887</td>
       <td>6.103176</td>
       <td>111.468541</td>
@@ -1112,11 +1118,11 @@ Saving testdata/M101_calibrators.reg
       <td>-0.792005</td>
       <td>-0.932542</td>
       <td>-0.617739</td>
-      <td>38.579199</td>
-      <td>25.521624</td>
-      <td>51.636773</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>76.034629</td>
+      <td>52.273807</td>
+      <td>99.795450</td>
+      <td>1.921653</td>
+      <td>4.517698</td>
     </tr>
     <tr>
       <th>551</th>
@@ -1172,8 +1178,8 @@ Saving testdata/M101_calibrators.reg
       <td>2CXO J140445.4+541452</td>
       <td>211.189426</td>
       <td>54.247897</td>
-      <td>81018.165114</td>
-      <td>NaN</td>
+      <td>139819.410649</td>
+      <td>10.703677</td>
       <td>4.581313</td>
       <td>2.651713</td>
       <td>135.472019</td>
@@ -1184,9 +1190,9 @@ Saving testdata/M101_calibrators.reg
       <td>0.999375</td>
       <td>0.501562</td>
       <td>1.000000</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>36.202173</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>0.487466</td>
       <td>0.974933</td>
     </tr>
@@ -1225,15 +1231,15 @@ Saving testdata/M101_calibrators.reg
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the 1 and 2 sigma region files for DS9 use.</span>
 <span class="c1"># The 2sig region files have the CSC ID printed above each source.</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;testdata/M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving testdata/M101_bestrads_2sig.reg
-Saving testdata/M101_bestrads_1sig.reg
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving M101_bestrads_2sig.reg
+Saving M101_bestrads_1sig.reg
 </pre></div>
 </div>
 </div>
@@ -1243,7 +1249,7 @@ Saving testdata/M101_bestrads_1sig.reg
 <a class="reference internal image-reference" href="../_images/positional_uncertainties.png"><img alt="../_images/positional_uncertainties.png" src="../_images/positional_uncertainties.png" style="width: 750px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Examples of the 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainties of <em>CXO</em> sources on an <em>HST</em> image, after applying the astrometric correction. By eye, the central source is clearly associated with a background galaxy, while the others are likely genuine XRBs.</span><a class="headerlink" href="#fig-positional-uncertainties" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">Examples of the 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainties of <em>CXO</em> sources on an <em>HST</em> image, after applying the astrometric correction. By eye, the central source is clearly associated with a background galaxy, while the others are likely genuine XRBs.</span><a class="headerlink" href="#fig-positional-uncertainties" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
@@ -1289,11 +1295,11 @@ Saving testdata/M101_bestrads_1sig.reg
       </div>
     </a>
     <a class="right-next"
-       href="errors.html"
+       href="selection.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Errors and How to Fix Them</p>
+        <p class="prev-next-title">Classifiying XRB Donor Stars</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

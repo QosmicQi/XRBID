@@ -62,8 +62,8 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     EEF 		[float]	: 	The Encircled Energy Fraction at the maximum aperture pixel 
     			  	        radius (default 20) for the instrument/filter of interest.
     			  	        If none is given, will pull the ~20 pix EEF for the instrument given. 
-    sigma       [float] (5) :	The sigma used in DaoFind, which adjusts the sensitivity
-    threshold 	[float] (5) :	The threshold used in DaoFind, which adjusts the sensitivity
+    sigma       [float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
+    threshold 	[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
     apcorr		[float] (0) :	In the event that aperture_correction is set to false, 
     				            user can input a manual aperture correction to the photometry, 
     			            	which will be saved in the photometry files.

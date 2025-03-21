@@ -11,4 +11,5 @@ chapters:
 - file: chapters/astrodrizzle
 - file: chapters/photometry
 - file: chapters/astrometry
+- file: chapters/selection
 - file: chapters/errors

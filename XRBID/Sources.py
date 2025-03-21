@@ -421,7 +421,7 @@ def DaoClean(daosources=None, sources=None, sourceid="ID", coordsys="img", coord
 		tempid = sources[sourceid][i]
 
 		# Search area around each source
-		print(temprad, xtemp, ytemp)
+		#print(temprad, xtemp, ytemp)
 		tempxmax = xtemp+temprad+wiggle
 		tempxmin = xtemp-temprad-wiggle
 		tempymax = ytemp+temprad+wiggle

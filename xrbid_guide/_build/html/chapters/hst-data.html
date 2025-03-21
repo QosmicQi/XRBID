@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -187,6 +187,7 @@
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
 </ul>
 
@@ -416,6 +417,13 @@ document.write(`
 </figcaption>
 </figure>
 <p>It’s useful to view what the actual images look like before downloading them. To do this, switch from the <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> tab to the <code class="docutils literal notranslate"><span class="pre">Images</span></code> tab. Select the appropriate images (you’ll more than likely want the ones with science data) and add them to your cart by clicking the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Data:</span> <span class="pre">FITS-Science</span></code> link beneath each image.  This will add them to the shopping cart tab, which you can use to retrieve your FITS data files once all desired images are selected.</p>
+<p>Alternatively, you can use the <a class="reference external" href="https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html">STSci MAST database</a> to get a better visual of how much of the galaxy has been covered and by what filters. This is usually a good option, but be aware that the target search includes all observations made by all telescopes in the database, so if you are searching for a well-documented galaxy, it may take a very long time to load!</p>
+<figure class="align-default" id="fig-mast">
+<img alt="../_images/mast.png" src="../_images/mast.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Example search using the STSci MAST database. Here, the search was narrowed down to include only HST ACS/WFC science (HAP-SVM) observations made with the F435W, F555W, and F814W filters.</span><a class="headerlink" href="#fig-mast" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
 <section id="python-hla-query-with-pyvo">
 <span id="sec-pyvo-search"></span><h2><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="headerlink" href="#python-hla-query-with-pyvo" title="Link to this heading">#</a></h2>

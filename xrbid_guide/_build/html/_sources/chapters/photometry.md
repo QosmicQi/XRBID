@@ -3,7 +3,11 @@
 
 Photometry refers to measuring the amount of light that is emitted by a source (like a star, cluster, or galaxy) and detected by an instrument. The photometry is obtained by integrating the amount of flux detected within a given region (i.e. the aperture around the star), for a given filter (e.g. red, green, or blue). For our purposes, we convert this flux into a magnitude (I for red, V for green, B for blue) and can use these values to calculate the colors of each source (e.g. V-I, B-V, B-I), allowing us to conduct a deeper analysis of the source's properties. 
 
-There are plenty of packages one can use to pull this data from an *HST* `FITS` file[^1], but my preferred method is using the fleet of tools within the `python` package `photutils`. For my process, I set up a complete pipeline in the function `PhotRun()` in the `AutoPhots.py` script given in Chapter \ref{sec:script-autophots}, but I'll explain the steps for identifying *HST* point sources manually as well. 
+There are plenty of packages one can use to pull this data from an *HST* `FITS` file[^1], but my preferred method is using the fleet of tools within the `python` package `photutils`. For my process, I set up a complete pipeline in the function `PhotRun()` in the `AutoPhots.py` script, but I'll explain the steps for identifying *HST* point sources manually as well. 
+
+```{note}
+While it is recommended to run `AstroDrizzle` through command line python, the scripts introduced here (and all others suggested in this guide) are fine to run within an `iPython` notebook. Just be sure to activate the proper environment (in my case, using `conda activate stenv`) before running `jupyter notebook &` in the command line. This will ensure your `iPython` notebook has access to all of the necessary `python` tools that were previously installed. 
+```
 
 (sec:runphots)=
 ## Using `AutoPhots.RunPhots()` for Everything
@@ -155,8 +159,8 @@ ap555_acs = -0.711
 ap555err_acs = 0.220
 ap435_acs = -0.660
 ap435err_acs = 0.248
-ap814_acs = -0.781
-ap814err_acs = 0.232
+ap814_acs = -0.561
+ap814err_acs = 0.253
 ```
 The values are negative because they are to be added to the magnitudes from the 3-pixel aperture photometry representing a given star. More negative magnitudes indicate brighter stars, and the aperture correction should make the star appear brighter as we add back the missing light. 
 
