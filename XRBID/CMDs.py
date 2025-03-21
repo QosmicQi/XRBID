@@ -83,7 +83,7 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 	if not file_dir: 
 		module_directory = os.path.dirname(os.path.abspath(__file__)) # Finding where the module is saved
-		file_dir = os.path.join(module_directory, '/pyfiles')
+		file_dir = module_directory + '/pyfiles'
 		print(module_directory, file_dir)
 
 	temp_dir = pwd()
