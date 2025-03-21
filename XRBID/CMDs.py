@@ -81,15 +81,13 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	
 	curr_dir = pwd()
 
+	# If no file directory is given, assume the files we need are in the same directory
+	# where the module is saved
 	if not file_dir: 
-		module_directory = os.path.dirname(os.path.abspath(__file__)) # Finding where the module is saved
-		file_dir = module_directory + '/pyfiles'
-		print(module_directory, file_dir)
-
-	temp_dir = pwd()
+		file_dir = os.path.dirname(os.path.abspath(__file__))
 
 	try: cd(file_dir)
-	except: print("Directory containg CMD models not found. Please input file_dir manually")
+	except: print("Directory containg CMD models not found.\nPlease check and input the correct directory manually with file_dir.")
 
 	# Reading in the appropriate models based on the instrument given.
 	if instrument.upper() =="WFC3":
@@ -260,7 +258,7 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	# Returning plot information, in case I need this later
 	# need to retrieve ax if using both subimg followed by AddCMD
 
-	cd(temp_dir)
+	cd(curr_dir)
 	return f, ax
 				
 
