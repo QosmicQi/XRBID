@@ -56,3 +56,10 @@ or
 ```
 
 If that doesn't work, you can always uninstall XRBID and start from scratch using the instructions above. 
+
+# Citing XRBID
+If you happen to use this code for research that results in a paper, please add it to the Software section and/or cite it as follows: 
+
+```
+Hunt, Q. (2025). XRBID: A Python package for X-ray binary identification (v1.0) [Software]. GitHub. https://github.com/QosmicQi/XRBID
+```
