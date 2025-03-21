@@ -3,7 +3,7 @@ XRBID is a custom `python` package created primarily to facilitate the identific
 
 For more information on this process or how these packages are used for practical research, visit the [XRBID Guidebook](https://qosmicqi.github.io/XRBID/chapters/intro.html).
 
-# Installing XRBID
+# Installing XRBID in a terminal
 
 From the directory where you would like to download XRBID, run in your command line terminal: 
 
@@ -25,3 +25,11 @@ from XRBID.DataFrameMod import Find
 ```
 
 etc. 
+
+# Installing XRBID on Google Colab
+
+If you are running your analysis through Google Drive with Google Colab, then you can install the necessary packages by opening a new Colab `iPython` notebook and running the following in an empty cell: 
+
+```
+!pip install git+https://github.com/username/repository.git
+```
