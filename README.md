@@ -44,10 +44,15 @@ As this module is under active development, you should update it from time to ti
 pip install --upgrade git+https://github.com/QosmicQi/XRBID.git
 ```
 
-or, if you're using Google Colab: 
+or, if you're using Google Colab, you can do this one of two ways: 
 
 ```
 !pip install --upgrade git+https://github.com/QosmicQi/XRBID.git
+```
+or 
+```
+%cd XRBID
+!git pull origin main
 ```
 
 If that doesn't work, you can always uninstall XRBID and start from scratch using the instructions above. 
