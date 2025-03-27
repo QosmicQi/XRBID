@@ -735,12 +735,15 @@ def CorrectAp(filename=None, goodstars=None, verbose=True, getstd=False, savefil
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=[V, B, I], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=3.63e6, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=[0,0,0,0]): 
+def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=[V, B, I], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=[0,0,0,0]): 
 
 	"""Calculating magnitudes with given aperture corrections. The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
 	try: frame = frame.copy()
 	except: pass;
+
+	if not distance: 
+		distance = float(input("Distance to galaxy (in units parsec): ")
 
 	# If U is given, add U corrections to all commands
 	if len(filters) == 4: U_true = True
