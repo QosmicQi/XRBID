@@ -746,7 +746,7 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 	except: pass;
 
 	if not distance: 
-		distance = float(input("Distance to galaxy (in units parsec): ")
+		distance = float(input("Distance to galaxy (in units parsec): "))
 
 	# If U is given, add U corrections to all commands
 	if len(filters) == 4: U_true = True
