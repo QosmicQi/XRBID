@@ -27,11 +27,8 @@ pwd = os.getcwd
 
 from XRBID.WriteScript import WriteReg
 
-try: 
-	from acstools import acszpt # for zeropoint retrieval
-except: 
-	!pip install acstools -q
-	from acstools import acszpt # for zeropoint retrieval
+from acstools import acszpt # for zeropoint retrieval
+
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
 
