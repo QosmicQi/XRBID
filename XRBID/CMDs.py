@@ -20,6 +20,9 @@ cd = os.chdir
 pwd = os.getcwd
 pd.options.mode.chained_assignment = None
 
+# Pull directory where XRBID files are saved
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
 from XRBID.DataFrameMod import Find, BuildFrame
 from XRBID.Sources import LoadSources
 from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
@@ -749,11 +752,11 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 	if len(filters) == 4: U_true = True
 	else: U_true = False
 	
-	current_dir = pwd()
+	curr_dir = pwd()
 	# Loading in the EEFs file
-	cd("/home/qiana/Documents/Research/XRB/")
+	cd(file_dir)
 	EEFs = LoadSources(instrument + "_EEFs.txt", verbose=False)
-	cd(current_dir)
+	cd(curr_dir)
 
 	# Reading in the 20px (or highest given) EEF from each filter 
 	V_EEF = Find(EEFs, "Filter = " + filters[0])[str(apertures[-1])][0]
@@ -845,11 +848,11 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 	try: frame = frame.copy()
 	except: pass;
 
-	current_dir = pwd()
+	curr_dir = pwd()
 	# Loading in the EEFs file
-	cd("/home/qiana/Documents/Research/XRB/")
+	cd(file_dir)
 	EEFs = LoadSources(instrument + "_EEFs.txt", verbose=False)
-	cd(current_dir)
+	cd(curr_dir)
 
 	if filt in V_filts: 
 		EEF = Find(EEFs, "Filter = " + filt)[str(apertures[-1])][0]

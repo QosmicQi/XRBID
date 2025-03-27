@@ -37,7 +37,7 @@ If you are running your analysis through Google Drive with Google Colab, then yo
 
 By default, this will clone the repository to a file on the `content` directory with the path `/content/XRBID`. Test the installation by importing the module and its functions into your notebook. 
 
-If you're using Google Colab, you will also need to run the following installation every time you restart a session: 
+If you're using Google Colab, you will also need to run the following installations every time you restart a session: 
 
 ```
 !pip install photutils -q
