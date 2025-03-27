@@ -21,6 +21,10 @@ from photutils.detection import DAOStarFinder as DaoFind
 from photutils.aperture import CircularAperture
 from photutils.background import Background2D, MedianBackground
 
+import os
+cd = os.chdir
+pwd = os.getcwd
+
 from XRBID.WriteScript import WriteReg
 
 from acstools import acszpt # for zeropoint retrieval
@@ -28,12 +32,17 @@ from acstools import acszpt # for zeropoint retrieval
 # These files should be downloaded and the path to the file should be added to the file name. 
 # ACS/WFC: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
 # WFC3/UVIS: https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/photometric-calibration/uvis-encircled-energy
+
+curr_dir = pwd()
+file_dir = os.path.dirname(os.path.abspath(__file__))
+cd(file_dir) 
 ACS_EEFs = pd.read_csv("ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
 WFC3_EEFs = pd.read_csv("WFC3_UVIS1_EEFs.frame")    # Using new EEFs for WFC3 as of 7/19/23
 
 # WFC3 zeropoints from: https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2021/WFC3_ISR_2021-04.pdf
 WFC3_UVIS1_zpt = pd.read_csv("WFC3_UVIS1_zeropoints.txt")
 WFC3_UVIS2_zpt = pd.read_csv("WFC3_UVIS2_zeropoints.txt")
+cd(curr_dir)
 
 ###-----------------------------------------------------------------------------------------------------
 
