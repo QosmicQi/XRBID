@@ -37,6 +37,14 @@ If you are running your analysis through Google Drive with Google Colab, then yo
 
 By default, this will clone the repository to a file on the `content` directory with the path `/content/XRBID`. Test the installation by importing the module and its functions into your notebook. 
 
+If you're using Google Colab, you will also need to run the following installation every time you restart a session: 
+
+```
+!pip install photutils -q
+!pip install acstools -q
+# (and any other tools not installed to Google Colab by default)
+```
+
 **NOTE:** Google Colab does not currently have a method for permanently installing GitHub repos, so you will need to rerun the installation every time you reboot Google Colab. You will need to navigate back to `/content/XRBID` with each new session and run the installation command. 
 
 # Updating XRBID
