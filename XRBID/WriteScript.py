@@ -431,7 +431,8 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 					coordsys = "fk5"
 					try: 
 						rad_temp = float(radius)
-						#radius = str(rad_temp * pixtoarcs) + "\""
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
 				else: 
 					xcoord = "x" 
@@ -442,7 +443,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 				ycoord = "Dec"	
 				try: 
 					rad_temp = float(radius)
-					#radius = str(rad_temp * pixtoarcs) + "\""
+					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 				except: pass;
 			elif coordsys == "image" and not coordnames: 
 				xcoord = "x" 
