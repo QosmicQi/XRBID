@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from XRBID import __version__
 
 setup(
@@ -7,5 +7,7 @@ setup(
 	url='https://github.com/QosmicQi/XRBID',
 	author='Qiana Hunt',
 	author_email='qiana.hunt@uleth.ca',
-	py_modules=['Align', 'AutoPhots', 'CMDs', 'DataFrameMod', 'Headers', 'HRs', 'ImageSearch', 'Sources', 'WriteScript']
+	packages=find_packages(where="XRBID"),
+    	package_dir={"": "XRBID"}
+	#py_modules=['Align', 'AutoPhots', 'CMDs', 'DataFrameMod', 'Headers', 'HRs', 'ImageSearch', 'Sources', 'WriteScript']
 )
