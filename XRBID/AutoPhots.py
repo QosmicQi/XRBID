@@ -35,8 +35,10 @@ from acstools import acszpt # for zeropoint retrieval
 
 curr_dir = pwd()
 file_dir = os.path.dirname(os.path.abspath(__file__))
+print(file_dir)
 cd(file_dir) 
-ACS_EEFs = pd.read_csv("ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
+print(pwd())
+ACS_EEFs = pd.read_csv(file_dir+"ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
 WFC3_EEFs = pd.read_csv("WFC3_UVIS1_EEFs.frame")    # Using new EEFs for WFC3 as of 7/19/23
 
 # WFC3 zeropoints from: https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2021/WFC3_ISR_2021-04.pdf
