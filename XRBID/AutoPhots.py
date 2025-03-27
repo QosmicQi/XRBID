@@ -41,7 +41,6 @@ WFC3_EEFs = pd.read_csv(file_dir+"/WFC3_UVIS1_EEFs.frame")    # Using new EEFs f
 # WFC3 zeropoints from: https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2021/WFC3_ISR_2021-04.pdf
 WFC3_UVIS1_zpt = pd.read_csv(file_dir+"/WFC3_UVIS1_zeropoints.txt")
 WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
-cd(curr_dir)
 
 ###-----------------------------------------------------------------------------------------------------
 
