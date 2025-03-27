@@ -27,17 +27,17 @@ pwd = os.getcwd
 
 from XRBID.WriteScript import WriteReg
 
-from acstools import acszpt # for zeropoint retrieval
+try: 
+	from acstools import acszpt # for zeropoint retrieval
+except: 
+	!pip install acstools -q
+	from acstools import acszpt # for zeropoint retrieval
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
 
 # These files should be downloaded and the path to the file should be added to the file name. 
 # ACS/WFC: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
 # WFC3/UVIS: https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/photometric-calibration/uvis-encircled-energy
-
-curr_dir = pwd()
-file_dir = os.path.dirname(os.path.abspath(__file__))
-print(file_dir)
-cd(file_dir) 
-print(pwd())
 ACS_EEFs = pd.read_csv(file_dir+"/ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
 WFC3_EEFs = pd.read_csv(file_dir+"/WFC3_UVIS1_EEFs.frame")    # Using new EEFs for WFC3 as of 7/19/23
 
