@@ -1,6 +1,0 @@
-README.md
-setup.py
-XRBID.egg-info/PKG-INFO
-XRBID.egg-info/SOURCES.txt
-XRBID.egg-info/dependency_links.txt
-XRBID.egg-info/top_level.txt
