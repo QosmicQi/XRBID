@@ -10,10 +10,10 @@ import numpy as np
 from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
-from DataFrameMod import FindUnique
+from XRBID.DataFrameMod import FindUnique
 import math
-from Sources import GetCoords
-from DataFrameMod import BuildFrame
+from XRBID.Sources import GetCoords
+from XRBID.DataFrameMod import BuildFrame
 
 X = "x" 
 Y = "y"
@@ -29,7 +29,7 @@ pixtodeg = arcstodeg * pixtoarcs
 
 ###-----------------------------------------------------------------------------------------------------
 
-def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None, tile=False): 
+def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, idheader="ID", filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None, tile=False): 
 
 	"""Arguments: (DataFrame, Galaxy name, Galaxy color .fits files in RGB order, Region files, Desired color scales, Output image name (number will be appended to the image), Output file name).
 
@@ -58,6 +58,7 @@ def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zs
 		except: pass;
 	
 		frame = frame.copy()
+		display(frame) 
 
 		if colorfiles == None: # Name of the files for RGB frames needed
 			while not good: 
@@ -126,7 +127,7 @@ def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zs
 					#except: tempname = j[0]
 
 					# Search dataframe for the scaling ID
-					temp = FindUnique(frame, "ID = " + j[0])
+					temp = FindUnique(frame, idheader + " = " + j[0])
 					
 					# If ID is found, print pan script to .sh file
 					if len(temp) > 0:
@@ -373,7 +374,7 @@ def WriteDS9_tile(frame=None, galaxy="M81", colorfiles=None, regions=None, scale
 
 ### UNDER CONSTRUCTION ###
 # Need to figure out how I want to implement different variations on region files. 
-def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, props=None, label=False, color="#FFC107", radius=3.0, radunit="pixel", showlabel=False, width=1, fontsize=10, bold=False, addshift=[0,0], savecoords=None, marker=None): 
+def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, props=None, label=False, color="#FFC107", radius=3, radunit="pixel", showlabel=False, width=1, fontsize=10, bold=False, addshift=[0,0], savecoords=None, marker=None): 
 	
 	"""
 	Writes a region file for all sources within the given DataFrame. Input (DataFrame, desired filename, coordinate system (image, fk5, etc), 
@@ -430,7 +431,8 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 					coordsys = "fk5"
 					try: 
 						rad_temp = float(radius)
-						#radius = str(rad_temp * pixtoarcs) + "\""
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
 				else: 
 					xcoord = "x" 
@@ -441,7 +443,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 				ycoord = "Dec"	
 				try: 
 					rad_temp = float(radius)
-					#radius = str(rad_temp * pixtoarcs) + "\""
+					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 				except: pass;
 			elif coordsys == "image" and not coordnames: 
 				xcoord = "x" 
@@ -557,7 +559,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 					rad_temp = float(radius)
 					radius = str(rad_temp * pixtoarcs) + "\""
 				except: pass;
-			elif coordsys == "image": 
+			elif coordsys == "image" and not coordnames: 
 				xcoord = "x" 
 				ycoord = "y" 	
 
@@ -986,8 +988,24 @@ def WriteDonor(frame, galaxy=None, colorfiles=None, regions=None, scales=None, u
 
 ###---------------------------------------------
 
-def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_scalings=["zscale","zscale","zscale"], regions=None, savescalings="autoscalings.txt", coords_header=[X,Y]): 
-	"""Script for automatically writing a default unique scaling for each source in the input DataFrame based on the image coordinates and input square regions. It is assumed that the regions get brighter closer to the center of the image and that regions are read in going from the outer regions moving inward. The regions are read in as rectangles in the form [[xmin, xmax], [ymin, ymax]] in image coordinates. Regions will be given as [red, green, blue]. If the source is found outside of all of the regions given, assumed to be in zscale. Input scalings and regions will automatically be saved in a file with the default name 'autoscalings.txt'. This file can be read in place of scalings and regions in situations where the same regions can be for the galaxy in all cases. This same file can then be called in as the scalings parameter, in place of a list of scalings. The best steps are the following: (1) Manually create an autoscaling file with a list of [redscale, greenscale, bluescale, xmin, xmax, ymin, ymax]; (2) Run WriteScalings using the new autoscaling file name name as the 'scalings' argument to create a file with a list of unique location-based scalings for each source; (3) Run WriteDS9 using unique_scale=True and the new unique scaling file as the 'scales' argument. Use the resulting .sh file to get scaled images of each source. """
+def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_scalings=["zscale","zscale","zscale"], regions=None, savescalings="autoscalings.txt", coords_header=['X','Y'], idheader="ID"): 
+	"""Script for automatically writing a default unique scaling for each source in the input DataFrame based on the image coordinates 
+	and input square regions. It is assumed that the regions get brighter closer to the center of the image and that regions are read in 
+	going from the outer regions moving inward. The regions are read in as rectangles in the form [[xmin, xmax], [ymin, ymax]] in image 
+	coordinates. Regions will be given as [red, green, blue]. If the source is found outside of all of the regions given, assumed to be 
+	in zscale. Input scalings and regions will automatically be saved in a file with the default name 'autoscalings.txt'. This file can 
+	be read in place of scalings and regions in situations where the same regions can be for the galaxy in all cases. This same file can
+	then be called in as the scalings parameter, in place of a list of scalings. 
+
+	The best steps are the following: 
+
+	(1) Manually create an autoscaling file with a list of [redscale, greenscale, bluescale, xmin, xmax, ymin, ymax]; 
+	(2) Run WriteScalings using the new autoscaling file name name as the 'scalings' argument to create a file with a 
+	    list of unique location-based scalings for each source; 
+	(3) Run WriteDS9 using unique_scale=True and the new unique scaling file as the 'scales' argument. Use the resulting 
+	    .sh file to get scaled images of each source. 
+
+	"""
 
 	sourcex = sources[coords_header[0]].values.tolist()
 	sourcey = sources[coords_header[1]].values.tolist()
@@ -1032,7 +1050,7 @@ def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_s
 					green = str(scale[1])
 					blue = str(scale[2])
 				# Each of these scalings will be overwritten if the source appears in a later (i.e. inner) region
-			temp = str(sources[ID][s]) + " "  + str(red) + " " + str(green) + " " + str(blue)
+			temp = str(sources[idheader][s]) + " "  + str(red) + " " + str(green) + " " + str(blue)
 			f.write(temp)
 			f.write("\n")
 	f.close()

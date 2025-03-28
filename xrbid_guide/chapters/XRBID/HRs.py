@@ -12,8 +12,8 @@ from astropy.io.votable import parse
 from numbers import Number
 import pandas as pd
 pd.options.mode.chained_assignment = None
-from DataFrameMod import Find, FindUnique, RawFind
-from Headers import ID, CSCID, T_counts, T_countslo, T_countshi, \
+from XRBID.DataFrameMod import Find, FindUnique, RawFind
+from XRBID.Headers import ID, CSCID, T_counts, T_countslo, T_countshi, \
 	U_counts, U_countslo, U_countshi, S_counts, S_countslo, \
 	S_countshi, M_counts, M_countslo, M_countshi, \
 	H_counts, H_countslo, H_countshi, HS, HSlo, HShi, HM, HMerr, \

@@ -14,29 +14,37 @@ from astropy.wcs import WCS
 import time
 import random
 
-from photutils import aperture_photometry
+# from photutils import aperture_photometry
+from photutils.aperture import aperture_photometry
 from photutils.utils import calc_total_error
 from photutils.detection import DAOStarFinder as DaoFind
 from photutils.aperture import CircularAperture
 from photutils.background import Background2D, MedianBackground
 
-from WriteScript import WriteReg
+import os
+cd = os.chdir
+pwd = os.getcwd
+
+from XRBID.WriteScript import WriteReg
 
 from acstools import acszpt # for zeropoint retrieval
+
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
 
 # These files should be downloaded and the path to the file should be added to the file name. 
 # ACS/WFC: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
 # WFC3/UVIS: https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/photometric-calibration/uvis-encircled-energy
-ACS_EEFs = pd.read_csv("ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
-WFC3_EEFs = pd.read_csv("WFC3_UVIS1_EEFs.frame")    # Using new EEFs for WFC3 as of 7/19/23
+ACS_EEFs = pd.read_csv(file_dir+"/ACS_WFC_EEFs.txt")          # Using new EEFs for ACS as of 7/19/23
+WFC3_EEFs = pd.read_csv(file_dir+"/WFC3_UVIS1_EEFs.frame")    # Using new EEFs for WFC3 as of 7/19/23
 
 # WFC3 zeropoints from: https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/wfc3/documentation/instrument-science-reports-isrs/_documents/2021/WFC3_ISR_2021-04.pdf
-WFC3_UVIS1_zpt = pd.read_csv("WFC3_UVIS1_zeropoints.txt")
-WFC3_UVIS2_zpt = pd.read_csv("WFC3_UVIS2_zeropoints.txt")
+WFC3_UVIS1_zpt = pd.read_csv(file_dir+"/WFC3_UVIS1_zeropoints.txt")
+WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
 
 ###-----------------------------------------------------------------------------------------------------
 
-def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, aperture_correction=True, suffix="", savereg=False):
+def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, aperture_correction=True, suffix=""):
 
     """
     Generates the initial photometric files needed for the aperture currection and photometric analyses.
@@ -62,8 +70,8 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     EEF 		[float]	: 	The Encircled Energy Fraction at the maximum aperture pixel 
     			  	        radius (default 20) for the instrument/filter of interest.
     			  	        If none is given, will pull the ~20 pix EEF for the instrument given. 
-    sigma       [float] (5) :	The sigma used in DaoFind, which adjusts the sensitivity
-    threshold 	[float] (5) :	The threshold used in DaoFind, which adjusts the sensitivity
+    sigma       [float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
+    threshold 	[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
     apcorr		[float] (0) :	In the event that aperture_correction is set to false, 
     				            user can input a manual aperture correction to the photometry, 
     			            	which will be saved in the photometry files.
@@ -74,7 +82,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     min_rad 	[float] (3) : 	The pixel radius of the minimum aperture size
     max_rad 	[float] (20): 	The pixel radius of the maximum aperture size
     aperture_correction [bool]  :	If true, runs the aperture correction for the field. Defaults as True.
-    suffix 		[str]	    :	Additional suffix to add to the end of filenames, if applicable. 
+    suffix 		[str]	:	Additional suffix to add to the end of filenames, if applicable. 
     			            	Good for if multiple fields are used for a single filter.
 
     RETURNS

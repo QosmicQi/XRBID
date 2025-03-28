@@ -20,23 +20,14 @@ cd = os.chdir
 pwd = os.getcwd
 pd.options.mode.chained_assignment = None
 
-from DataFrameMod import Find, BuildFrame
-from Sources import LoadSources
-from Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
-from DataFrameMod import SaveDF
+# Pull directory where XRBID files are saved
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+from XRBID.DataFrameMod import Find, BuildFrame
+from XRBID.Sources import LoadSources
+from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
 
 default_aps = [0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
-
-#min1 = pd.read_csv("masstrackmin_1Msun.frame", verbose=False)
-#min2 = pd.read_csv("masstrackmin_2Msun.frame", verbose=False)
-#min3 = pd.read_csv("masstrackmin_3Msun.frame", verbose=False)
-#min5 = pd.read_csv("masstrackmin_5Msun.frame", verbose=False)
-#min8 = pd.read_csv("masstrackmin_8Msun.frame", verbose=False)
-#min20 = pd.read_csv("masstrackmin_20Msun.frame", verbose=False)
-#min40 = pd.read_csv("masstrackmin_40Msun.frame", verbose=False)
-
-#min_masses = [min1, min2, min3, min5, min8, min20, min40]
-#min_masses = [min3, min5, min8, min20]
 
 # Labels associated with each line. Sources BELOW each line (but above the previous) get this label
 mass_labels = ["Low", "Intermediate", "Intermediate", "High"]
@@ -46,7 +37,7 @@ mass_labels = ["Low", "Intermediate", "Intermediate", "High"]
 
 ###-----------------------------------------------------------------------------------------------------
 
-def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir="/home/qiana/Documents/Research/"): 
+def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir=False): 
 
 	"""Makes a CMD from a given set of points, either from a list or an input dataframe.
 
@@ -78,7 +69,9 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	instrument [str] ("ACS"): 		Name of the instrument used, to determine which models to call. 
 	color_correction [list] ([0,0]): 	Corrections on the x and y position of the sources. Defaults to no correction. 
 	labelpoints [list] (False): 		Labels to add to each point. If none are given, defaults to False and no labels added. 
-	file_dir [str]: 			The directory within which the models may be found.
+	file_dir [str]: 			The directory within which the models may be found. By default, the 
+						code attempts to find this automatically, but if it fails, it will 
+						prompt the user to input the directory manually. 
 
 	RETURNS: 
 	f, ax: 		Arguments defining the figure, which can be used to add more points to the CMD after the initial plotting.
@@ -88,9 +81,16 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	# Setting the style of my plots
 	#fontparams = {'font.family':'stix'}
 	#labelparams = {'family':'stix', 'size':fontsize}
+	
+	curr_dir = pwd()
 
-	temp_dir = pwd()
-	cd(file_dir)
+	# If no file directory is given, assume the files we need are in the same directory
+	# where the module is saved
+	if not file_dir: 
+		file_dir = os.path.dirname(os.path.abspath(__file__))
+
+	try: cd(file_dir)
+	except: print("Directory containg CMD models not found.\nPlease check and input the correct directory manually with file_dir.")
 
 	# Reading in the appropriate models based on the instrument given.
 	if instrument.upper() =="WFC3":
@@ -108,6 +108,8 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 	masses = [mass1, mass3, mass5, mass8, mass20] # list of DataFrames of each mass model
 	mass_labels = ["1 M$_\odot$", "3 M$_\odot$", "5 M$_\odot$", "8 M$_\odot$", "20 M$_\odot$"]
+
+	cd(curr_dir) 
 
 	if savefile: save = True
 
@@ -259,7 +261,7 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	# Returning plot information, in case I need this later
 	# need to retrieve ax if using both subimg followed by AddCMD
 
-	cd(temp_dir)
+	cd(curr_dir)
 	return f, ax
 				
 
@@ -736,22 +738,25 @@ def CorrectAp(filename=None, goodstars=None, verbose=True, getstd=False, savefil
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=[V, B, I], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=3.63e6, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=[0,0,0,0]): 
+def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=[V, B, I], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=[0,0,0,0]): 
 
 	"""Calculating magnitudes with given aperture corrections. The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
 	try: frame = frame.copy()
 	except: pass;
 
+	if not distance: 
+		distance = float(input("Distance to galaxy (in units parsec): "))
+
 	# If U is given, add U corrections to all commands
 	if len(filters) == 4: U_true = True
 	else: U_true = False
 	
-	current_dir = pwd()
+	curr_dir = pwd()
 	# Loading in the EEFs file
-	cd("/home/qiana/Documents/Research/XRB/")
+	cd(file_dir)
 	EEFs = LoadSources(instrument + "_EEFs.txt", verbose=False)
-	cd(current_dir)
+	cd(curr_dir)
 
 	# Reading in the 20px (or highest given) EEF from each filter 
 	V_EEF = Find(EEFs, "Filter = " + filters[0])[str(apertures[-1])][0]
@@ -820,7 +825,7 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 			Mags = BuildFrame(headers=[ID_header, X, Y, V, B, I, U, VI, BV, BI], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], V_corr, B_corr, I_corr, V_corr-I_corr, B_corr-V_corr, B_corr-I_corr])
 
-		SaveDF(Mags, savefile)
+		Mags.to_csv(savefile)
 
 	try: 
 		frame[headers[0]] = V_corr
@@ -843,11 +848,11 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 	try: frame = frame.copy()
 	except: pass;
 
-	current_dir = pwd()
+	curr_dir = pwd()
 	# Loading in the EEFs file
-	cd("/home/qiana/Documents/Research/XRB/")
+	cd(file_dir)
 	EEFs = LoadSources(instrument + "_EEFs.txt", verbose=False)
-	cd(current_dir)
+	cd(curr_dir)
 
 	if filt in V_filts: 
 		EEF = Find(EEFs, "Filter = " + filt)[str(apertures[-1])][0]
@@ -902,7 +907,7 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 			Mags = BuildFrame(headers=[ID_header, X, Y, header], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], corr])
 
-		SaveDF(Mags, savefile)
+		Mags.to_csv(savefile)
 
 	try: 
 		frame[header] = corr.tolist()[0]

@@ -1,9 +1,10 @@
 ###################################################################################
 ##########		For searching and modifying DataFrames		########### 
-##########		Last update: Nov. 26, 2024 			########### 
-##########		Update desc: Standardized parameters, added	########### 
-##########		   descriptions, and removed unused or 		########### 
-##########		   obsolete code				########### 
+##########		Last update: Mar. 4, 2025 			########### 
+##########		Update desc: Removed the use of Headers.py 	########### 
+##########		   to define a search header in Find().		########### 
+##########		   Code will instead assume the user input	########### 
+##########		   the proper header name. 			########### 
 ###################################################################################
 
 import re
@@ -15,7 +16,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
-from Headers import heads, lowerheads, Class2, CSCID, Crossrefs, RA, Dec, ID, Bounds, X, Y
+from XRBID.Headers import heads, lowerheads, Class2, CSCID, Crossrefs, RA, Dec, ID, Bounds, X, Y
 
 imext = [0., 13500.] # extent of 
 
@@ -102,15 +103,11 @@ def Find(df, criteria, verbose=False):
 		### extent, overlap, or bounds. First try for former case. 		###
 		### Then override with conditions of latter, if applicable. 		###
 
-		# if temp[0] is one of the headers, set search_head to the corresponding header 
-		if temp[0] in lowerheads:	
-			search_head = heads[lowerheads.index(temp[0])]
-			search = temp[-1] # search criteria comes after the operator in len > 1 cases.
-			raw_search = raw_search[-1]
-		else: # If temp[0] is not one of the known headers, use whatever the user input
-			search_head = raw_search[0]
-			if search_head[-1] == " ": search_head = search_head[:-1]
-			search = raw_search[-1]
+
+		# Setting the header based on the user input
+		search_head = raw_search[0]
+		if search_head[-1] == " ": search_head = search_head[:-1]
+		search = raw_search[-1]
 		
 		# NOTE: search is now the criteria we're searching for under the criteria.	###
 		### It is still string! The following code will override the search and 	###
