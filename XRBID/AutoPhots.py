@@ -31,7 +31,6 @@ from acstools import acszpt # for zeropoint retrieval
 
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
-print(file_dir) 
 
 # These files should be downloaded and the path to the file should be added to the file name. 
 # ACS/WFC: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
