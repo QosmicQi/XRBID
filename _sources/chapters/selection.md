@@ -1,5 +1,5 @@
 (chap:selection)=
-# Selecting Optical Counterparts
+# Classifiying XRB Donor Stars
 
 From this point on, the methodolgy for identifying the best candidate counterpart for each XRB and becomes fairly open ended. While there are still specific steps that need to be taken, there are a countless number of ways to do so! Here, I detail the steps I typically take to optimize my workflow. The details of ones workflow do not matter as long as you accomplish the following: 
 
@@ -15,5 +15,6 @@ From this point on, the methodolgy for identifying the best candidate counterpar
 
 ## Incorporating Other Catalogs 
 
-One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they've identified. You should then create a DS9 region file of those sources with `WriteScript.WriteReg()`. This will become important as you attempt to classify the optical counterparts of each X-ray source. 
+One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they've identified. You should then create a DS9 region file of those sources with `WriteScript.WriteReg()`. This will become important as you attempt to classify the optical counterparts of each X-ray source.
 
+If there is one or more catalog that you can use in your own research, you will likely find it useful to cross-reference the sources in your sample to sources in those catalog. `XRBID.Sources.Crossref()` will prove instrumental for that. `Crossref()` takes in a `DataFrame` containing source coordinates (e.g. a `DataFrame` of your X-ray sources) and 

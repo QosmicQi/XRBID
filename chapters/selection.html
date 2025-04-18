@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Selecting Optical Counterparts &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+    <title>Classifiying XRB Donor Stars &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
   
   
   
@@ -62,8 +62,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/selection';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Errors and How to Fix Them" href="errors.html" />
-    <link rel="prev" title="Astrometric Corrections" href="astrometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,6 +124,8 @@
       
       
       
+        
+      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -181,15 +181,18 @@
                 </a>
             </li>
         </ul>
-        <ul class="current nav bd-sidenav">
+        <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Selecting Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daoclean.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
 </ul>
 
@@ -376,7 +379,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Selecting Optical Counterparts</h1>
+    <h1>Classifiying XRB Donor Stars</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -398,8 +401,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="selecting-optical-counterparts">
-<span id="chap-selection"></span><h1>Selecting Optical Counterparts<a class="headerlink" href="#selecting-optical-counterparts" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="classifiying-xrb-donor-stars">
+<span id="chap-selection"></span><h1>Classifiying XRB Donor Stars<a class="headerlink" href="#classifiying-xrb-donor-stars" title="Link to this heading">#</a></h1>
 <p>From this point on, the methodolgy for identifying the best candidate counterpart for each XRB and becomes fairly open ended. While there are still specific steps that need to be taken, there are a countless number of ways to do so! Here, I detail the steps I typically take to optimize my workflow. The details of ones workflow do not matter as long as you accomplish the following:</p>
 <ol class="arabic simple">
 <li><p>Identify optical counterparts that fall within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of each X-ray source;</p></li>
@@ -411,6 +414,7 @@ document.write(`
 <section id="incorporating-other-catalogs">
 <h2>Incorporating Other Catalogs<a class="headerlink" href="#incorporating-other-catalogs" title="Link to this heading">#</a></h2>
 <p>One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they’ve identified. You should then create a DS9 region file of those sources with <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>. This will become important as you attempt to classify the optical counterparts of each X-ray source.</p>
+<p>If there is one or more catalog that you can use in your own research, you will likely find it useful to cross-reference the sources in your sample to sources in those catalog. <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.Crossref()</span></code> will prove instrumental for that. <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing source coordinates (e.g. a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> of your X-ray sources) and</p>
 </section>
 </section>
 
@@ -444,24 +448,6 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="astrometry.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Astrometric Corrections</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="errors.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Errors and How to Fix Them</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -503,7 +489,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

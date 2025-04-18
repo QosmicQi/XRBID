@@ -68,9 +68,14 @@ A good 'ideal star' is one with a magnitude that increases up until about 3 pixe
 The radial profile of an `ideal' star, showing the total flux (converted to magnitudes) within an aperture of a given radius. The integrated flux of stars in *HST* images will generally max out by 3 pixels and should be flat at increasing radius. If there are wiggles/spikes in the flux, this suggests the star is non well-isolated (light from a nearby star is interfering with the measurement), and that star should not be used for the aperture correction.
 ```
 
-## Identifying Point Sources with `DAOStarFinder`
+## Manual Source Identification and Photometry (w/o `RunPhots()`)
 
-For those who prefer to run their own point source identification, whether because `RunPhots()` did not produce acceptable results or because you value the skill, you can extract sources using `photutils` instead, which should already be included in your `python` installation. The main function used to find stars in a `FITS` file is the `DAOStarFinder`[^4] function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.
+For those who prefer to run their own point source identification, whether because `RunPhots()` did not produce acceptable results or because you value the skill, you can extract sources using `photutils` instead, which should already be included in your `python` installation. The following instructions walk you through one means of manually identifying point sources in your *HST* images, extracting their photometry, and estimating an aperture correction for each image/filter, which you can use *instead of* `RunPhots()`. There almost certainly are other methods that you could use as well, but those will not be discussed here.
+
+
+### Identifying Point Sources with `DAOStarFinder`
+
+The main function used to find stars in a `FITS` file is the `DAOStarFinder`[^4] function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.
 
 Open the `FITS` file in your imaging software of choice and use the analytics of that software to determine some reasonable measurement of the background noise in a dark area of the image, and the FWHM of a few average stars. For `DS9`, you can use the instructions in {ref}`sec:runphots` to find the FWHM. An important thing to note is that `DAOStarFinder` requires the FWHM in pixels, but `DS9` gives it in arcseconds. The pixel scale for is 0.05 arcsec per pixel for ACS/WFC and 0.03962 for WFC3/UVIS. This is usually stored under the `FITS` `HDU` header `D001SCAL`.
 
@@ -95,7 +100,7 @@ objects = daofind(data)
 
 `DAOStarFind` will return a table containing the coordinates of all identified sources, which can be used to make a region file that will plot in `DS9` and `CARTA` (this can be done easily using my custom function `WriteScript.WriteReg()`). For reasons I don't understand, the region file that comes from these coordinates often doesn't align very well with the image itself, even though I believe the photometry that comes from these coordinates is accurate. When creating a region file, it may be a good idea to do a minor coordinate shift, just so that the regions align with the image and don't cause confusion during the aperture correction step. Also, you'll want to check the region file to make sure `DAOStarFind` isn't missing any obvious sources. If it is, you'll need to adjust your parameters (such as the FWHM) and run it again.
 
-## Extracting Photometry with `aperture_photometry`
+### Extracting Photometry with `aperture_photometry`
 
 `RunPhots()` will conduct the aperture photometry for you with a default minimum radius of 3 pixels, but you can also run the aperture photometry yourself with `photutils.aperture_photometry`. The inputs for `aperture_photometry` are fairly simple: all you need is the `FITS` data (background subtracted) and a list of aperture radii at the positions of your sources of interest, built with `photutils.aperture.CircularAperture()`. Using the resulting `objects` table obtained from `DAOStarFinder` above: 
 
@@ -144,7 +149,7 @@ phot_full.write("<filename>.ecsv")
 
 The resulting `.ecsv` file will contain the coordinates of each source and the integrated flux within each aperture radius (in this case, 1--30 pixels). For normal stars, I generally use the flux within a 3-pixel aperture to represent a single star, as this radius is usually large enough to collect most of the stellar light but small enough for the flux not to be influenced by contamination from a neighboring star. However, any defined aperture is sure to miss some of the light of the chosen star, which is why an aperture correction is also needed to fully represent the stellar flux of a star of interest.
 
-## Estimating Aperture Corrections
+### Estimating Aperture Corrections
 
 `RunPhots()` will automatically conduct the aperture corrections using a second custom function, `CorrectAp()`. The philosophy behind aperture corrections is described in detailed above in {ref}`sec:runphots` or, in a more official capacity, here: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
 
@@ -159,8 +164,8 @@ ap555_acs = -0.711
 ap555err_acs = 0.220
 ap435_acs = -0.660
 ap435err_acs = 0.248
-ap814_acs = -0.781
-ap814err_acs = 0.232
+ap814_acs = -0.561
+ap814err_acs = 0.253
 ```
 The values are negative because they are to be added to the magnitudes from the 3-pixel aperture photometry representing a given star. More negative magnitudes indicate brighter stars, and the aperture correction should make the star appear brighter as we add back the missing light. 
 
