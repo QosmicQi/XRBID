@@ -465,7 +465,7 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False):
 				sig2.append(df[sig2search][i])
 				sig1.append(df[sig2search][i]*0.5)
 			else: 
-				print("Invalid observation for source", i, ". Setting radius to 0.")
+				#print("Invalid observation for source", i, ". Setting radius to 0.")
 				sig2.append(0)
 				sig1.append(0)
             

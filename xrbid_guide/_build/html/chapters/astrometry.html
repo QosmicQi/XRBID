@@ -433,6 +433,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetCoords</span>
 <span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">RemoveElse</span><span class="p">,</span> <span class="n">FindUnique</span>
 <span class="kn">from</span> <span class="nn">XRBID.Align</span> <span class="kn">import</span> <span class="n">CorrectAstrometry</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <span class="c1"># Reading in sources from the DataFrame containing all of the X-ray sources</span>
 <span class="c1"># You can use pd.read_csv() instead of LoadSources, if you prefer</span>
@@ -449,28 +451,6 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:474: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  elif len(re.split(&quot;\.&quot;, sources)) &gt; 1: # if the sources are given as a filename, use GetCoords
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:483: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  temp = re.split(&quot;\.&quot;, outfile)
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:592: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  elif len(re.split(&quot;\.&quot;, sources)) &gt; 1: # if the sources are given as a filename, use GetCoords
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:603: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  temp = re.split(&quot;\.&quot;, outfile)
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:718: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  elif len(re.split(&quot;\.&quot;, sources)) &gt; 1:
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:766: SyntaxWarning: invalid escape sequence &#39;\.&#39;
-  temp = re.split(&quot;\.&quot;, outfile)
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/DataFrameMod.py:92: SyntaxWarning: invalid escape sequence &#39;\(&#39;
-  temp[-1] = re.sub(&quot;\(|\)&quot;, &quot;&quot;, temp[-1])	# remove () from temp for now
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/DataFrameMod.py:93: SyntaxWarning: invalid escape sequence &#39;\(&#39;
-  raw_search[-1] = re.sub(&quot;\(|\)&quot;, &quot;&quot;, raw_search[-1])
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/DataFrameMod.py:216: SyntaxWarning: invalid escape sequence &#39;\W&#39;
-  for i in re.split(&quot;\W+&quot;, search):  # adding all possible variations to a temp list
-/Users/qianahunt/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/DataFrameMod.py:226: SyntaxWarning: invalid escape sequence &#39;\W&#39;
-  for i in re.split(&quot;\W+&quot;, search):  # adding all possible variations to a temp list
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/cscresults_M101_renamed.frame...
 </pre></div>
 </div>
@@ -509,7 +489,9 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
-9 calibrators found.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
 Saving ../testdata/M101_calibrators.reg
 </pre></div>
 </div>
