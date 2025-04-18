@@ -1,17 +1,18 @@
 ###########################################################################################
-##########	For writing scripts, such as bash scripts and region files	        ########### 
-##########	                Last Update: Feb 11, 2025               	        ########### 
-##########	(Standardized parameters, added descriptions, cleaned up code)      ########### 
+##########	For writing scripts, such as bash scripts and region files	########### 
+##########	                Last Update: Feb 11, 2025               	########### 
+##########	(Standardized parameters, added descriptions, cleaned up code)  ########### 
 ###########################################################################################
 
+import math
 import datetime
 import re
 import numpy as np
 from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
+
 from XRBID.DataFrameMod import FindUnique
-import math
 from XRBID.Sources import GetCoords
 from XRBID.DataFrameMod import BuildFrame
 
@@ -445,7 +446,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 					rad_temp = float(radius)
 					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 				except: pass;
-			elif coordsys == "image" and not coordnames: 
+			elif "im" in coordsys and not coordnames: 
 				xcoord = "x" 
 				ycoord = "y" 	
 

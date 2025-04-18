@@ -13,13 +13,18 @@ from numbers import Number
 import pandas as pd
 pd.options.mode.chained_assignment = None
 from XRBID.DataFrameMod import Find, FindUnique, RawFind
-from XRBID.Headers import ID, CSCID, T_counts, T_countslo, T_countshi, \
-	U_counts, U_countslo, U_countshi, S_counts, S_countslo, \
-	S_countshi, M_counts, M_countslo, M_countshi, \
-	H_counts, H_countslo, H_countshi, HS, HSlo, HShi, HM, HMerr, \
-	HMlo, HMhi, MS, MSerr, MSlo, MShi, \
-	Flux_bb, Flux_bblo, Flux_bbhi, Flux_pow, Flux_powlo, Flux_powhi, \
-	MSRat, HSRat, HMRat
+
+HSRat = "HS Ratio"
+HSlo = "HS Lo"
+HShi = "HS Hi" 
+HMRat = "HM Ratio"
+HMerr = "HM Err"
+HMlo = "HM Lo" 
+HMhi = "HM Hi"
+MSRat = "MS Ratio"
+MSerr = "MS Err"
+MSlo = "MS Lo" 
+MShi = "MS Hi"
 
 imext = [0., 13500.]
 
@@ -129,5 +134,3 @@ def CalcHRSub(source, higher, lower, meanval=False):
 	if rat == 1.0: return np.nan
 	else: return rat
 ###-----------------------------------------------------------------------------------------------------
-
-#def 

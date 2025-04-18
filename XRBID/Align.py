@@ -7,6 +7,7 @@
 import re
 import numpy as np
 from numpy import median, mean, std, sqrt
+from math import isnan
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.io.votable import parse
@@ -344,7 +345,7 @@ def CorrectAstrometry(base_coords, cat_coords, autoresid=True, returnshifts=True
   # Saving median shifts
   medshiftx = median(offsets_x)
   medshifty = median(offsets_y)
-  print("Median offsets in x and y", medshiftx, medshifty)
+  print("Median offsets in x and y (deg):", medshiftx, medshifty)
 
   # Plotting the residuals
   resids_x = good_cat_x - medshiftx - good_base_x
@@ -410,7 +411,6 @@ def CorrectAstrometry(base_coords, cat_coords, autoresid=True, returnshifts=True
 
 ###-----------------------------------------------------------------------------------------------------
 
-from math import isnan
 def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False): 
 	
 	"""
