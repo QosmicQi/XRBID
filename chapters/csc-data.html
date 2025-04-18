@@ -769,8 +769,6 @@ All other results can be left as is, or you may remove the properties that you w
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the file using Pandas</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
 <span class="n">TempSources</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101.frame&quot;</span><span class="p">)</span> <span class="c1"># Pandas version of saving the df</span>
 
 <span class="c1"># Alternatively, saving file using NewSources</span>
@@ -805,66 +803,331 @@ All other results can be left as is, or you may remove the properties that you w
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
+<span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span>
 
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;cscsources_M101.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101_renamed.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">TempSources</span><span class="p">)</span>
+
+<span class="c1"># Writing to a DS9-compatible region file</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscsources_M101.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
         <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
-<span class="nn">File ~/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/pandas/core/indexes/base.py:3805,</span> in <span class="ni">Index.get_loc</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3804</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">3805</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">casted_key</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3806</span> <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/cscresults_M101_renamed.frame...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-<span class="nn">File index.pyx:167,</span> in <span class="ni">pandas._libs.index.IndexEngine.get_loc</span><span class="nt">()</span>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
 
-<span class="nn">File index.pyx:196,</span> in <span class="ni">pandas._libs.index.IndexEngine.get_loc</span><span class="nt">()</span>
-
-<span class="nn">File pandas/_libs/hashtable_class_helper.pxi:7081,</span> in <span class="ni">pandas._libs.hashtable.PyObjectHashTable.get_item</span><span class="nt">()</span>
-
-<span class="nn">File pandas/_libs/hashtable_class_helper.pxi:7089,</span> in <span class="ni">pandas._libs.hashtable.PyObjectHashTable.get_item</span><span class="nt">()</span>
-
-<span class="ne">KeyError</span>: &#39;x&#39;
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">WriteReg</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;cscsources_M101.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
-<span class="g g-Whitespace">      </span><span class="mi">4</span>         <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nn">File ~/Desktop/Research/JupyterBooks/XRBID/xrbid_guide/chapters/XRBID/WriteScript.py:566,</span> in <span class="ni">WriteReg</span><span class="nt">(sources, outfile, coordsys, coordnames, idname, props, label, color, radius, radunit, showlabel, width, fontsize, bold, addshift, savecoords, marker)</span>
-<span class="g g-Whitespace">    </span><span class="mi">563</span> 	<span class="n">xcoord</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span> 
-<span class="g g-Whitespace">    </span><span class="mi">564</span> 	<span class="n">ycoord</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span> 	
-<span class="ne">--&gt; </span><span class="mi">566</span> <span class="n">x_coords</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="n">xcoord</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="g g-Whitespace">    </span><span class="mi">567</span> <span class="n">y_coords</span> <span class="o">=</span> <span class="n">sources</span><span class="p">[</span><span class="n">ycoord</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="g g-Whitespace">    </span><span class="mi">569</span> <span class="c1"># if the label is given, use them as the ids</span>
-
-<span class="nn">File ~/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/pandas/core/frame.py:4102,</span> in <span class="ni">DataFrame.__getitem__</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">4100</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">4101</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getitem_multilevel</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">4102</span> <span class="n">indexer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">4103</span> <span class="k">if</span> <span class="n">is_integer</span><span class="p">(</span><span class="n">indexer</span><span class="p">):</span>
-<span class="g g-Whitespace">   </span><span class="mi">4104</span>     <span class="n">indexer</span> <span class="o">=</span> <span class="p">[</span><span class="n">indexer</span><span class="p">]</span>
-
-<span class="nn">File ~/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/pandas/core/indexes/base.py:3812,</span> in <span class="ni">Index.get_loc</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3807</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">casted_key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-<span class="g g-Whitespace">   </span><span class="mi">3808</span>         <span class="nb">isinstance</span><span class="p">(</span><span class="n">casted_key</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">Iterable</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3809</span>         <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">casted_key</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">3810</span>     <span class="p">):</span>
-<span class="g g-Whitespace">   </span><span class="mi">3811</span>         <span class="k">raise</span> <span class="n">InvalidIndexError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-<span class="ne">-&gt; </span><span class="mi">3812</span>     <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
-<span class="g g-Whitespace">   </span><span class="mi">3813</span> <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">3814</span>     <span class="c1"># If we have a listlike key, _check_indexing_error will raise</span>
-<span class="g g-Whitespace">   </span><span class="mi">3815</span>     <span class="c1">#  InvalidIndexError. Otherwise we fall through and re-raise</span>
-<span class="g g-Whitespace">   </span><span class="mi">3816</span>     <span class="c1">#  the TypeError.</span>
-<span class="g g-Whitespace">   </span><span class="mi">3817</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_check_indexing_error</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-
-<span class="ne">KeyError</span>: &#39;x&#39;
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Separation</th>
+      <th>CSC ID</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>ExpTime</th>
+      <th>Theta</th>
+      <th>Err Ellipse Major</th>
+      <th>Err Ellipse Minor</th>
+      <th>Err Ellipse Angle</th>
+      <th>Significance</th>
+      <th>...</th>
+      <th>HS Ratio hilim</th>
+      <th>HM Ratio</th>
+      <th>HM Ratio lolim</th>
+      <th>HM Ratio hilim</th>
+      <th>MS Ratio</th>
+      <th>MS Ratio lolim</th>
+      <th>MS Ratio hilim</th>
+      <th>Counts</th>
+      <th>Counts lolim</th>
+      <th>Counts hilim</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>192658.710333</td>
+      <td>2.687974</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>170.006026</td>
+      <td>155.698239</td>
+      <td>184.313814</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>142729.493705</td>
+      <td>2.727056</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>254.489381</td>
+      <td>233.532285</td>
+      <td>274.136658</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>141298.623812</td>
+      <td>2.783596</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>442.576953</td>
+      <td>419.112035</td>
+      <td>464.477543</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>132129.439441</td>
+      <td>2.690653</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>131.798703</td>
+      <td>118.539780</td>
+      <td>144.321019</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>130186.649966</td>
+      <td>2.749161</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>649.590529</td>
+      <td>616.129127</td>
+      <td>683.051932</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3487</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>120993.038017</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>59.364933</td>
+    </tr>
+    <tr>
+      <th>3488</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>88598.047743</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>14.952548</td>
+    </tr>
+    <tr>
+      <th>3489</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>81021.851289</td>
+      <td>13.486809</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>53.481053</td>
+      <td>29.414579</td>
+      <td>77.547526</td>
+    </tr>
+    <tr>
+      <th>3490</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>52087.100775</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>34.780341</td>
+    </tr>
+    <tr>
+      <th>3491</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>14276.493764</td>
+      <td>3.416463</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>7.591890</td>
+      <td>4.313574</td>
+      <td>10.870206</td>
+    </tr>
+  </tbody>
+</table>
+<p>3492 rows × 28 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/cscsources_M101.reg
 </pre></div>
 </div>
 </div>
@@ -886,16 +1149,16 @@ All other results can be left as is, or you may remove the properties that you w
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "jupyterbook"
         },
         kernelOptions: {
-            name: "python3",
+            name: "jupyterbook",
             path: "./chapters"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'jupyterbook'</script>
 
                 </article>
               
