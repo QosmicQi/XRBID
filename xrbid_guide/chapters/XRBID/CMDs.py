@@ -25,9 +25,8 @@ file_dir = os.path.dirname(os.path.abspath(__file__))
 
 from XRBID.DataFrameMod import Find, BuildFrame
 from XRBID.Sources import LoadSources
-from XRBID.Headers import heads, B, V, I, U, BV, VI, BI, UB, Filter, ID, X, Y
 
-default_aps = [0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
+default_aps = [i for i in range(1,31)] #[0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,20.]
 
 # Labels associated with each line. Sources BELOW each line (but above the previous) get this label
 mass_labels = ["Low", "Intermediate", "Intermediate", "High"]

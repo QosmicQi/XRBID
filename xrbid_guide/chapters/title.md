@@ -21,4 +21,5 @@ Before starting this guide, one should follow the instructions on the repository
 
 \
 \
-*This Jupyter Book was last updated on March 12, 2025*
+*This Jupyter Book was last updated on April 20, 2025*\
+*Special thanks to Pau Bosch-Cabot for his input on editing this guide.*

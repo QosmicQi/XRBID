@@ -16,7 +16,6 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
-from XRBID.Headers import heads, lowerheads, Class2, CSCID, Crossrefs, RA, Dec, ID, Bounds, X, Y
 
 imext = [0., 13500.] # extent of 
 
@@ -268,7 +267,7 @@ def Find(df, criteria, verbose=False):
 
 ###-----------------------------------------------------------------------------------------------------
 
-def FindUnique(df, criteria=None, header=ID):
+def FindUnique(df, criteria=None, header='ID'):
 
 	"""
 	Finds unique sources from the given DataFrame. Sources from CSCView may be duplicated if multiple 
