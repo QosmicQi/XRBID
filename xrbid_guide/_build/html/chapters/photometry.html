@@ -441,8 +441,7 @@ document.write(`
 </figcaption>
 </figure>
 <p>To run <code class="docutils literal notranslate"><span class="pre">RunPhots</span></code>, you will simply need to read in the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> <code class="docutils literal notranslate"><span class="pre">HDU</span></code>, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AutoPhots</span> <span class="kn">import</span> <span class="n">RunPhots</span>
-<span class="o">%</span><span class="n">run</span> <span class="n">AutoPhots</span><span class="o">.</span><span class="n">py</span>     <span class="c1"># Only run if running in .ipynb</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.AutoPhots</span> <span class="kn">import</span> <span class="n">RunPhots</span>
 
 <span class="c1"># Running analysis on full mosaic. Can be done on individual</span>
 <span class="c1"># fields using the &#39;suffix&#39; parameter to differentiate savefile names</span>

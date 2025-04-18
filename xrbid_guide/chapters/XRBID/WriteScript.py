@@ -11,6 +11,9 @@ import numpy as np
 from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
+import warnings
+warnings.filterwarnings("ignore")
+
 
 from XRBID.DataFrameMod import FindUnique
 from XRBID.Sources import GetCoords
