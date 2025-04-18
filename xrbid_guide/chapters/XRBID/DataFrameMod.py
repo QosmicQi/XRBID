@@ -89,8 +89,8 @@ def Find(df, criteria, verbose=False):
 
 		# Parentheses indicate Long candidate classifications. Keep track of these! 
 		if "(" in temp[-1]: 	# AKA if candidate...
-			temp[-1] = re.sub("\(|\)", "", temp[-1])	# remove () from temp for now
-			raw_search[-1] = re.sub("\(|\)", "", raw_search[-1])
+			temp[-1] = re.sub(r"\(|\)", "", temp[-1])	# remove () from temp for now
+			raw_search[-1] = re.sub(r"\(|\)", "", raw_search[-1])
 			cand = True
 		else: cand = False
 
@@ -213,7 +213,7 @@ def Find(df, criteria, verbose=False):
 		elif "all" in crit: 	# if searching for all possible instances, including candidates
 			if "/" in search and search != "N/A": temp = ["("+search+")"]; pass;
 			else: temp = []				
-			for i in re.split("\W+", search):  # adding all possible variations to a temp list
+			for i in re.split(r"\W+", search):  # adding all possible variations to a temp list
 				temp.append(i)
 				temp.append("("+i+")")
 			for i in temp: 		# adding all variations from temp to the searching function
@@ -223,7 +223,7 @@ def Find(df, criteria, verbose=False):
 			# if searching for all possible instances to exclude
 			if "/" in search and search != "N/A": temp = ["("+search+")"]; pass;
 			else: temp = []				
-			for i in re.split("\W+", search):  # adding all possible variations to a temp list
+			for i in re.split(r"\W+", search):  # adding all possible variations to a temp list
 				temp.append(i)
 				temp.append("("+i+")")
 			for i in temp: 		# adding all variations from temp to the searching function

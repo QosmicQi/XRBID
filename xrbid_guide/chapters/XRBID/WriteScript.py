@@ -489,7 +489,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 			else: 
 				x_coords = np.array(sources).T[0]
 				y_coords = np.array(sources).T[1]
-		elif len(re.split("\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
+		elif len(re.split(r"\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
 			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
 
 		if not coordsys: # if coordsys not given, use simple check to assign
@@ -498,7 +498,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 
 		
 		# Making sure outfile has a proper file extension (default = .reg)
-		temp = re.split("\.", outfile)
+		temp = re.split(r"\.", outfile)
 		if len(temp) == 1: outfile = temp[0] + ".reg"
 
 		if not isinstance(radius, list): radius = [radius]
@@ -624,7 +624,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 			if label: ids = label
 			elif not label and showlabel: ids = np.arange(0, len(x_coords))
 			
-		elif len(re.split("\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
+		elif len(re.split(r"\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
 			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
 
 		if not coordsys: # if coordsys not given, use simple check to assign
@@ -635,7 +635,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 		if not outfile: outfile = input("Output filename?: ")
 
 		# Making sure outfile has a proper file extension (default = .reg)
-		temp = re.split("\.", outfile)
+		temp = re.split(r"\.", outfile)
 		if len(temp) == 1: outfile = temp[0] + ".reg"
 
 		if not isinstance(radius, list): radius = [radius]
@@ -750,7 +750,7 @@ def WriteFilledReg(sources=None, coords=None, outfile=None, filename=None, coord
 				x_coords = np.array(sources).T[0]
 				y_coords = np.array(sources).T[1]
 		# If the sources is a filename, use GetCoords
-		elif len(re.split("\.", sources)) > 1: 
+		elif len(re.split(r"\.", sources)) > 1: 
 			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
 
 	# if coordinates are given separately, read them in
@@ -798,7 +798,7 @@ def WriteFilledReg(sources=None, coords=None, outfile=None, filename=None, coord
 	if not outfile: outfile = input("Output filename?: ")
 
 	# Making sure outfile has a proper file extension (default = .reg)
-	temp = re.split("\.", outfile)
+	temp = re.split(r"\.", outfile)
 	if len(temp) == 1: outfile = temp[0] + ".reg"
 
 	if not isinstance(radius, list): radius = [radius]*len(x_coords) 
@@ -1184,3 +1184,6 @@ def WriteTable(frame, outfile=None, headers=None, dimensions=None):
 
 	f.close()
 	print("Done")	
+
+
+
