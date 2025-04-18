@@ -1,17 +1,18 @@
 ###########################################################################################
-##########	For writing scripts, such as bash scripts and region files	        ########### 
-##########	                Last Update: Feb 11, 2025               	        ########### 
-##########	(Standardized parameters, added descriptions, cleaned up code)      ########### 
+##########	For writing scripts, such as bash scripts and region files	########### 
+##########	                Last Update: Feb 11, 2025               	########### 
+##########	(Standardized parameters, added descriptions, cleaned up code)  ########### 
 ###########################################################################################
 
+import math
 import datetime
 import re
 import numpy as np
 from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
+
 from XRBID.DataFrameMod import FindUnique
-import math
 from XRBID.Sources import GetCoords
 from XRBID.DataFrameMod import BuildFrame
 
@@ -423,7 +424,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 			sources = sources.copy()
 			
 			# Attempting to define the coordinate system and coordinate names, if they are
-			# Not well-defined by the user. This assumes the coordsys is eeither fk5 or image.
+			# not well-defined by the user. This assumes the coordsys is either fk5 or image.
 			if not coordsys and not coordnames: 
 				if "RA" in sources.columns.tolist():
 					xcoord = "RA" 
@@ -434,18 +435,35 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 						# Setting up radius to include arcsec mark
 						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
+					coordsys = "fk5"
+					try: 
+						rad_temp = float(radius)
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
+					except: pass;
+				elif 'X' in sources.columns.tolist(): 
+					xcoord = "X" 
+					ycoord = "Y" 
+					coordsys = "image"
 				else: 
 					xcoord = "x" 
 					ycoord = "y" 
 					coordsys = "image"	
 			elif coordsys == "fk5" and not coordnames: 
-				xcoord = "RA" 
-				ycoord = "Dec"	
+				if "RA" in sources.columns.tolist():
+					xcoord = "RA" 
+					ycoord = "Dec"
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
 				try: 
 					rad_temp = float(radius)
 					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 				except: pass;
-			elif coordsys == "image" and not coordnames: 
+			elif "im" in coordsys and not coordnames: 
 				xcoord = "x" 
 				ycoord = "y" 	
 
@@ -548,13 +566,30 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 						rad_temp = float(radius)
 						radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
+					coordsys = "fk5"
+					try: 
+						rad_temp = float(radius)
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
+					except: pass;
+				elif 'X' in sources.columns.tolist(): 
+					xcoord = "X" 
+					ycoord = "Y" 
+					coordsys = "image"
 				else: 
 					xcoord = "x" 
 					ycoord = "y" 
 					coordsys = "image"	
 			elif coordsys == "fk5": 
-				xcoord = "RA" 
-				ycoord = "Dec"	
+				if "RA" in sources.columns.tolist():
+					xcoord = "RA" 
+					ycoord = "Dec"
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
 				try: 
 					rad_temp = float(radius)
 					radius = str(rad_temp * pixtoarcs) + "\""
@@ -1149,6 +1184,3 @@ def WriteTable(frame, outfile=None, headers=None, dimensions=None):
 
 	f.close()
 	print("Done")	
-
-
-

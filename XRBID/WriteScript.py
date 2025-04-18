@@ -424,7 +424,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 			sources = sources.copy()
 			
 			# Attempting to define the coordinate system and coordinate names, if they are
-			# Not well-defined by the user. This assumes the coordsys is eeither fk5 or image.
+			# not well-defined by the user. This assumes the coordsys is either fk5 or image.
 			if not coordsys and not coordnames: 
 				if "RA" in sources.columns.tolist():
 					xcoord = "RA" 
@@ -435,13 +435,30 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 						# Setting up radius to include arcsec mark
 						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
+					coordsys = "fk5"
+					try: 
+						rad_temp = float(radius)
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
+					except: pass;
+				elif 'X' in sources.columns.tolist(): 
+					xcoord = "X" 
+					ycoord = "Y" 
+					coordsys = "image"
 				else: 
 					xcoord = "x" 
 					ycoord = "y" 
 					coordsys = "image"	
 			elif coordsys == "fk5" and not coordnames: 
-				xcoord = "RA" 
-				ycoord = "Dec"	
+				if "RA" in sources.columns.tolist():
+					xcoord = "RA" 
+					ycoord = "Dec"
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
 				try: 
 					rad_temp = float(radius)
 					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
@@ -549,13 +566,30 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 						rad_temp = float(radius)
 						radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
+					coordsys = "fk5"
+					try: 
+						rad_temp = float(radius)
+						# Setting up radius to include arcsec mark
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
+					except: pass;
+				elif 'X' in sources.columns.tolist(): 
+					xcoord = "X" 
+					ycoord = "Y" 
+					coordsys = "image"
 				else: 
 					xcoord = "x" 
 					ycoord = "y" 
 					coordsys = "image"	
 			elif coordsys == "fk5": 
-				xcoord = "RA" 
-				ycoord = "Dec"	
+				if "RA" in sources.columns.tolist():
+					xcoord = "RA" 
+					ycoord = "Dec"
+				elif "ra" in sources.columns.tolist():
+					xcoord = "ra" 
+					ycoord = "dec"
 				try: 
 					rad_temp = float(radius)
 					radius = str(rad_temp * pixtoarcs) + "\""
