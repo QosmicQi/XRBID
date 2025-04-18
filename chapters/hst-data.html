@@ -512,7 +512,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">astropy.wcs</span> <span class="kn">import</span> <span class="n">WCS</span> <span class="c1"># defining the coordinate system, e.g. RA/Dec</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
 
-<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">info</span><span class="p">())</span> <span class="c1"># Display the hdu info to get more information about what it contains</span>
 
 <span class="c1"># Setting up the figure</span>
@@ -538,9 +538,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">reproject</span> <span class="kn">import</span> <span class="n">reproject_interp</span>    <span class="c1"># May need to install first</span>
 
 <span class="c1"># Calling FITS files as the RGB filters</span>
-<span class="n">hdu_r</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f814w_example.fits&#39;</span><span class="p">)</span>
-<span class="n">hdu_g</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f555w_example.fits&#39;</span><span class="p">)</span>
-<span class="n">hdu_b</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_r</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f814w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_g</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f555w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_b</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
 <span class="n">data_g</span> <span class="o">=</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>   <span class="c1"># Pulling data from FITS HDU</span>
 
 <span class="c1"># Resizing images that don&#39;t match the base HDU, hdu_g (required)</span>

@@ -43,8 +43,7 @@ Example radial profile of an *HST* star. In this case, half-max occurs at around
 To run `RunPhots`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
 
 ```
-from AutoPhots import RunPhots
-%run AutoPhots.py     # Only run if running in .ipynb
+from XRBID.AutoPhots import RunPhots
 
 # Running analysis on full mosaic. Can be done on individual
 # fields using the 'suffix' parameter to differentiate savefile names
