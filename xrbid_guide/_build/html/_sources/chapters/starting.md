@@ -3,7 +3,7 @@
 
 There is a list of different software you'll need to properly analyze *CXO* and *HST*, which I've compiled here. 
 
-```{note}
+```{important}
 If you're using a Mac and your operating system is older than version 12.0, you may encounter unexpected issues with these applications. Please ensure your OS is up to date, if possible, before continuing! This chapter assumes you're using a Mac, but if not, most of these programs will have a Linux installation as well.
 ```
 
@@ -17,7 +17,7 @@ If you encounter any errors while running these programs, please check {ref}`cha
 ## Installing Software
 
 ### `Anaconda` and `python`
-The code I use in my work is based on `python`, so you will need to set that up before starting with the data[^1]. The best way to do this is to start with Anaconda. This is generally a painless process, as Anaconda takes care of the rest of your `python` setup for you, except for a few specialized packages you may need.  
+The code I use in my work is based in `python`, so you will need to set that up before starting with the data[^1]. The best way to do this is to start with Anaconda. This is generally a painless process, as Anaconda takes care of the rest of your `python` setup for you, except for a few specialized packages you may need.  
 
 If you haven't already, install the appropriate version of Anaconda from here:
 https://docs.anaconda.com/anaconda/install/
@@ -28,7 +28,7 @@ Once you install Anaconda, you can use the `conda` command to handle future comm
 `stenv` is a pre-made astronomy-based environment that will automatically install a ton of astronomy-related packages. You can find instructions on setting up `stenv` here:
 https://stenv.readthedocs.io/en/latest/getting_started.html
 
-Skip the `conda` installation instructions and follow the instructions under `Choose an stenv release`, making sure to follow the `conda` instructions and not the `micromamba` or `mamba` instructions. To enter the `stenv` environment after setting it up, you'll simply type into the command line (AKA the terminal): 
+Follow the instructions under `Choose an stenv release`, making sure to follow the `conda` instructions (third tab) and not the `micromamba` or `mamba` instructions. To enter the `stenv` environment after setting it up, you'll simply type into the command line (AKA the terminal): 
 ```
 conda activate stenv
 ``` 
@@ -45,15 +45,50 @@ If you encounter other issues with `conda`, try running:
 conda update conda
 ```
 
+### Other `python` packages
+
+#### `XRBID` and `git`
+Some of these packages may require `git` to install. Most Mac computers will have this software already installed, but if you're using an older machine, you may have to install it manually: 
+https://github.com/git-guides/install-git
+
+By now, you should have already installed the `XRBID` package from GitHub. If you haven't, you can find the installation instructions at this repository: https://github.com/QosmicQi/XRBID
+
+You can either install this in the `stenv` environment, or make a new one to make sure this package doesn't accidentally interfere with your normal `python` setup. For example, you can make a copy of the `stenv` environment and install XRBID there: 
+```
+conda create --name xrbenv --clone stenv
+conda activate xrbenv
+```
+
+```{note}
+I am currently making changes to the installation and read-in of the modules in XRBID, so some of the code in the rest of this guide may soon change. Keep an eye out for XRBID version 2.0!! 
+```
+
+#### `PyVO`
+If you intend to query *HST* images (or any publicly-available archival astronomy data) through `python`, you will likely need to install `PyVO`, which may be found here: 
+https://pyvo.readthedocs.io/en/latest/  
+
+#### `astroquery`
+If you plan on creating mosaics from the *HST* images, you will also want to install `astroquery`, found here: https://astroquery.readthedocs.io/en/latest/#using-astroquery
+
+#### `DrizzlePac`
+To make mosaics, you'll also need to install `DrizzlePac`[^3], which contains the `AstroDrizzle` function. *But* `DrizzlePac` will probably give you issues if installed on its own, so it's recommended to install and run it in a custom environment (`stenv` or `xrbenv`). `stenv` should have automatically installed `DrizzlePac`, but in the event it didn't, you can find it here: 
+https://drizzlepac.readthedocs.io/en/latest/
+
+Remember to enter the proper environment first before running the installation, for example: 
+```
+conda activate stenv
+```  
+
 ### The Chandra Source Catalog and related tools
 
 To find and download *CXO* sources, you will need the Chandra Source Catalog (`CSC`) desktop app (unless you're using their webpage). This requires `Java`: http://www.java.com
 
 Next, install the `CSC` desktop app, `CSCview`: http://cda.cfa.harvard.edu/cscview/
 
-`CSC` outputs data in the form of `VOTables` or `TSV` (tab-separated value) tables, which are basically forms of spreadsheets. You may find it easier to open these formats using a program like `TOPCAT`: https://www.star.bris.ac.uk/~mbt/topcat/#install 
+#### `TOPCAT`
+`CSC` outputs data in the form of `VOTables` or `TSV` (tab-separated value) tables, which are basically forms of spreadsheets. You may find it easier to open these formats using a program like `TOPCAT` (thought this is not strictly required): https://www.star.bris.ac.uk/~mbt/topcat/#install 
 
-I recommend running the `Standalone Jar File`, but you can also do a full install of the graphic interface with: 
+You can either run the `Standalone Jar File` (which will require you to open the program through the terminal), or you can do a full install of the graphic interface by downloading the `PKG Packaged Application` (currently only available on Mac OS X) or by entering into the terminal: 
 ```
 url -OL http://www.starlink.ac.uk/topcat/topcat-all.dmg
 ```
@@ -75,23 +110,10 @@ mkdir bin
 
 If while installing `DS9` you encounter an error that states the program has an unknown developer, you will need to change the security settings of your computer to allow you to proceed anyway. If you have no issues installing `DS9` but have trouble opening it, then make sure `Darwin X11` and `XQuartz` are installed and up to date on your computer.
 
-### Other `python` packages
-
-If you intend to query *HST* images (or any publicly-available archival astronomy data) through `python`, you will likely need to install `PyVO`, which may be found here: 
-https://pyvo.readthedocs.io/en/latest/  
-
-If you plan on creating mosaics from the *HST* images, you will also want to install `astroquery`, found here: https://astroquery.readthedocs.io/en/latest/#using-astroquery
-
-To make mosaics, you'll also need to install `DrizzlePac`[^3], which contains the `AstroDrizzle` function. *But* `DrizzlePac` will probably give you issues if installed on its own, so it's recommended to install and run it in a custom environment (`stenv`). `stenv` should have automatically installed `DrizzlePac`, but in the event it didn't, you can find it here: 
-https://drizzlepac.readthedocs.io/en/latest/
-
-Remember to enter the `stenv` environment first before running the installation: 
+Please note, there are some process in this guide that open `DS9` as a bash script (e.i. `XRBID.WriteScript.WriteDS9`). These scripts require you open a special terminal before running them, or you may run into errors with `Darwin X11` or `XQuartz`: 
 ```
-conda activate stenv
-```  
-
-Some of these packages may require `git` to install. Most Mac computers will have this software already installed, but if you're using an older machine, you may have to install it manually: 
-https://github.com/git-guides/install-git
+xterm &
+```
 
 ## Starting `python`
 
@@ -110,23 +132,27 @@ jupyter notebook &
 (where the optional `&` opens the notebook separately from the command line, keeping the command line free for continued use). 
 
 
-This command will open an interface in a new browser window/tab with a list of files in the directory from withing which you called the command. You can select a pre-existing notebook (which have the suffix `.ipynb`), or create a new one using the `New > Notebook` option in the menu on the right. This will open a new `.ipynb` for you to work within. 
+This command will open an interface in a new browser window/tab with a list of files in the directory from withing which you called the command. You can select a pre-existing notebook (which have the suffix `.ipynb`), or create a new one using the `New > Notebook` option in the menu on the right. This will open a new `.ipynb` for you to work within. Make sure the kernel matches the environment you wish to run the code out of. 
 
 
 ```{note}
 If you wish to run it out of the `stenv` environment, be sure to run `conda activate stenv` first, regardless of whether you're running your code out of the command line or an `iPython` notebook. 
 ```
 
-Alternatively, you can run this entire project out of Google Colaboratory, a `python` compiler that runs out of Google Drive. This has the benefit of being able to run from anywhere from any computer, regardless of the operating system. However, the downside is that it's much slower than running `python` on your laptop and is prone to timing out if too much memory is used at once. To open `python` in Google, enter your Google Drive, navigate to your preferred directory, select `+ New > More > + Connect more apps` and find Google Colab on the list (it has an orange CO logo). Afer installing it once, you'll be able to find the app under `+ New > More` without having to install it again. From there, you can install all necessary astronomy packages into Google Colab using `!pip install` within one of the cells. You should only have to do this once per package, which should then be accessible to any other Google Colab notebook you make. 
+Alternatively, you can run this entire project out of Google Colaboratory, a `python` compiler that runs out of Google Drive. This has the benefit of being able to run from anywhere from any computer, regardless of the operating system. However, the downside is that it's much slower than running `python` on your laptop and is prone to timing out if too much memory is used at once. To open `python` in Google, enter your Google Drive, navigate to your preferred directory, select `+ New > More > + Connect more apps` and find Google Colab on the list (it has an orange CO logo). Afer installing it once, you'll be able to find the app under `+ New > More` without having to install it again. From there, you can install all necessary astronomy packages into Google Colab using `!pip install` within one of the cells.
+
+```{note}
+Google Colab does not currently support persistent installations, meaning you will need to re-install all special packages each time you start a new runtime. This includes your installation of `XRBID`!
+``` 
 
 ## Starting `CSC` (and complementary programs)
 
-To open `CSC` on a Mac, you should be able to click on the application icon and have it open directly. Otherwise, you may call it from the command line from the directory where it was installed:  
+To open `CSC` on a Mac, you should be able to click on the application icon and have it open directly. If you chose to download the `Standalone Jar File`, you may call it from the command line from the directory where it was installed:  
 
 ```
 java -jar cscview.jar
 ``` 
-or, if you have a newer version of `java` than I use: 
+or, if you have a newer version of `java` than I use, you can call it with: 
 
 ```
 java --add-modules java.se.ee -jar cscview.jar
@@ -143,7 +169,17 @@ From there, you should be able to navigate to your desired table and open it to 
 
 Throughout this guide, I will be organizing my data as Pandas `DataFrames`. I've found this is the easiest way to view large collections of data. There are certainly more efficient data formats, but I appreciate the ability to seamlessly mix strings and numbers into a readable (and writeable) table. One thing to note, however: `DataFrames` are not very good at saving numerical data to a high degree of precision, so be wary when reading and writing values. If you notice minor discrepancies in your numbers when working on your data on different days, the `DataFrames` may be the culprit! 
 
-At the end of the guide, I will provide the code I use to manage and manipulate these `DataFrame` files, which may be of use to you as well or may form the baseline of your own code. This code, and all other custom functions, are provided in the `pyfiles` folder on the XRBID GitHub repository.
+Provided in the `XRBID` package is a custom module for searching and modifying the `DataFrames` created in this guide called `DataFrameMod()`. The most important tool within this module is the `Find()` function (`XRBID.DataFrameMod.Find`), which allows the user to find entries with specific values under a given header. For example, one may use: 
+
+```
+from XRBID.DataFrameMod import Find
+Find(df_example, "CSC ID = 2CXO J140312.5+542056")
+```
+to find a specific X-ray source under the header "CSC ID" in a `DataFrame` called "df_example", or 
+```
+Find(df_example, ["CSC ID = 2CXO J140312.5+542056", "Theta < 3"])
+```
+to stack search criteria. Some more examples of its use can be found throughout the guide. 
 
 
 [^1]: Alternatively, {cite}`chandar20` choose to use `IRAF` for their photometric measurements. I will not go into detail about how that is done, but if you find you'd rather use `IRAF` (or `PyRAF`), [more information about its installation can be found here](https://faculty1.coloradocollege.edu/~sburns/courses/18-19/pc362/Anaconda_IRAF_install.html).

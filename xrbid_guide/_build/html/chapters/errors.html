@@ -60,7 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/errors';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Classifiying XRB Donor Stars" href="selection.html" />
+    <link rel="prev" title="Estimating XRB Masses with CMDs and CCDs" href="cmds.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -183,10 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daoclean.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Errors and How to Fix Them</a></li>
 </ul>
 
@@ -391,11 +394,13 @@ document.write(`
 <ul class="simple">
 <li><p>When trying to run <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">astroquer.mast</span> <span class="pre">as</span> <span class="pre">Observation</span></code>, I encountered an error stating that <code class="docutils literal notranslate"><span class="pre">StructuredUnit</span></code> could not be imported from <code class="docutils literal notranslate"><span class="pre">astropy.units</span></code>.
 <strong>SOLUTION:</strong> In the command line, run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">update</span> <span class="pre">astropy</span></code>. Then, reopen <code class="docutils literal notranslate"><span class="pre">python</span></code> or the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> and run again the import.</p></li>
+<li><p>While importing <code class="docutils literal notranslate"><span class="pre">TweakReg</span></code> with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">drizzlepack</span> <span class="pre">import</span> <span class="pre">tweakreg</span></code>, particularly on a MAC with a Silicon chip, you may encounter an importation error. This is caused by some problem during the installation process.
+<strong>SOLUTION:</strong> In the terminal, try to force conda to reinstall <code class="docutils literal notranslate"><span class="pre">scipy</span></code>, <code class="docutils literal notranslate"><span class="pre">libgfortran</span></code>, and <code class="docutils literal notranslate"><span class="pre">libgfortran5</span></code> with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">--force-reinstall</span> <span class="pre">scipy</span> <span class="pre">libgfortran</span> <span class="pre">libgfortran5</span></code>. If this doesn’t work, you can try uninstalling and reinstalling <code class="docutils literal notranslate"><span class="pre">drizzlepac</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">drizzlepac</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">remove</span> <span class="pre">drizzlepac</span></code>, followed by <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">-c</span> <span class="pre">astroconda</span> <span class="pre">drizzlepac</span></code>. If that fails, consult with ChatGPT and try its solutions until something works.</p></li>
 <li><p>While running <code class="docutils literal notranslate"><span class="pre">TweakReg</span></code>, I encountered an error that read: <code class="docutils literal notranslate"><span class="pre">OSError:</span> <span class="pre">Empty</span> <span class="pre">or</span> <span class="pre">corrupt</span> <span class="pre">FITS</span> <span class="pre">file</span></code>.
 <strong>SOLUTION:</strong> At least one of the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files in your input list is bad. If you run each individual file through <code class="docutils literal notranslate"><span class="pre">TweakReg</span></code>, you may eventually find one (or more) that returns
 <code class="docutils literal notranslate"><span class="pre">ValueError:</span> <span class="pre">Input</span> <span class="pre">file</span> <span class="pre">'&lt;filename&gt;'</span> <span class="pre">is</span> <span class="pre">neither</span> <span class="pre">a</span> <span class="pre">GEIS</span> <span class="pre">file</span> <span class="pre">nor</span> <span class="pre">a</span> <span class="pre">FITS</span> <span class="pre">file.</span></code> Remove these from your item list. You can also attempt to open each FITS file in a for loop using a try and except block to find the bad files; this is a quicker method.</p></li>
 <li><p>When trying to run a bash script obtained by running WriteDS9, received the error <code class="docutils literal notranslate"><span class="pre">application-specific</span> <span class="pre">initialization</span> <span class="pre">failed:</span> <span class="pre">couldn't</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">display</span> <span class="pre">&quot;:0&quot;</span></code>.
-<strong>SOLUTION:</strong> Try opening an XQuartz terminal either through the application or by typing <code class="docutils literal notranslate"><span class="pre">xterm</span> <span class="pre">&amp;</span></code> into the terminal. The bash script should be executable through that new terminal. If you receive an additional error <code class="docutils literal notranslate"><span class="pre">application-specific</span> <span class="pre">initialization</span> <span class="pre">failed:</span> <span class="pre">couldn't</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">display</span> <span class="pre">&quot;:1&quot;</span></code>, run <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DISPLAY=:0</span></code> and try again. One may also try to following steps in the terminal:</p></li>
+<strong>SOLUTION:</strong> Try opening an XQuartz terminal either through the application or by typing <code class="docutils literal notranslate"><span class="pre">xterm</span> <span class="pre">&amp;</span></code> into the terminal. The bash script should be executable through that new <code class="docutils literal notranslate"><span class="pre">xterm</span></code> terminal. If you receive an additional error <code class="docutils literal notranslate"><span class="pre">application-specific</span> <span class="pre">initialization</span> <span class="pre">failed:</span> <span class="pre">couldn't</span> <span class="pre">connect</span> <span class="pre">to</span> <span class="pre">display</span> <span class="pre">&quot;:1&quot;</span></code>, run <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DISPLAY=:0</span></code> and try again. One may also try to following steps in the standard command line terminal:</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pkill Xquartz
 open -a XQuartz
@@ -441,12 +446,12 @@ xterm &amp;
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="selection.html"
+       href="cmds.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Classifiying XRB Donor Stars</p>
+        <p class="prev-next-title">Estimating XRB Masses with CMDs and CCDs</p>
       </div>
     </a>
 </div>
@@ -475,7 +480,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -184,10 +184,13 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Selecting Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="daoclean.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
 </ul>
 
@@ -403,13 +406,14 @@ In general, the process I use can be broken down into these basic steps:</p>
 <ol class="arabic simple">
 <li><p>Select a galaxy (or galaxies) of interest;</p></li>
 <li><p>Obtain the <em>CXO</em> X-ray Data from the Chandra Source Catalog (<code class="docutils literal notranslate"><span class="pre">CSC</span></code>);</p></li>
-<li><p>Obtain the optical imaging from the <em>HST</em> from the Hubble Legacy Archive (HLA) or MAST either directly or through an HLA query;</p></li>
-<li><p>Calculate the photometric corrections on each <em>HST</em> field;</p></li>
+<li><p>If necessary, obtain the optical imaging from the <em>HST</em> from the Hubble Legacy Archive (HLA) or MAST either directly or through an HLA query;</p></li>
 <li><p>If necessary, combine the <em>HST</em> images into a single mosaic using <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> (this step isn’t strictly required, but may be useful for a variety of reasons);</p></li>
+<li><p>Identify point sources in HST image(s);</p></li>
+<li><p>Calculate the photometric corrections on each <em>HST</em> field/image;</p></li>
 <li><p>Perform astrometric corrections on the X-ray coordinates to align them to the optical image;</p></li>
 <li><p>Identify candidate optical counterparts for each X-ray source;</p></li>
 <li><p>Identify supernova remnants, background galaxies, and foreground stars among the optical counterparts;</p></li>
-<li><p>Take the photometry of candidate donor stars and host star clusters, including photometric corrections;</p></li>
+<li><p>Extract the photometry of candidate donor stars and host star clusters, including photometric corrections;</p></li>
 <li><p>Create a color-magnitude diagram of candidate donor stars or color-color diagrams of candidate host star clusters to estimate the masses of the XRB donor stars; and</p></li>
 <li><p>Perform any other analysis necessary on the XRB populations.</p></li>
 </ol>
@@ -518,7 +522,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>
