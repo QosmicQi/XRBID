@@ -14,7 +14,6 @@ pd.options.mode.chained_assignment = None
 import warnings
 warnings.filterwarnings("ignore")
 
-
 from XRBID.DataFrameMod import FindUnique
 from XRBID.Sources import GetCoords
 from XRBID.DataFrameMod import BuildFrame

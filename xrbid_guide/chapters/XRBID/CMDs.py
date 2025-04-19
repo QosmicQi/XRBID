@@ -22,6 +22,7 @@ pd.options.mode.chained_assignment = None
 
 # Pull directory where XRBID files are saved
 file_dir = os.path.dirname(os.path.abspath(__file__))
+curr_dir = pwd()
 
 from XRBID.DataFrameMod import Find, BuildFrame
 from XRBID.Sources import LoadSources
@@ -31,44 +32,66 @@ default_aps = [i for i in range(1,31)] #[0.5,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,15.,
 # Labels associated with each line. Sources BELOW each line (but above the previous) get this label
 mass_labels = ["Low", "Intermediate", "Intermediate", "High"]
 
-#print("Testing load on CMDs.py")
+# Old code refers to headers as defined below. These will need to be updated - 4/18/25
+V = "V"
+B = "B" 
+I = "I"
+U = "U"
 
+# Calling in tracks for future use by MakeCMD
+cd(file_dir)
+
+wfc3_masses = [pd.read_csv("isoWFC3_1Msun.frame"), pd.read_csv("isoWFC3_3Msun.frame"), pd.read_csv("isoWFC3_5Msun.frame"),
+	       pd.read_csv("isoWFC3_8Msun.frame"), pd.read_csv("isoWFC3_20Msun.frame")]
+
+acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Msun.frame"), pd.read_csv("isoACS_WFC_5Msun.frame"),
+	      pd.read_csv("isoACS_WFC_8Msun.frame"), pd.read_csv("isoACS_WFC_20Msun.frame")]
+
+cd(curr_dir)
 
 ###-----------------------------------------------------------------------------------------------------
 
-def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir=False): 
+def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, figsize=(6,4), xlim=None, ylim=None, color="black", size=10, marker=None, label=None, save=False, savefile=None, title=None, subimg=None, annotation=None, annotation_size=None, imshow=True, fontsize=15, shift_labels=[[0,0],[0,0],[0,0],[0,0],[0,0]], set_labels=None, instrument="ACS", color_correction=[0,0], labelpoints=False, file_dir=False): 
 
 	"""Makes a CMD from a given set of points, either from a list or an input dataframe.
 
 	PARAMETERS: 
-	sources [pd.dataframe or list] (None): 	Input may either be a pandas dataframe containing the appropriate magnitudes required for the CMD, 
+	sources 	[pd.dataframe, list]: 	Input may either be a pandas dataframe containing the appropriate magnitudes required for the CMD, 
 				       		or a list of coordinates in the format [[xs],[ys]]. 
-	xcolor [str or list]: 			The name of the color or magnitude to plot in the x-axis, as it is labeled in the dataframe. This will be the default x-axis label. If a list is given, it is 							assumed to contain the column names of the input dataframe to be subtracted (e.g. F555W - F814W)
-	ycolor [str or list]: 			The name of the color or magnitude to plot in the y-axis, as it is labeled in the dataframe. This will be the default y-axis label. If a list is given, it is 							assumed to contain the column names of the input dataframe to be subtracted (e.g. F555W - F814W)
-	xmodel [str or list]: 			The magnitude(s) of the filter(s) to be used from the stellar models for the x-axis. If given as a list, it is assumed the color is xmodel[0] - xmodel[1] 
-	ymodel [str or list]: 			The magnitude(s) of the filter(s) to be used from the stellar models for the y-axis. If given as a list, it is assumed the color is ymodel[0] - ymodel[1] 
-	figsize [tuple] (6,4): 			The desired dimensions of the figure. 
-	xlim [tuple] (None): 			The limits on the x-axis. If none are given, the limits are assumed to be the (xmin - 1, xmax + 1) 
-	ylim [tuple] (None) 			The limits on the y-axis. If none are given, the limits are assumed to be (ymax + 1, ymin - 1)
-	color [str] ("black"): 			Marker color
-	size [int] (10): 			Marker size
-	marker [str] (None):			The style of the marker. Defaults to a filled point. If "o" is given, the marker is set to be an open circle. 
-	label [str] (None):			The legend label to assign to the input points from sources. 
-	save (bool) (False): 			Sets whether to automatically same the CMD image. 
-	savefile [str] (None): 			The name to assigned the saved CMD image. 
-	title [str)] (None): 			Title of the figure, to be placed near, but not at, the top of the figure.
-	subimg [str] (None): 			Filename of an image to include in the corner of the CMD. This is to allow a subplot of the XRB plotted to be shown within the CMD. 
-	annotation [str] (None): 		Additional annotation to add to the bottom corner of the CMD (usually XRB ID)
+	xcolor 		[str or list]: 		The name of the color or magnitude to plot in the x-axis, as it is labeled in the dataframe. 
+						This will be the default x-axis label. If a list is given, it is assumed to contain the 
+						column names of the input dataframe to be subtracted (e.g. F555W - F814W)
+	ycolor 		[str or list]: 		The name of the color or magnitude to plot in the y-axis, as it is labeled in the dataframe. 
+						This will be the default y-axis label. If a list is given, it is assumed to contain the column 
+						names of the input dataframe to be subtracted (e.g. F555W - F814W)
+	xmodel 		[str or list]: 		The magnitude(s) of the filter(s) to be used from the stellar models for the x-axis. 
+						If given as a list, it is assumed the color is xmodel[0] - xmodel[1] 
+	ymodel 		[str or list]: 		The magnitude(s) of the filter(s) to be used from the stellar models for the y-axis. 
+						If given as a list, it is assumed the color is ymodel[0] - ymodel[1] 
+	figsize 	[tuple] (6,4): 		The desired dimensions of the figure. 
+	xlim 		[tuple] (None):		The limits on the x-axis. If none are given, the limits are assumed to be the (xmin - 1, xmax + 1) 
+	ylim 		[tuple] (None):		The limits on the y-axis. If none are given, the limits are assumed to be (ymax + 1, ymin - 1)
+	color 		[str] ("black"): 	Marker color
+	size 		[int] (10): 		Marker size
+	marker 		[str] (None):		The style of the marker. Defaults to a filled point. If "o" is given, 
+						the marker is set to be an open circle. 
+	label 		[str] (None):		The legend label to assign to the input points from sources. 
+	save 		[bool] (False): 	Sets whether to automatically same the CMD image. 
+	savefile 	[str] (None): 		The name to assigned the saved CMD image. 
+	title 		[str)] (None): 		Title of the figure, to be placed near, but not at, the top of the figure.
+	subimg 		[str] (None): 		Filename of an image to include in the corner of the CMD. 
+						This is to allow a subplot of the XRB plotted to be shown within the CMD. 
+	annotation 	[str] (None): 		Additional annotation to add to the bottom corner of the CMD (usually XRB ID)
 	annotation_size [int] (None): 		Annotation fontsize 
-	imshow [bool] (True): 				
-	fontsize [int] (20): 			The fontsize of text other than the annoations
-	shift_labels [list]: 			List of x and y coordinate distances by which to shift each of the model mass labels.
+	imshow 		[bool] (True): 		Shows the plot.
+	fontsize 	[int] (20): 		The fontsize of text other than the annoations
+	shift_labels 	[list]: 		List of x and y coordinate distances by which to shift each of the model mass labels.
 						Defaults to [[0,0],[0,0],[0,0],[0,0],[0,0]] (no shifts)
-	set_labels [list] (None):		Sets the position of labels. If none is given, positions are automatically calculated.
-	instrument [str] ("ACS"): 		Name of the instrument used, to determine which models to call. 
-	color_correction [list] ([0,0]): 	Corrections on the x and y position of the sources. Defaults to no correction. 
-	labelpoints [list] (False): 		Labels to add to each point. If none are given, defaults to False and no labels added. 
-	file_dir [str]: 			The directory within which the models may be found. By default, the 
+	set_labels 	[list] (None):		Sets the position of labels. If none is given, positions are automatically calculated.
+	instrument 	[str] ("ACS"): 		Name of the instrument used, to determine which models to call. 
+	color_correction [list] ([0,0]):	Corrections on the x and y position of the sources. Defaults to no correction. 
+	labelpoints 	[list] (False): 	Labels to add to each point. If none are given, defaults to False and no labels added. 
+	file_dir 	[str]: 			The directory within which the models may be found. By default, the 
 						code attempts to find this automatically, but if it fails, it will 
 						prompt the user to input the directory manually. 
 
@@ -85,30 +108,31 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 	# If no file directory is given, assume the files we need are in the same directory
 	# where the module is saved
-	if not file_dir: 
-		file_dir = os.path.dirname(os.path.abspath(__file__))
+	#if not file_dir: 
+	#	file_dir = os.path.dirname(os.path.abspath(__file__))
 
-	try: cd(file_dir)
-	except: print("Directory containg CMD models not found.\nPlease check and input the correct directory manually with file_dir.")
+	#try: cd(file_dir)
+	#except: print("Directory containg CMD models not found.\nPlease check and input the correct directory manually with file_dir.")
 
 	# Reading in the appropriate models based on the instrument given.
-	if instrument.upper() =="WFC3":
-		mass1 = pd.read_csv("isoWFC3_1Msun.frame")
-		mass3 = pd.read_csv("isoWFC3_3Msun.frame")
-		mass5 = pd.read_csv("isoWFC3_5Msun.frame")
-		mass8 = pd.read_csv("isoWFC3_8Msun.frame")
-		mass20 = pd.read_csv("isoWFC3_20Msun.frame")
-	elif instrument.upper() =="ACS": 
-		mass1 = pd.read_csv("isoACS_WFC_1Msun.frame")
-		mass3 = pd.read_csv("isoACS_WFC_3Msun.frame")
-		mass5 = pd.read_csv("isoACS_WFC_5Msun.frame")
-		mass8 = pd.read_csv("isoACS_WFC_8Msun.frame")
-		mass20 = pd.read_csv("isoACS_WFC_20Msun.frame")
+	#if instrument.upper() =="WFC3":
+	#	mass1 = pd.read_csv("isoWFC3_1Msun.frame")
+	#	mass3 = pd.read_csv("isoWFC3_3Msun.frame")
+	#	mass5 = pd.read_csv("isoWFC3_5Msun.frame")
+	#	mass8 = pd.read_csv("isoWFC3_8Msun.frame")
+	#	mass20 = pd.read_csv("isoWFC3_20Msun.frame")
+	#elif instrument.upper() =="ACS": 
+	#	mass1 = pd.read_csv("isoACS_WFC_1Msun.frame")
+	#	mass3 = pd.read_csv("isoACS_WFC_3Msun.frame")
+	#	mass5 = pd.read_csv("isoACS_WFC_5Msun.frame")
+	#	mass8 = pd.read_csv("isoACS_WFC_8Msun.frame")
+	#	mass20 = pd.read_csv("isoACS_WFC_20Msun.frame")
 
-	masses = [mass1, mass3, mass5, mass8, mass20] # list of DataFrames of each mass model
+	if instrument.upper() =="WFC3": masses = wfc3_masses # list of DataFrames of each mass model
+	else: masses = acs_masses
 	mass_labels = ["1 M$_\odot$", "3 M$_\odot$", "5 M$_\odot$", "8 M$_\odot$", "20 M$_\odot$"]
 
-	cd(curr_dir) 
+	#cd(curr_dir) 
 
 	if savefile: save = True
 
@@ -124,15 +148,16 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 	### Pulling the x and y values of the sources ###
 	# if input source is a pandas dataframe, read in the appropriate colors and magnitudes (and add correction, if needed)
-	if isinstance(sources, pd.DataFrame):
-		if isinstance(xcolor, list): xsources = sources[xcolor[0]].values - sources[xcolor[1]].values + color_correction[0]
-		else: xsources = sources[xcolor].values + color_correction[0]
-		if isinstance(ycolor, list): ysources = sources[ycolor[0]].values - sources[ycolor[1]].values + color_correction[1]
-		else: ysources = sources[ycolor].values + color_correction[1]
+	if sources: 
+		if isinstance(sources, pd.DataFrame):
+			if isinstance(xcolor, list): xsources = sources[xcolor[0]].values - sources[xcolor[1]].values + color_correction[0]
+			else: xsources = sources[xcolor].values + color_correction[0]
+			if isinstance(ycolor, list): ysources = sources[ycolor[0]].values - sources[ycolor[1]].values + color_correction[1]
+			else: ysources = sources[ycolor].values + color_correction[1]
 		
-	else: # If sources is a list or coordinates, pull the x and y values as given (with additional color correction)
-		xsources = (np.array(sources[0]) + color_correction[0]).tolist()
-		ysources = (np.array(sources[1]) + color_correction[1]).tolist()	
+		else: # If sources is a list or coordinates, pull the x and y values as given (with additional color correction)
+			xsources = (np.array(sources[0]) + color_correction[0]).tolist()
+			ysources = (np.array(sources[1]) + color_correction[1]).tolist()	
 	### Will only need to call xsources or ysources from now on ###
 
 	
@@ -193,17 +218,18 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 	ylims = np.array(ylims) 
 
 	# PLOTTING SOURCE POINTS
-	if marker == "o": 	# 'o' used for open circle 
-		ax.scatter(xsources, ysources, facecolor="none", edgecolor=color, s=size, label=label)
-	elif marker == None: 	# default is a closed circle 
-		ax.scatter(xsources, ysources, color=color, s=size, label=label)
-	else: 
-		ax.scatter(xsources, ysources, color=color, s=size, label=label, marker=marker)
+	if sources: 
+		if marker == "o": 	# 'o' used for open circle 
+			ax.scatter(xsources, ysources, facecolor="none", edgecolor=color, s=size, label=label)
+		elif marker == None: 	# default is a closed circle 
+			ax.scatter(xsources, ysources, color=color, s=size, label=label)
+		else: 
+			ax.scatter(xsources, ysources, color=color, s=size, label=label, marker=marker)
 
-	# PLOTTING POINT NAMES, IF GIVEN
-	if labelpoints: 
-		for i in range(len(labelpoints)): 
-			ax.annotate(labelpoints[i], xy=[xsources[i], ysources[i]-.2], size=10, horizontalalignment="center")
+		# PLOTTING POINT NAMES, IF GIVEN
+		if labelpoints: 
+			for i in range(len(labelpoints)): 
+				ax.annotate(labelpoints[i], xy=[xsources[i], ysources[i]-.2], size=10, horizontalalignment="center")
 
 	# Setting plot limits
 	if not xlim:
@@ -266,474 +292,48 @@ def MakeCMD(sources=None, xcolor=None, ycolor=None, xmodel=None, ymodel=None, fi
 
 ###-----------------------------------------------------------------------------------------------------
 
-def AddCMD(df=None, xcolors=VI, ycolors=V, color="black", size=10, marker=None, label=None, f=None, ax=None, color_correction=[0,0]): 
+def AddCMD(df=None, xcolor=False, ycolor=False, color="black", size=10, marker=None, label=None, f=None, ax=None, color_correction=[0,0]): 
 
 	"""Adds multiple sets of points to a single CMD plot. Should be used after MakeCMD. If plots do not print as expected, call in f and ax from MakeCMD."""
 
+	
+	# Setting the x- and y-axes labels.
+	# if xcolor and/or ycolor is a list, will need to set color[0] - color[1] as the color of the appropriate axis
+	if not xcolor: xcolor=xmodel
+	if not ycolor: ycolor=ymodel
+
+	if isinstance(xcolor, list): xlabel = " - ".join(xcolor)
+	else: xlabel = xcolor
+	if isinstance(ycolor, list): ylabel = " - ".join(ycolor)
+	else: ylabel = ycolor
+
+	### Pulling the x and y values of the sources ###
+	# if input source is a pandas dataframe, read in the appropriate colors and magnitudes (and add correction, if needed)
+	if isinstance(sources, pd.DataFrame):
+		if isinstance(xcolor, list): xsources = sources[xcolor[0]].values - sources[xcolor[1]].values + color_correction[0]
+		else: xsources = sources[xcolor].values + color_correction[0]
+		if isinstance(ycolor, list): ysources = sources[ycolor[0]].values - sources[ycolor[1]].values + color_correction[1]
+		else: ysources = sources[ycolor].values + color_correction[1]
+		
+	else: # If sources is a list or coordinates, pull the x and y values as given (with additional color correction)
+		xsources = (np.array(sources[0]) + color_correction[0]).tolist()
+		ysources = (np.array(sources[1]) + color_correction[1]).tolist()	
+	### Will only need to call xsources or ysources from now on ###
+
 	try: 
-		xi = colors.index(xcolors)
-		yi = colors.index(ycolors)
-
-
-		# Making sure all of the necessary colors are available in the DataFrame
-		try: 
-			temp = (df[xcolors].values - color_correction[0]).tolist()
-		except: 
-			df_heads = df.columns.values.tolist()
-			if xi == 3: df_xcol = (df[B].values - df[V].values - color_correction[0]).tolist()
-			elif xi == 4: df_xcol = (df[V].values - df[I].values - color_correction[0]).tolist()
-			elif xi == 5: df_xcol = (df[B].values - df[I].values - color_correction[0]).tolist()
-			else: print(xcolors + " not available.")
-			df_values = [df[i].values.tolist() for i in df_heads]
-			df_heads.append(xcolors)
-			df_values.append(df_xcol)
-			df = BuildFrame(headers=df_heads, values=df_values)
-			df_heads = df.columns.values.tolist()
-		try: 
-			temp = (df[ycolors] - color_correction[1]).values.tolist()
-		except: 
-			df_heads = (df.columns.values - color_correction[1]).tolist()
-			if yi == 3: df_ycol = (df[B].values - df[V].values - color_correction[1]).tolist()
-			elif yi == 4: df_ycol = (df[V].values - df[I].values - color_correction[1]).tolist()
-			elif yi == 5: df_ycol = (df[B].values - df[I].values - color_correction[1]).tolist()
-			else: print(ycolors + " not available.")
-			df_values = [df[i].values.tolist() for i in df_heads]
-			df_heads.append(ycolors)
-			df_values.append(df_ycol)
-			df = BuildFrame(headers=df_heads, values=df_values)
-			df_heads = df.columns.values.tolist()
-
-
 		if ax: 	# ax MUST be read in if subimg is used in MakeCMD. 
 			if marker == "o": 	# 'o' used for open circle 
-				ax.scatter(df[xcolors], df[ycolors], facecolor="none", edgecolor=color, s=size, label=label)
+				ax.scatter(xsources, ysources, facecolor="none", edgecolor=color, s=size, label=label)
 			elif marker == None: 	# default is a closed circle 
-				ax.scatter(df[xcolors], df[ycolors], color=color, s=size, label=label)
+				ax.scatter(xsources, ysources, color=color, s=size, label=label)
 		else: 
 			if marker == "o": 	# 'o' used for open circle 
-				plt.scatter(df[xcolors], df[ycolors], facecolor="none", edgecolor=color, s=size, label=label)
+				plt.scatter(xsources, ysources, facecolor="none", edgecolor=color, s=size, label=label)
 			elif marker == None: 	# default is a closed circle 
-				plt.scatter(df[xcolors], df[ycolors], color=color, s=size, label=label)
+				plt.scatter(xsources, ysources, color=color, s=size, label=label)
 
 	except: return "Failed to add points."		
 	
-
-###-----------------------------------------------------------------------------------------------------
-
-def GetMasses(df, colors=[VI,V], setv="F547M", setb="F438W", seti="F814W"): 
-
-	"""Assigns masses based on the position of the source on the CMD relative to the mass tracks. Outputs either a list of masses, or the DataFrame"""
-
-	df = df.copy()
-
-	# For calculating colors based on input xcolors, ycolors, and defined or default filters
-	# used for mass tracks
-	mass_colors = [setb, setv, seti]
-	mass_colorpairs = [[setb, setv], [setv, seti], [setb, seti]]
-
-	xi = colors.index(colors[0])   # the positions of the CMD colors lines
-	yi = colors.index(colors[1])
-
-	# Add a Mass column to the DataFrame, if one does not already exist
-	try: 
-		temp = [None]*len(df)
-		df.insert(df.shape[1], "Mass", temp)
-	except: pass;
-
-	# Comparing each source to the mass tracks
-	for i in range(len(df)): 
-		for j in range(len(min_masses)): 
-			track = min_masses[j]	# go through the tracks one by one
-			# Looking for the correct filters to compare to
-			try: 
-				if xi > 2: xtemp = track[mass_colorpairs[xi-3][0]] - track[mass_colorpairs[xi-3][1]]
-				else: xtemp = track[mass_colors[xi]]
-				if yi > 2: track = track[mass_colorpairs[yi-3][0]] - track,[mass_colorpairs[yi-3][1]]
-				else: ytemp = track[mass_colors[yi]]
-			except: 
-				xtemp = track[colors[xi]]
-				ytemp = track[colors[yi]]
-			# Interpolating the track so that we can compare magnitude at the xval of the source
-			f1 = interp1d(xtemp, ytemp, kind="nearest", fill_value="extrapolate")
-			linetemp = f1(df[colors[0]][i])
-			if df[colors[1]][i] < linetemp: 
-				df["Mass"][i] = mass_labels[j]
-				pass;
-			elif df[colors[1]][i] == linetemp: 
-				df["Mass"][i] = mass_labels[j+1]
-				break;
-			else:  
-				df["Mass"][i] = mass_labels[j]
-				break;
-
-	return df
-
-
-###-----------------------------------------------------------------------------------------------------
-
-def GetPhots(filename=None, ids=None, outfile=None, savephot=None, getaps=False, getcoords=False, aperture=None): 
-
-	"""Retrieves the photometry from a given .ph file. If IDs are given, all other objects are filtered out. Outfile saves the resulting photometry."""
-
-	if filename == None: filename = input("Photometry file name?: ")
-	phot = np.genfromtxt(filename, dtype=float)
-
-	# If IDs are given as a file or a list, filter out all other phots
-	if ids: 
-		try: 
-			ids = np.genfromtxt(ids, dtype=float)
-			ids = [int(i) for i in ids]
-		except: pass;
-		phot = np.array([phot[int(i)] for i in ids])		
-
-	if savephot: 
-		f = open(savephot, "wb")
-		np.savetxt(f, phot)
-		print(savephot + " saved!")
-
-	# Getting the number of apertures
-	numaps = int((phot.shape[-1] - 2)/3)
-	
-	if getaps: 
-		if len(phot.shape) > 1: aps = phot.T[2:numaps+2].T[0]
-		else: aps = phot[2:numaps+2]
-	if getcoords: 
-		coords = []
-		for i in range(len(phot)): 
-			coords.append([phot.T[0][i], phot.T[1][i]])
-
-	phot = phot.T[2+numaps:-1*numaps]
-	phot = phot.T
-
-	if outfile: 
-		f = open(outfile, "wb")
-		np.savetxt(f, phot)
-		print(outfile + " saved!")
-	
-	if aperture: phot = np.array(phot).T[default_aps.index(aperture)].tolist()
-
-	if getaps and getcoords: 
-		return phot, coords, aps
-	elif getaps: 
-		return phot, aps
-	elif getcoords: 
-		return phot, coords
-	else: return phot
-
-
-###-----------------------------------------------------------------------------------------------------
-
-def CorrectAp(filename=None, goodstars=None, verbose=True, getstd=False, savefile=None, savecorr=None, apertures=[3,20], savecoords=None, colors=None, labels=None, randomize=False, nrand=100, saverand=None, overwrite_rand=True, field=None, xlim=[0,20], ylim=[26,18]): 
-
-	"""For calculating the aperture correction using a sample of previously chosen and measured, bright, isolated stars. Parameter 'goodstars' may be a list of good stars ids to pull from the file listed in 'filename' or a .txt file with the ids listed. """
-	
-	# savecoords can be bool or list. If given, getcoords=True
-	if savecoords: getcoords = True
-	else: savecoords=False; getcoords = False
-
-	# If filename is given as a list, treat these as a set of files to compare
-	# Needs to convert filename as a list if only one file given. 
-	if not isinstance(filename, list): filename = [filename]
-	phots = [] # contains photometry of all stars in .ph file(s).
-	aps = []   # list of aperture sizes from the file
-	if getcoords: coords = []	# might not need coords
-	
-	# If goodstars is given, either pull list from file or read in for GetPhots
-	# This is overwritten if randomize is set to True
-	if goodstars: 
-		if ".txt" in goodstars: goodstars = np.genfromtxt(goodstars,dtype=int).tolist()
-
-	# NOTE: This is written as if more than one filename can be passed, but that doesn't work well in principle. 
-	#       Due to this, goodstars is assumed to be a single file, not a list of files, 
-	#       and filename should NOT be read in as a list (not fixed as of April 7, 2021)
-	for i in filename:
-		try: 
-			temp_phots, temp_coords, temp_aps = GetPhots(filename=i, ids=goodstars, getaps=True, getcoords=getcoords)
-			phots.append(temp_phots)
-			coords.append(temp_coords)
-			aps.append(temp_aps)
-		except: 
-			temp_phots, temp_aps = GetPhots(filename=i, ids=goodstars, getaps=True)
-			phots.append(temp_phots)
-			aps.append(temp_aps)
-
-		#--- END FOR LOOP
-
-
-	# If randomize = True, randomly draw from the input .ph file to test the correction on. 
-	# This is helpful for when finding the perfect stars is difficult. 
-	# If a good sample of perfect stars isn't picked up by this method, run again. 
-	if randomize: 
-		for i in range(len(phots)): # for each .ph file contained in phots...
-			temp = phots[i]     # look at the photometry in the current field
-			# Select nrand number of random stars
-			temp_select_temp = random.sample(range(0, len(temp)), nrand)
-			temp_select_temp.sort()
-			temp_select = []
-
-			cont = True # counter for continuing while loop
-
-			# Checks the validity of the radial profile.
-			# Stars that dip or don't flatten should be automatically excluded.
-			# While the length of temp_select is less than nrand, add more stars.
-			while cont: 
-				if len(temp_select) < nrand:
-					for j in temp_select_temp: 
-						temp2 = temp[j] # full radial profile of chosen random star
-						# checking for dips and flattened ends
-						if temp2[2] < 25.5 and temp2[-1] > 19:
-							if all(k>l for k,l in zip(temp2, temp2[1:])): # ensures the profile always decreases
-								if all(k-l<0.15 for k,l in zip(temp2[3:], temp2[4:])):
-									if j not in temp_select: temp_select.append(j)
-					temp_select_temp = random.sample(range(0, len(temp)), nrand-len(temp_select))
-				else: cont = False; pass;
-
-			temp_select.sort()
-			phots[i] = phots[i][temp_select]
-
-	# Get the magnitudes and apertures from the file
-	# Plot all of the stars magnitudes vs. aperture radius to compare straightness
-	# Plot each star mag vs. ap *** (start of loop)
-	# Ask for which star is bad
-	# Invert to create mask for "good stars"
-	# Plot all "good stars"
-	# As if process needs to be repeated *** (reset loop)
-	# If so, start from plotting each star and repeat until good
-	# Take the median and std of the aperture corrections between given apertures (?)
-	# Added 'compare=None' to give me the option to compare same stars in different filters
-	#	and remove star across the board (updated: 7/22/19)
-
-	# Getting apertures to compare
-	compare = []
-	for i in aps: compare.append([i.tolist().index(apertures[0]),i.tolist().index(apertures[1])])  
-	print("Comparing apertures: " + str(int(aps[0][compare[0][0]])) + " and " + str(int(aps[0][compare[0][1]])))
-
-	# Setting up files for saving coordinates
-	if savecoords and isinstance(savecoords, bool): 
-		# if savecoords indicated but not given, use the filenames as savecoords names
-		savecoords = []
-		for i in filename: 
-			savecoords.append(re.split(".ph", i)[0] + ".coords")
-	elif savecoords and not isinstance(savecoords, list): 
-		savecoords = [savecoords]
-
-	if savefile and not isinstance(savefile, list): 
-		savefile = [savefile]
-	
-
-	# Setting up colors and labels for plotting, if needed
-	if colors and isinstance(colors, list): 
-		while len(colors) != len(filename): 
-			print("Number of colors does not match number of files (" + str(len(filename)) + " needed)") 
-			colors = input("Plot line colors (separate by commas): ")
-			colors = re.split("\W+", colors)
-	if labels and isinstance(labels, list): 
-		while len(labels) != len(filename): 
-			print("Number of labels does not match number of files (" + str(len(filename)) + " needed)") 
-			labels = input("Plot line lables (separate by commas): ")
-			labels = re.split(",", labels)	
-
-	# Convert everything to arrays for easy manipulation
-	phots = np.array(phots)
-	aps = np.array(aps)
-	if getcoords: coords = np.array(coords)
-
-	# Plotting all stars to see if all crooked ones are removed
-	for i in range(len(phots)):
-		for j in phots[i]:  
-			plt.plot(aps[i], j)
-			plt.ylim(ylim[0],ylim[1])
-			plt.xlim(xlim[0],xlim[1])
-		plt.title(filename[i])
-		plt.show()
-
-	try: 
-		userin = input("Remove stars?: ").lower()
-		if userin[0] == "y" or userin[0] == "r": 
-			repeat = True
-		else: repeat = False; pass;
-	except: repeat = False; pass;
-
-	while repeat == True: 
-		# If verbose is set to true, then ask if star should be removed after each plot. 
-		if verbose == True: 
-
-			bad = []	# keeping track of bad stars
-
-			# Plotting all given photometry per single star with object number
-			for j in range(len(phots[0])): # for each star in files
-				for i in range(len(phots)):	# for all files
-					if colors and labels: 
-						plt.plot(aps[i], phots[i][j], color=colors[i], label=labels[i])
-						plt.legend()
-					elif colors: plt.plot(aps[i], phots[i][j], color=colors[i]) 
-					elif labels: 
-						plt.plot(aps[i], phots[i][j], label=labels[i]) 
-						plt.legend()
-					else: plt.plot(aps[i], phots[i][j])
-					plt.ylim(ylim)
-					plt.xlim(xlim)
-					if randomize: plt.ylabel("Star ID: " + str(temp_select[j]))  # So that I can keep track of the 'good' stars
-
-				plt.title("Star " + str(j), size=20)
-				plt.show()	# plot all files per star on one plot
-
-				# After plotting, ask if it should be removed (as per verbose)
-				# This just removes star # j
-				try: 
-					userin = input("Remove?: ").lower()
-					if userin[0] == "y" or userin[0] == "r": bad.append(j)
-					else: plt.close(); pass;
-				except: plt.close(); pass;
-
-			#--- END IF STATEMENT
-
-		# If verbose is set to false, plot each star first, then ask for list of stars to remove.
-		else: 
-			# Plotting each star with object number
-			for j in range(len(phots[0])): 
-				for i in range(len(phots)):
-					if colors and labels: plt.plot(aps[i], phots[i][j], color=colors[i], label=labels[i])
-					elif colors: plt.plot(aps[i], phots[i][j], color=colors[i]) 
-					elif labels: plt.plot(aps[i], phots[i][j], label=labels[i]) 
-					else: plt.plot(aps[i], phots[i][j])
-					plt.ylim(ylim[0],ylim[1])
-					plt.xlim(xlim[0],xlim[1])
-				plt.title(j, size=20)
-				plt.show()
-
-			# Removing bad stars from the list
-			bad = input("Remove which star number? (separate by commas): ")
-
-			if len(bad) > 0: 
-				bad = re.split("\W+", bad)
-				bad = [int(x) for x in bad]
-
-			#--- END ELSE STATEMENT
-
-		print("\nRemoving bad stars...\n")
-		
-		temp_phots =[]
-
-		for i in phots: # looking at all stars in each file
-			temp_phots.append([x for j,x in enumerate(i) if not j in bad])
-		phots = np.array(temp_phots)
-
-		if getcoords: # do the same if coords are given
-			temp_coords = []
-			for i in coords: 
-				temp_coords.append([x for j,x in enumerate(i) if not j in bad])
-			coords = np.array(temp_coords)
-		else: pass;
-
-		# And if randomize is set, remove bad stars from the randomized list.
-		if randomize: 
-			temp_select = [temp_select[i] for i in range(len(temp_select)) if not i in bad]
-		else: pass;
-
-
-		# Plotting all stars to see if all crooked ones are removed
-		for i in range(len(phots)):
-			for j in phots[i]:  
-				plt.plot(aps[i], j)
-				plt.ylim(ylim[0],ylim[1])
-				plt.xlim(xlim[0],xlim[1])
-			plt.title(filename[i])
-			plt.show()
-
-		# Testing current aperture correction and stds
-		print("Aperture corrections and (standard deviations)") 
-		for i in range(len(phots)): 
-			print(str(nanmedian(np.array(phots)[i].T[compare[i][0]] - np.array(phots)[i].T[compare[i][1]])) + " ("  + str(nanstd(np.array(phots)[i].T[compare[i][0]] - np.array(phots)[i].T[compare[i][1]])) + ")")
-
-		try: 	# remove more if currentaperture correction and std isn't good enough
-			userin = input("Remove more?: ").lower()
-			if userin[0] == "y": repeat = True; pass;
-			elif userin == "reset" or userin == "restart": 	# reset removal if needed
-				repeat = True
-				print("\nResetting aperture corrections...\n")
-				phots = []
-				aps = []
-				if getcoords: coords = []	# might not need coords
-				for i in filename:
-					try: 
-						temp_phots, temp_coords, temp_aps = GetPhots(filename=i, getaps=True, getcoords=getcoords)
-						phots.append(temp_phots)
-						coords.append(temp_coords)
-						aps.append(temp_aps)
-					except: 
-						temp_phots, temp_aps = GetPhots(filename=i, getaps=True)
-						phots.append(temp_phots)
-						aps.append(temp_aps)
-
-				# Printing all photometries per file
-				for i in range(len(phots)):
-					for j in phots[i]:  
-						plt.plot(aps[i], j)
-						plt.ylim(ylim[0],ylim[1])
-						plt.xlim(xlim[0],xlim[1])
-					plt.title(filename[i])
-					plt.show()
-			else: repeat = False; break;
-		except: repeat = False; break; # If no other bad stars exist, break the while cycle
-		
-		# Converting data into arrays for easier handling
-		phots = np.array(phots)
-		try: coords = np.array(coords)
-		except: pass;
-	
-		#--- END WHILE LOOP
-
-	# Saving results to a file if filename is given
-	if savefile:
-		for i in range(len(savefile)): 
-			try:
-				f = open(savefile[i], "wb")
-				np.savetxt(f, phots[i]) 
-				f.close()
-			except: print("\nSaving " + savefile[i] + " failed.")
-	if savecoords: 
-		for i in range(len(savecoords)):
-			try:
-				f = open(savecoords[i], "wb")
-				np.savetxt(f, np.column_stack([coords[i].T[0], coords[i].T[1]]))
-				f.close()
-			except: print("\nSaving " + savecoords[i] + " failed.")
-
-	# Currently only allows for a single random star selection save
-	# If the file exists, add new stars to bottom. If it doesn't, create it.
-
-	if saverand: 
-		if not overwrite_rand:
-			f = open(saverand, "a+")
-			np.savetxt(f, np.column_stack([np.array(temp_select).T]))
-			f.close()
-			print("Added " + str(len(temp_select)) + " good stars to " + saverand)
-		else: 
-			f = open(saverand, "w+")
-			np.savetxt(f, np.column_stack([np.array(temp_select).T]))
-			f.close()
-			print("Saved good stars as " + saverand)
-
-	print("Done")
-
-	# Returning results
-	return_phots = []
-	for i in range(len(phots)): 
-		return_phots.append(nanmedian(phots[i].T[compare[i][0]] - phots[i].T[compare[i][1]]))
-	
-	return_std = []
-	for i in range(len(phots)): 
-		return_std.append(nanstd(phots[i].T[compare[i][0]] - phots[i].T[compare[i][1]]))
-	
-	if savecorr: 
-		f = open(savecorr, "a+")
-		f.write(str(field)+" "+str(return_phots[0])+" "+str(return_std[0])+"\n")
-		f.close()
-
-	if getstd: return return_phots, return_std
-	else: return return_phots
-
 
 ###-----------------------------------------------------------------------------------------------------
 
@@ -838,14 +438,11 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 
 ###-----------------------------------------------------------------------------------------------------
 
-###-----------------------------------------------------------------------------------------------------
-
-def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=3.63e6, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=0): 
+def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, ID_header=ID, coord_headers=["X", "Y"], extinction=0): 
 
 	"""Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter (so that it doesn't require all filters to be given if only one measurement is needed). The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
-	try: frame = frame.copy()
-	except: pass;
+	if df: frame = df.copy()
 
 	curr_dir = pwd()
 	# Loading in the EEFs file
@@ -870,25 +467,11 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 		phots = []
 		phots.append(frame[header])
 
+	if not distance: distance = input("Input distance to galaxy (in parsecs): ")
 	dmod = 5.*log10(distance/10.)
 
 	# Converting to absolute magnitudes? 
 	Mag = phots - dmod - extinction
-
-	# Finding the proper corrections factor. If none given, find proper defaults.
-	# Double check this. I believe this is now obsolete
-	#if not correction: 
-	#	if not field: 
-	#		try: field = frame["Field"].values.tolist()
-	#		except: field = input("Image Field? (f_):")
-	#	if isinstance(field, list): 
-	#		correction = [Corrections[header][int(i)-1] for i in field]
-	#		correction = np.array(correction)
-	#	else: 
-	#		try: corr = int(re.split("f", field.lower())[-1][0])
-	#		except: corr = int(field)
-	#		correction = [Corrections[header][corr-1]]
-	#		correction = np.array(correction)
 
 	# Calculating the corrections
 	try: 
@@ -900,10 +483,10 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 	#	if corr[i] > 100 or corr[i] < -100: corr[i] = np.nan
 
 	if savefile: 
-		try: Mags = BuildFrame(headers=[ID_header, X, Y, header], \
+		try: Mags = BuildFrame(headers=[ID_header, coord_headers[0], coord_headers[1], header], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], corr])
 		except: 
-			Mags = BuildFrame(headers=[ID_header, X, Y, header], \
+			Mags = BuildFrame(headers=[ID_header, coord_headers[0], coord_headers[1], header], \
 		         values = [frame[ID_header], frame[coord_headers[0]], frame[coord_headers[1]], corr])
 
 		Mags.to_csv(savefile)
@@ -914,202 +497,3 @@ def CorrectMag(frame=None, phots=None, correction=None, field=None, apertures=[3
 	except: 
 		return corr
 
-###-----------------------------------------------------------------------------------------------------
-
-
-def CalColors(phots=None, reddening=[0,0,0]):	
-	
-	"""Calculates the colors from the given VBI magnitudes. Reddening may be used to add a reddening correction in the order [E(B-V), E(V-I), E(B-I)], and extinction should be given as [V,B,I]. NOTE: still need to add the possibility of U."""
-	
-	if not isinstance(phots, list): 
-		phots = [phots[V].values.tolist(), phots[B].values.tolist(), phots[I].values.tolist()]
-
-
-	try: 
-		vi = (np.array(phots[0] - phots[2]) - reddening[1]).tolist()
-		bv = (np.array(phots[1] - phots[0]) - reddening[0]).tolist()
-		bi = (np.array(phots[1] - phots[2]) - reddening[2]).tolist()
-	except: 
-		vi = [phots[0][i] - phots[2][i] - reddening[1] for i in range(len(phots[0]))]
-		bv = [phots[1][i] - phots[0][i] - reddening[0] for i in range(len(phots[0]))]
-		bi = [phots[1][i] - phots[2][i] - reddening[2] for i in range(len(phots[0]))]
-
-
-	print("Returning VI, BV, and BI.")
-	
-	return vi, bv, bi
-
-
-###-----------------------------------------------------------------------------------------------------
-
-def CorrectApOld(filename=None, verbose=True, getstd=False, savefile=None, apertures=[3,20], savecoords=None, compare=None): 
-
-	"""For calculating the aperture correction."""
-	
-	if savecoords: getcoords = True
-	else: getcoords = False
-
-	try: phots, coords, aps = GetPhots(filename=filename, getaps=True, getcoords=getcoords)
-	except: phots, aps = GetPhots(filename=filename, getaps=True)
-
-	# Get the magnitudes and apertures from the file
-	# Plot all of the stars magnitudes vs. aperture radius to compare straightness
-	# Plot each star mag vs. ap *** (start of loop)
-	# Ask for which star is bad
-	# Invert to create mask for "good stars"
-	# Plot all "good stars"
-	# As if process needs to be repeated *** (reset loop)
-	# If so, start from plotting each star and repeat until good
-	# Take the median and std of the aperture corrections between given apertures (?)
-	# Added 'compare=None' to give me the option to compare same stars in different filters
-	#	and remove star across the board (updated: 7/22/19)
-
-	# Getting apertures to compare
-	compare = [aps.tolist().index(apertures[0]),aps.tolist().index(apertures[1])]  
-	print("Comparing apertures: " + str(int(aps[compare[0]])) + " " + str(int(aps[compare[1]]))) 
-
-	# Plotting all stars to see if all crooked ones are removed
-	plt.figure(figsize=(8,6))
-	for i in phots: 
-		plt.plot(aps, i)
-		plt.ylim(26, 18)
-	plt.show()
-
-	try: 
-		if input("Remove stars?: ").lower()[0] == "y" or input("Remove stars?: ").lower()[0] == "r": 
-			repeat = True
-		elif se: repeat = False; pass;
-	except: repeat = False; pass;
-
-	# If verbose is set to true, then ask if star should be removed after each plot. 
-	# UNDER CONSTRUCTION 
-	if verbose == True: 
-		while repeat == True: 
-			bad = []
-
-			# Plotting each star with object number
-			for i in range(len(phots)): 
-				j = phots[i]
-				plt.plot(aps, j)
-				plt.title(i, size=20)
-				plt.ylim(26, 18)
-				plt.show()
-
-				# After plotting, ask if it should be removed (as per verbose)
-				try: 
-					if input("Remove?: ").lower()[0] == "y" or input("Remove?: ").lower()[0] == "r": bad.append(i)
-					else: plt.close(); pass;
-				except: plt.close(); pass;
-
-			print("\nRemoving bad stars...\n")
-			phots = [x for i,x in enumerate(phots) if not i in bad]
-			try: coords = [x for i,x in enumerate(coords) if not i in bad]
-			except: pass;
-
-			# Plotting all stars to see if all crooked ones are removed
-			plt.figure(figsize=(10,8))
-			for i in phots: 
-				plt.plot(aps, i)
-				plt.ylim(26, 18)
-			plt.show()
-			print("Aperture correction: " + str(nanmedian(np.array(phots).T[compare[0]] - np.array(phots).T[compare[1]])) + "\nStandard deviation: "  + str(nanstd(np.array(phots).T[compare[0]] - np.array(phots).T[compare[1]])))
-			try: 
-				temp = input("Remove more?: ").lower()
-				if temp[0] == "y": repeat = True; pass;
-				elif temp == "reset" or temp == "restart": 
-					repeat = True
-					print("\nResetting aperture corrections...\n")
-					try:  
-						phots, coords, aps = GetPhots(filename=filename, getaps=True, getcoords=getcoords)
-					except: phots, aps = GetPhots(filename=filename, getaps=True)
-					for i in phots: 
-						plt.plot(aps, i)
-						plt.ylim(26, 18)
-					plt.show()
-			except: repeat = False; break; # If no other bad stars exist, break the while cycle
-
-	else: 
-		# If verbose is set to false, plot each star first, then ask for list of stars to remove.
-		# Repeat plotting magnitudes vs. apertures until all bad stars are removed
-		while repeat == True: 
-
-			# Plotting each star with object number
-			for i in range(len(phots)): 
-				j = phots[i]
-				plt.plot(aps, j)
-				plt.title(i, size=20)
-				plt.ylim(26, 18)
-				plt.show()
-
-			# Removing bad stars from the list
-			bad = input("Remove which star number? (separate by commas): ")
-
-			if len(bad) > 0: 
-				bad = re.split("\W+", bad)
-				bad = [int(x) for x in bad]
-				phots = [x for i,x in enumerate(phots) if not i in bad]
-				try: coords = [x for i,x in enumerate(coords) if not i in bad]
-				except: pass;
-
-				# Plotting all stars to see if all crooked ones are removed
-				plt.figure(figsize=(10,8))
-				for i in phots: 
-					plt.plot(aps, i)
-					plt.ylim(26, 18)
-				plt.show()
-				print("Aperture correction: " + str(nanmedian(np.array(phots).T[compare[0]] - np.array(phots).T[compare[1]])) + "\nStandard deviation: "  + str(nanstd(np.array(phots).T[compare[0]] - np.array(phots).T[compare[1]])))
-				try: 
-					temp = input("Remove more?: ").lower()
-					if temp[0] == "y": repeat = True
-					elif temp == "reset" or temp == "restart": 
-						repeat = True
-						print("\nResetting aperture corrections...\n")
-						try: 	
-							phots, coords, aps = GetPhots(filename=filename, getaps=True, getcoords=getcoords)
-						except:  
-							phots, aps = GetPhots(filename=filename, getaps=True)
-							plt.figure(figsize=(10,8))
-						for i in phots: 
-							plt.plot(aps, i)
-							plt.ylim(26, 18)
-						plt.show()
-				except: repeat = False; pass;
-			else: repeat = False; break; # If no other bad stars exist, break
-
-	# Converting data into arrays for easier handling
-	phots = np.array(phots)
-	coords = np.array(coords)
-
-	# Saving results to a file if filename is given
-	if savefile:
-		for i in savefile: 
-			try:
-				f = open(savefile[i], "wb")
-				np.savetxt(f, phots[i]) 
-				f.close()
-			except: print("\nSaving " + savefile[i] + " failed.")
-	if savecoords: 
-		for i in savecoords:
-			try:
-				f = open(savecoords[i], "wb")
-				np.savetxt(f, np.column_stack([coords[i].T[0], coords[i].T[1]]))
-				f.close()
-			except: print("\nSaving " + savecoords[i] + " failed.")
-
-	# Returning results
-	if getstd == False: # Check if returning std
-		return nanmedian(phots.T[compare[0]] - phots.T[compare[1]])
-	else: 
-		return nanmedian(phots.T[compare[0]] - phots.T[compare[1]]), nanstd(phots.T[compare[0]] - phots.T[compare[1]])
-
-	
-
-###-----------------------------------------------------------------------------------------------------
-
-def GetTracks(): 
-
-	"""Reads in info for tracks from the .txt or .dat files output from Padova Mass Tracks website."""
-
-
-
-				
