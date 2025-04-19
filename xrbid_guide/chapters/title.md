@@ -22,4 +22,4 @@ Before starting this guide, one should follow the instructions on the repository
 \
 \
 *This Jupyter Book was last updated on April 20, 2025*\
-*Special thanks to Pau Bosch-Cabot for his input on editing this guide.*
+*Special thanks to Pau Bosch-Cabot and Dev Khullar for their aid in the creation of this guide.*

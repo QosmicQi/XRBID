@@ -38,14 +38,16 @@ B = "B"
 I = "I"
 U = "U"
 
-# Calling in tracks for future use by MakeCMD
 cd(file_dir)
-
+# Calling in tracks for future use by MakeCMD
 wfc3_masses = [pd.read_csv("isoWFC3_1Msun.frame"), pd.read_csv("isoWFC3_3Msun.frame"), pd.read_csv("isoWFC3_5Msun.frame"),
 	       pd.read_csv("isoWFC3_8Msun.frame"), pd.read_csv("isoWFC3_20Msun.frame")]
 
 acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Msun.frame"), pd.read_csv("isoACS_WFC_5Msun.frame"),
 	      pd.read_csv("isoACS_WFC_8Msun.frame"), pd.read_csv("isoACS_WFC_20Msun.frame")]
+
+# Calling in model for creating the cluster color-color diagrams
+BC03 = pd.read_csv("BC03_models_solar.txt")
 
 cd(curr_dir)
 
@@ -130,7 +132,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 
 	if instrument.upper() =="WFC3": masses = wfc3_masses # list of DataFrames of each mass model
 	else: masses = acs_masses
-	mass_labels = ["1 M$_\odot$", "3 M$_\odot$", "5 M$_\odot$", "8 M$_\odot$", "20 M$_\odot$"]
+	mass_labels = [r"1 M$_\odot$", r"3 M$_\odot$", r"5 M$_\odot$", r"8 M$_\odot$", r"20 M$_\odot$"]
 
 	#cd(curr_dir) 
 
@@ -148,16 +150,15 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 
 	### Pulling the x and y values of the sources ###
 	# if input source is a pandas dataframe, read in the appropriate colors and magnitudes (and add correction, if needed)
-	if sources: 
-		if isinstance(sources, pd.DataFrame):
-			if isinstance(xcolor, list): xsources = sources[xcolor[0]].values - sources[xcolor[1]].values + color_correction[0]
-			else: xsources = sources[xcolor].values + color_correction[0]
-			if isinstance(ycolor, list): ysources = sources[ycolor[0]].values - sources[ycolor[1]].values + color_correction[1]
-			else: ysources = sources[ycolor].values + color_correction[1]
+	if isinstance(sources, pd.DataFrame):
+		if isinstance(xcolor, list): xsources = sources[xcolor[0]].values - sources[xcolor[1]].values + color_correction[0]
+		else: xsources = sources[xcolor].values + color_correction[0]
+		if isinstance(ycolor, list): ysources = sources[ycolor[0]].values - sources[ycolor[1]].values + color_correction[1]
+		else: ysources = sources[ycolor].values + color_correction[1]
 		
-		else: # If sources is a list or coordinates, pull the x and y values as given (with additional color correction)
-			xsources = (np.array(sources[0]) + color_correction[0]).tolist()
-			ysources = (np.array(sources[1]) + color_correction[1]).tolist()	
+	elif sources: # If sources is a list or coordinates, pull the x and y values as given (with additional color correction)
+		xsources = (np.array(sources[0]) + color_correction[0]).tolist()
+		ysources = (np.array(sources[1]) + color_correction[1]).tolist()	
 	### Will only need to call xsources or ysources from now on ###
 
 	
@@ -218,7 +219,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 	ylims = np.array(ylims) 
 
 	# PLOTTING SOURCE POINTS
-	if sources: 
+	if isinstance(sources, pd.DataFrame) or isinstance(sources, list): 
 		if marker == "o": 	# 'o' used for open circle 
 			ax.scatter(xsources, ysources, facecolor="none", edgecolor=color, s=size, label=label)
 		elif marker == None: 	# default is a closed circle 
@@ -339,7 +340,7 @@ def AddCMD(df=None, xcolor=False, ycolor=False, color="black", size=10, marker=N
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=[V, B, I], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, ID_header=ID, coord_headers=[X, Y], extinction=[0,0,0,0]): 
+def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=["V", "B", "I"], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, ID_header="ID", coord_headers=["X", "Y"], extinction=[0,0,0,0]): 
 
 	"""Calculating magnitudes with given aperture corrections. The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
@@ -440,7 +441,7 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, ID_header=ID, coord_headers=["X", "Y"], extinction=0): 
+def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, ID_header="ID", coord_headers=["X", "Y"], extinction=0): 
 
 	"""Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter (so that it doesn't require all filters to be given if only one measurement is needed). The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
@@ -499,3 +500,124 @@ def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,2
 	except: 
 		return corr
 
+###-----------------------------------------------------------------------------------------------------
+
+def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"], colors=["V-I","B-V"], correct_ext=False, E_BV=0.08, color="black", size=15, title="", model_dir=file_dir): 
+
+	"""
+	Creates a color-color diagram for comparing the photometric properties of input sources 
+	to the cluster color evolutionary models of Bruzual & Charlot (2003), assuming solar metallicity.
+	
+	PARAMETERS: 
+	-----------
+	clusters [pd.DataFrame]	:	DataFrame containing the magnitude of each cluster in each filter
+					denoted by xcolor and ycolor. 
+	xcolor	[list]		:	List containing the filters used to calculate the x-axis colors.
+					By default, set to ["F555W","F814W"], which equates to a V-I 
+					color on the x-axis.
+	ycolor	[list]		:	List containing the filters used to calculate the y-axis colors.
+					By default, set to ["F435W","F555W"], which equates to a B-V 
+					color on the y-axis.
+	colors	[list]		: 	List containing the short-hand for the color in the x and y axes. 
+					This will be used to determine which extinction factor would be 
+					applied to the x and y colors and the direction/magnitude of the
+					reddening arrow. 
+	correct_ext [bool]	: 	Adjust the color of clusters to correct for extinction (reddening)
+					using the Milky Way extinction law and E_BV.
+	E_BV	[float]	(0.08)	:	Galactic reddening towards the galaxy or source of interest.
+					Used to adjust the extinction arrow vector.
+	color	[str]	(black)	:	Color of the cluster markers. 
+	size	[int]	(15)	:	Cluster marker size. 
+	title	[str]		: 	Title of the figure. 
+	model_dir [str]		:	Allows user to define the location of the B&C model.
+
+	RETURNS: 
+	----------- 
+
+	Plots input clusters against the cluster color evolution models, including an arrow pointing in the direction
+	of reddening. 
+
+	"""
+
+	# Calculating reddening factors from the MW reddening law
+	Rv = 3.19  # from MW extinction law
+	Av = Rv * E_BV
+
+	# From other relations: 
+	Au = 1.586 * Av     # 5.06
+	Ab = (1 + Rv)*E_BV  # 4.19
+	Ai = 0.536 * Av     # 1.71
+
+	E_UB = Au - Ab
+	E_UV = Au - Av
+	E_UI = Au - Ai
+	E_VI = Av - Ai
+	E_BI = Ab - Ai
+	E_BV = Ab - Av
+
+	# Finding the appropriate reddening factor based on the input x and y colors
+	if colors[0] == "U-B": Ex = E_UB
+	elif colors[0] == "U-V": Ex = E_UV
+	elif colors[0] == "U-I": Ex = E_UI
+	elif colors[0] == "V-I": Ex = E_VI
+	elif colors[0] == "B-I": Ex = E_BI
+	elif colors[0] == "B-V": Ex = E_BV
+
+	if colors[1] == "U-B": Ey = E_UB
+	elif colors[1] == "U-V": Ey = E_UV
+	elif colors[1] == "U-I": Ey = E_UI
+	elif colors[1] == "V-I": Ey = E_VI
+	elif colors[1] == "B-I": Ey = E_BI
+	elif colors[1] == "B-V": Ey = E_BV
+
+	# If user wishes to apply extinction correction, set the extinction factor
+	if correct_ext: 
+		Ex_clust = Ex
+		Ey_clust = Ey
+	else: 
+		Ex_clust = 0
+		Ey_clust = 0
+
+	plt.figure(figsize=(4.5,4.5))
+	plt.tick_params(direction="in", width=1.4, length=7)
+
+	# Plotting clusters from input dataframe
+	if isinstance(clusters, pd.DataFrame): 
+		clusters = clusters.copy()
+		plt.scatter(clusters[xcolor[0]] - clusters[xcolor[1]]+Ex_clust, 
+		    	    clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust, 
+			    s=size, color=color)
+
+	# Pulling x and y colors from the model based on the input DataFrame
+	for head in BC03.columns.values.tolist(): 
+		if xcolor[0] in head: x0 = head
+		if xcolor[1] in head: x1 = head
+		if ycolor[0] in head: y0 = head
+		if ycolor[1] in head: y1 = head
+	
+	# Headers in BC03 are in V-<filter> format, so they must be subtracted backwards
+	xmodel = BC03[x1]-BC03[x0]
+	ymodel = BC03[y1]-BC03[y0]
+
+	# Plotting the Solar model
+	plt.plot(xmodel, ymodel, color="black", label="Solar", alpha=0.7)
+
+	# Plotting the models for young and globular clusters
+	TempAge = Find(BC03, "log Age = 7") # 10 Myrs
+	plt.scatter(TempAge[x1]-TempAge[x0], TempAge[y1]-TempAge[y0], marker="v", color="black", s=75, zorder=5)
+	plt.annotate("10 Myrs", (TempAge[x1]-TempAge[x0] + 0.1, TempAge[y1]-TempAge[y0]))
+
+	TempAge = Find(BC03, "log Age = 8.606543") # ~400 Myr
+	plt.scatter(TempAge[x1]-TempAge[x0], TempAge[y1]-TempAge[y0], marker="v", color="black", s=75, zorder=5)
+	plt.annotate("~400 Myrs", (TempAge[x1]-TempAge[x0]- 0.55, TempAge[y1]-TempAge[y0]+0.03))
+
+	# Plotting the reddening arrow
+	print("Plotting reddening arrow for", colors[0], "vs.", colors[1])
+	plt.arrow(x=1,y=-0.25, dx=Ex, dy=Ey, head_width=.05, color="black")
+
+	plt.xlim(-0.5,1.6)
+	plt.ylim(1.3,-.5)
+	plt.xlabel(xcolor[0] + " - " + xcolor[1],fontsize=20)
+	plt.ylabel(ycolor[0] + " - " + ycolor[1],fontsize=20)
+	plt.title(title)
+	plt.show()

@@ -11,7 +11,7 @@ chapters:
 - file: chapters/astrodrizzle
 - file: chapters/photometry
 - file: chapters/astrometry
-- file: chapters/daoclean
+- file: chapters/selection
 - file: chapters/sourceids
 - file: chapters/cmds
 - file: chapters/errors
