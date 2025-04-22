@@ -1582,7 +1582,16 @@ document.write(`
 </section>
 <section id="selecting-the-best-counterpart">
 <h2>Selecting the Best Counterpart<a class="headerlink" href="#selecting-the-best-counterpart" title="Link to this heading">#</a></h2>
-<p>Selecting the best optical counterpart for each X-ray sources is a multi-step process that requires some manual choices using reasonable arguments.</p>
+<p>Selecting the best optical counterpart for each X-ray source is a multi-step process that requires some manual choices using reasonable arguments. There are several different types of objects within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of an X-ray source with <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code>, which will be covered in the next few chapters. The ‘best’ counterpart to any given X-ray source depends on what sort of object you see, as there is a heirarchy of how the sources are prioritized as the ‘best’ counterpart. In order of highest priority, this heirarchy is:</p>
+<ul class="simple">
+<li><p>Background galaxies and foreground stars;</p></li>
+<li><p>Clusters;</p></li>
+<li><p>High-mass stars;</p></li>
+<li><p>Low-mass stars, and finally;</p></li>
+<li><p>Intermediate-mass stars.</p></li>
+</ul>
+<p>Background galaxies and foreground stars are considered contaminants in any XRB catalog, so we remove those first. Since clusters are generally considered the birthplace of most XRBs, they are more likely associated with an XRB than a single isolated star. Finally, if the only counterparts of an X-ray source are a handful of stars, we argue that high-mass stars are more likely to form XRBs than low-mass stars in the disk, while low-mass stars are more likely to survive in an active XRB than intermediate-mass stars. Thus, a high-mass star is more likely to be the donor than a low-mass star, while a low-mass star is more likely to be the donor than an intermediate-mass star. In my work, it usually isn’t necessary to identify the exact donor star if all of the stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> are of the same mass class (high, intermediate, or low), although some studies opt to define the donor star as the brightest star, the star closest to the center, or some combination of those factors.</p>
+<p>So, the selection of the best optical counterpart for X-ray sources with multiple optical counterparts should be done sychronously with the steps in the next few chapters.</p>
 </section>
 </section>
 
