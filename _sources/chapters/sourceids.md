@@ -184,4 +184,13 @@ In the "Class" column of the file, I manually write 'Nucleus', 'AGN', 'Star', or
 
 ## Identifying SNR from X-ray colors
 
-While true SNR identification is a multi-wavelength process that requires a lot of work, a shortcut using just X-ray colors was developed in
+While true SNR identification is a multi-wavelength process that requires a lot of analysis of data we don't typically have for these XRB surveys, a shortcut using just X-ray colors was developed in {cite:p}`hunt21` based on the X-ray properties of known SNRs in M83. It defines hardness ratio (HR) and X-ray luminosity (Lx) cuts, such that the majority of X-ray sources below the pre-defined limits are likely SNRs. Ideally, these cuts would be tested against SNR in a sample of additional galaxies, but for now, we define SNR candidates as those having HR ≤ −0.75 and a log(Lx) ≤ 37.5, as shown in {numref}`fig-snr`.
+
+```{figure} ../images/example_SNR.png
+:name: fig-snr
+:width: 350px
+
+A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See {cite:p}`hunt21` for more information.  
+```
+
+There are several ways one can keep track of these sources, depending on your workflow. Based on the current data files I've created in these examples, I would probably use `Find()` on `M101_best` to identify SNR candidates from the X-ray properties of each source. Then for each source in `M101_xrb`, I would check to see if the source appears in the SNR `DataFrame` I just created and update the `Class` header to `(SNR)` if it does, where the parentheses indicate that these are candidate SNR rather than SNR definitively identified by some other catalog. Alternatively, I have also, in previous surveys, added a `(SNR)` column to my main working `DataFrame` and flagged them as `True` or `False` (1 or 0) based on the cuts.

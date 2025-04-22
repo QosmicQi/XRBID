@@ -190,7 +190,7 @@
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="daoclean.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Estimating XRB Masses with CMDs and CCDs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
@@ -390,6 +390,11 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
 </ul>
             </nav>
         </div>
@@ -404,30 +409,289 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="estimating-xrb-masses-with-cmds-and-ccds">
 <span id="chap-cmds"></span><h1>Estimating XRB Masses with CMDs and CCDs<a class="headerlink" href="#estimating-xrb-masses-with-cmds-and-ccds" title="Link to this heading">#</a></h1>
 <p>X-ray sources that are associated with point sources (i.e. stars) or compact star clusters and that are not flagged as SNR are considered genuine XRBs. The masses of their donor stars, then, are obtained by comparing their photometry across the filters available to us to stellar evolutionary models. The most useful tools for this process are color-magnitude diagrams (CMDs) and color-color diagrams (CCDs). The former is used to estimate the mass of isolated XRBs, while the latter allows us to approximate the most likely donor star mass of XRBs that exist within compact star clusters.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Insert</span> <span class="n">image</span> <span class="n">of</span> <span class="n">color</span><span class="o">-</span><span class="n">magnitude</span> <span class="n">diagram</span> <span class="ow">and</span> <span class="n">color</span><span class="o">-</span><span class="n">color</span> <span class="n">diagram</span> <span class="k">for</span> <span class="n">reference</span>
-</pre></div>
-</div>
+<p><img alt="alt" src="../_images/example_cmd.png" /></p>
+<p><img alt="alt" src="../_images/example_ccd.png" /></p>
 <p>This chapter demonstrates how to pull the photometry of each point source or cluster, calculate their magnitudes, and compare their magnitudes and colors to the models included in the <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> package.</p>
 <section id="extracting-photometry-with-getdaophots">
 <span id="sec-getphots"></span><h2>Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code><a class="headerlink" href="#extracting-photometry-with-getdaophots" title="Link to this heading">#</a></h2>
-<p>Before we can create a CMD or CCD, we need to extract the photometry of each optical counterpart in each filter. Following the procedures in <a class="reference internal" href="daoclean.html#sec-crossref"><span class="std std-ref">Cross-referencing sources across filters</span></a>, the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> named <code class="docutils literal notranslate"><span class="pre">DaoCleanMatch</span></code> now contains the name of each X-ray source (<code class="docutils literal notranslate"><span class="pre">CSC</span> <span class="pre">ID</span></code>), and the ID of each point source that falls within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> in each filter (<code class="docutils literal notranslate"><span class="pre">F555W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F435W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F814W</span> <span class="pre">ID</span></code>). To pull each point source’s photometry from the appropriate filter data file, we use <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.GetDaoPhots()</span></code>:</p>
+<p>Before we can create a CMD or CCD, we need to extract the photometry of each optical counterpart in each filter. Following the procedures in <a class="reference internal" href="selection.html#sec-crossref"><span class="std std-ref">Cross-referencing sources across filters</span></a>, the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> named <code class="docutils literal notranslate"><span class="pre">DaoCleanMatch</span></code> now contains the name of each X-ray source (<code class="docutils literal notranslate"><span class="pre">CSC</span> <span class="pre">ID</span></code>), and the ID of each point source that falls within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> in each filter (<code class="docutils literal notranslate"><span class="pre">F555W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F435W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F814W</span> <span class="pre">ID</span></code>). To pull each point source’s photometry from the appropriate filter data file, we use <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.GetDaoPhots()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetDaoPhots</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetDaoPhots</span>
 
 <span class="c1"># Ideally, you would run this on a DataFrame containing only point sources or clusters,</span>
 <span class="c1"># but for this demonstration, I&#39;ll pull the info for all previously-identified </span>
 <span class="c1"># objects from the DaoClean() step of this guide</span>
 <span class="n">DaoCleanMatch</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daoclean_matches.frame&quot;</span><span class="p">)</span>
 
-<span class="c1">#GetDaoPhots(df, daofiles, </span>
+<span class="n">dist</span> <span class="o">=</span> <span class="mf">6.4e6</span> <span class="c1"># units pc, from Chandar et al. 2020</span>
+<span class="n">dmod</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span>
+
+<span class="n">DaoCleanPhots</span> <span class="o">=</span> <span class="n">GetDaoPhots</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">,</span> 
+                            <span class="n">photfiles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;../testdata/photometry_M101_f555w_acs_sources.ecsv&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;../testdata/photometry_M101_f435w_acs_sources.ecsv&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;../testdata/photometry_M101_f814w_acs_sources.ecsv&quot;</span><span class="p">],</span>  
+                            <span class="n">idheads</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W ID&quot;</span><span class="p">,</span> <span class="s2">&quot;F435W ID&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W ID&quot;</span><span class="p">],</span> 
+                            <span class="n">filters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F435W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> 
+                            <span class="n">magheader</span><span class="o">=</span><span class="s2">&quot;aperture_mag_corr&quot;</span><span class="p">,</span> <span class="n">dmod</span><span class="o">=</span><span class="n">dmod</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/M101_daoclean_matches.frame...
+Searching ../testdata/photometry_M101_f555w_acs_sources.ecsv
 </pre></div>
 </div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Searching ../testdata/photometry_M101_f435w_acs_sources.ecsv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Searching ../testdata/photometry_M101_f814w_acs_sources.ecsv
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+      <th>F555W ID</th>
+      <th>F435W ID</th>
+      <th>F814W ID</th>
+      <th>CSC ID</th>
+      <th>F555W</th>
+      <th>F435W</th>
+      <th>F814W</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>101364</td>
+      <td>143088.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.008009</td>
+      <td>-8.693963</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>101394</td>
+      <td>143125.0</td>
+      <td>148555.0</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.229914</td>
+      <td>-8.773200</td>
+      <td>-9.919766</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>101442</td>
+      <td>143189.0</td>
+      <td>148645.0</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-8.117305</td>
+      <td>-7.383763</td>
+      <td>-9.247246</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>101505</td>
+      <td>143293.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.178998</td>
+      <td>-8.697017</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>101528</td>
+      <td>143332.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-10.077190</td>
+      <td>-9.155895</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1397</th>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>3143</td>
+      <td>4807.0</td>
+      <td>6523.0</td>
+      <td>2CXO J140346.1+541615</td>
+      <td>-8.644579</td>
+      <td>-7.398538</td>
+      <td>-10.176378</td>
+    </tr>
+    <tr>
+      <th>1398</th>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>52656</td>
+      <td>74953.0</td>
+      <td>71911.0</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>-11.382241</td>
+      <td>-11.394625</td>
+      <td>-11.491202</td>
+    </tr>
+    <tr>
+      <th>1399</th>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>52713</td>
+      <td>74989.0</td>
+      <td>72017.0</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>-5.801205</td>
+      <td>-5.828547</td>
+      <td>-7.045369</td>
+    </tr>
+    <tr>
+      <th>1400</th>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>68</td>
+      <td>105.0</td>
+      <td>100.0</td>
+      <td>2CXO J140338.3+541355</td>
+      <td>-5.285409</td>
+      <td>-3.928275</td>
+      <td>-7.542093</td>
+    </tr>
+    <tr>
+      <th>1401</th>
+      <td>4105.006500</td>
+      <td>4868.306051</td>
+      <td>307</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2CXO J140353.7+541430</td>
+      <td>-4.486746</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>1402 rows × 9 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="estimating-stellar-masses-on-a-cmd">
+<h2>Estimating Stellar Masses on a CMD<a class="headerlink" href="#estimating-stellar-masses-on-a-cmd" title="Link to this heading">#</a></h2>
+<p>Once you’ve pulled the photometry of each star and</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCMD</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" src="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MakeCMD</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" src="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">Find</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="s2">&quot;CSC ID = 2CXO J140312.7+541743&quot;</span><span class="p">)</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" src="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" />
+</div>
+</div>
+<section id="id1">
+<h3><a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+</section>
+</section>
+<section id="aging-clusters-on-a-ccd">
+<h2>Aging Clusters on a CCD<a class="headerlink" href="#aging-clusters-on-a-ccd" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCCD</span>
+<span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">RemoveElse</span><span class="p">,</span> <span class="n">FindUnique</span>
+
+<span class="c1"># Picking out a few clusters to plot</span>
+<span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;2CXO J140309.7+542114&quot;</span><span class="p">,</span> <span class="s2">&quot;2CXO J140313.9+542136&quot;</span><span class="p">,</span> 
+           <span class="s2">&quot;2CXO J140304.6+542037&quot;</span><span class="p">,</span> <span class="s2">&quot;2CXO J140319.2+542149&quot;</span><span class="p">]</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">RemoveElse</span><span class="p">(</span><span class="n">FindUnique</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">),</span> 
+                         <span class="n">clusters</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)</span>
+
+<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="s2">&quot;XRBID&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting reddening arrow for V-I vs. B-V
+</pre></div>
+</div>
+<img alt="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" src="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" />
 </div>
 </div>
 </section>
@@ -498,6 +762,11 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
 </ul>
   </nav></div>
 
