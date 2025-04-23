@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/cmds';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Errors and How to Fix Them" href="errors.html" />
+    <link rel="next" title="Final Thoughts" href="final.html" />
     <link rel="prev" title="Classifying Optical Counterparts" href="sourceids.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -193,7 +193,9 @@
 <li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -390,10 +392,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
 </ul>
             </nav>
@@ -409,8 +408,23 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="estimating-xrb-masses-with-cmds-and-ccds">
 <span id="chap-cmds"></span><h1>Estimating XRB Masses with CMDs and CCDs<a class="headerlink" href="#estimating-xrb-masses-with-cmds-and-ccds" title="Link to this heading">#</a></h1>
 <p>X-ray sources that are associated with point sources (i.e. stars) or compact star clusters and that are not flagged as SNR are considered genuine XRBs. The masses of their donor stars, then, are obtained by comparing their photometry across the filters available to us to stellar evolutionary models. The most useful tools for this process are color-magnitude diagrams (CMDs) and color-color diagrams (CCDs). The former is used to estimate the mass of isolated XRBs, while the latter allows us to approximate the most likely donor star mass of XRBs that exist within compact star clusters.</p>
-<p><img alt="alt" src="../_images/example_cmd.png" /></p>
-<p><img alt="alt" src="../_images/example_ccd.png" /></p>
+<figure class="align-default" id="fig-example-cmd">
+<a class="reference internal image-reference" href="../_images/example_cmd.png"><img alt="../_images/example_cmd.png" src="../_images/example_cmd.png" style="width: 500px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">An example of a color-magnitude diagram (CMD) using XRBs in M81. The color on the x-axis is calculated by subtracting the red magnitude by the green magnitude of the donor star. The models, which represent the evolution of a standard solar-metallicity star of a given mass, are derived from stellar evolutionary models for either ACS/WFC or WFC3/UVIS, so the observations taken of the donor stars should be done in at least 2 filters of the same intstrument (ACS or WFC3).</span><a class="headerlink" href="#fig-example-cmd" title="Link to this image">#</a></p>
+<div class="legend">
+<p>Here, we see that there is a fairly even population of XRBs with visible donor stars measuring as low-mass (falling below the 3 solar mass line), intermediate-mass (falling above the 3 solar mass line), and high-mass high-mass (falling above the 8 solar mass line).</p>
+</div>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-example-ccd">
+<a class="reference internal image-reference" href="../_images/example_ccd.png"><img alt="../_images/example_ccd.png" src="../_images/example_ccd.png" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">An example of a color-color diagram of XRB-hosting clusters in M81, compared to the standard color evolution of a cluster with solar-metallicity stars. 10 Myr and 400 Myr are denoted by black triangles; these are the ages that separate very young clusters, intermediate-age clusters, and globular clusters.</span><a class="headerlink" href="#fig-example-ccd" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 <p>This chapter demonstrates how to pull the photometry of each point source or cluster, calculate their magnitudes, and compare their magnitudes and colors to the models included in the <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> package.</p>
 <section id="extracting-photometry-with-getdaophots">
 <span id="sec-getphots"></span><h2>Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code><a class="headerlink" href="#extracting-photometry-with-getdaophots" title="Link to this heading">#</a></h2>
@@ -622,25 +636,31 @@ document.write(`
 </section>
 <section id="estimating-stellar-masses-on-a-cmd">
 <h2>Estimating Stellar Masses on a CMD<a class="headerlink" href="#estimating-stellar-masses-on-a-cmd" title="Link to this heading">#</a></h2>
-<p>Once you’ve pulled the photometry of each star and</p>
+<p>The mass of a star can be estimated by comparing their magnitudes and colors to stellar evolutionary models of stars of different masses. Below is an example of two blank CMDs, as plotted by <code class="docutils literal notranslate"><span class="pre">XRBID.CMDs.MakeCMD()</span></code>. Each line represents a different solar mass, with the color of the star evolving over time from left (where the main sequence lies) to right (towards redder overall colors).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCMD</span>
+
+<span class="c1"># The color and magnitude must be read in for the code to work. </span>
+<span class="c1"># The smaller wavelength should always be first when calculating colors.</span>
 <span class="n">MakeCMD</span><span class="p">(</span><span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F435W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F814W&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
- &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+ &lt;Axes: xlabel=&#39;F435W - F814W&#39;, ylabel=&#39;F814W&#39;&gt;)
 </pre></div>
 </div>
 <img alt="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" src="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" />
+<img alt="../_images/24b74dce17d5855419ce173ba29d01a0fed92ec7d6ef8880ee78221d83a02606.png" src="../_images/24b74dce17d5855419ce173ba29d01a0fed92ec7d6ef8880ee78221d83a02606.png" />
 </div>
 </div>
+<p>To plot points on the CMD, read in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the magnitudes of the sources, such as the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> produced by GetDaoPhots. For simplicity the header containing the magnitudes should match the name of the filter represented. Because the models are instrument dependent, you should also read in the instrument the stars were observed with (ACS or WFC3). In the example below, I am simply printing <em>all</em> optical point sources identified within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of the X-ray sources in my sample; in actuality, you would only want to plot the sources that you know are stars.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MakeCMD</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MakeCMD</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;ACS&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -652,6 +672,8 @@ document.write(`
 <img alt="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" src="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" />
 </div>
 </div>
+<p>In order to determine the best candidate donor star for a particular X-ray source, one should isolate that source and plot only its donor stars on a CMD. If there are several stars associated with a single source, it may not be possible to identify the exact XRB donor star, but in most cases it’s not necessary: if, for an X-ray source only associated with stars, there exists at least one high-mass star within 2-<span class="math notranslate nohighlight">\(\sigma\)</span>, then that source is considered a high-mass XRB; if the source has a mix of low- and intermediate-mass stars, then that source is considered a low-mass XRB; and only if there are only intermediate-mass stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> should an XRB be classified as intermediate-mass. See <a class="reference internal" href="selection.html#sec-selection"><span class="std std-ref">Selecting the Best Counterpart</span></a> for more information.</p>
+<p>Below, I demonstrate the selection of the candidate donor stars of a single X-ray source and plot its CMD. In this case, the source has a mix of both high-mass and intermediate-mass stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. Therefore, based on the selection heirarchy we use, this XRB is defined as a high-mass XRB – albeit with an unidentifable donor star.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">Find</span>
@@ -668,12 +690,15 @@ document.write(`
 <img alt="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" src="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" />
 </div>
 </div>
-<section id="id1">
-<h3><a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-</section>
 </section>
 <section id="aging-clusters-on-a-ccd">
 <h2>Aging Clusters on a CCD<a class="headerlink" href="#aging-clusters-on-a-ccd" title="Link to this heading">#</a></h2>
+<p>If an X-ray source is associated with a cluster rather than a point source (i.e. star), then one should use <code class="docutils literal notranslate"><span class="pre">XRBID.CMDs.MakeCCD()</span></code> instead of <code class="docutils literal notranslate"><span class="pre">MakeCMD()</span></code>; this will plot the photometry of each source against an evolutionary model for a solar-mass cluster instead. Because color is quite sensitive to reddening, it is recommended that one looks up the estimated extinction towards the coordinate of the cluster, which can be done by entering the coordinates in the <a class="reference external" href="https://ned.ipac.caltech.edu/extinction_calculator">NASA/IPAC Extragalactic Database</a> and calculating it as B-V.</p>
+<p>On this plot, as demonstrated below, the crucial ages of 10 Myr and 400 Myr are plotted, indicating the division between very young clusters (which are argued to most likely host high-mass XRBs), intermediate-age clusters (which may host intermediate-mass XRBs, though this is inconclusive at the moment), and globular clusters (which <em>only</em> contain low-mass XRBs).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Depending on the general size of the clusters in your galaxy, you may need to pull the photometry for a larger aperture size than the default of 3. This may also require you to redo the aperture photometry. I’m in the process of testing this and applying it to the <code class="docutils literal notranslate"><span class="pre">RunPhots</span></code> code, to make it easier to pull the photometry of clusters in the future.</p>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCCD</span>
@@ -685,15 +710,25 @@ document.write(`
 <span class="n">TempSources</span> <span class="o">=</span> <span class="n">RemoveElse</span><span class="p">(</span><span class="n">FindUnique</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">),</span> 
                          <span class="n">clusters</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)</span>
 
-<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="s2">&quot;XRBID&quot;</span><span class="p">)</span>
+<span class="c1"># Testing with and without extinction correction.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting WITHOUT extinction correction:&quot;</span><span class="p">)</span>
+<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">correct_ext</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting with extinction correction:&quot;</span><span class="p">)</span>
+<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">correct_ext</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting reddening arrow for V-I vs. B-V
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting WITHOUT extinction correction:
+Plotting reddening arrow for V-I vs. B-V
 </pre></div>
 </div>
 <img alt="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" src="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting with extinction correction:
+Plotting reddening arrow for V-I vs. B-V
+</pre></div>
+</div>
+<img alt="../_images/ab17b4b1a10c9fbaa44c830a932fe117d0e784c91751e87d9edfe07358af3ccb.png" src="../_images/ab17b4b1a10c9fbaa44c830a932fe117d0e784c91751e87d9edfe07358af3ccb.png" />
 </div>
 </div>
 </section>
@@ -739,11 +774,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="errors.html"
+       href="final.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Errors and How to Fix Them</p>
+        <p class="prev-next-title">Final Thoughts</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -764,10 +799,7 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
 </ul>
   </nav></div>

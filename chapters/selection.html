@@ -193,7 +193,9 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Identifying Optical Counterparts to X-ray Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -1581,7 +1583,7 @@ document.write(`
 <p>This will result in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the CSC ID of each source, its coordinates, and the ID of all corresponding matches from each catalog. The matches will be saved to the data file defined by <code class="docutils literal notranslate"><span class="pre">outfile</span></code>.</p>
 </section>
 <section id="selecting-the-best-counterpart">
-<h2>Selecting the Best Counterpart<a class="headerlink" href="#selecting-the-best-counterpart" title="Link to this heading">#</a></h2>
+<span id="sec-selection"></span><h2>Selecting the Best Counterpart<a class="headerlink" href="#selecting-the-best-counterpart" title="Link to this heading">#</a></h2>
 <p>Selecting the best optical counterpart for each X-ray source is a multi-step process that requires some manual choices using reasonable arguments. There are several different types of objects within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of an X-ray source with <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code>, which will be covered in the next few chapters. The ‘best’ counterpart to any given X-ray source depends on what sort of object you see, as there is a heirarchy of how the sources are prioritized as the ‘best’ counterpart. In order of highest priority, this heirarchy is:</p>
 <ul class="simple">
 <li><p>Background galaxies and foreground stars;</p></li>
