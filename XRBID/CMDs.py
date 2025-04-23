@@ -534,8 +534,9 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 	RETURNS: 
 	----------- 
 
-	Plots input clusters against the cluster color evolution models, including an arrow pointing in the direction
-	of reddening. 
+	Plots input clusters against the cluster color evolution models, including an arrow pointing in the direction of reddening. 
+
+	Returns plt figure.
 
 	"""
 
@@ -620,4 +621,4 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 	plt.xlabel(xcolor[0] + " - " + xcolor[1],fontsize=20)
 	plt.ylabel(ycolor[0] + " - " + ycolor[1],fontsize=20)
 	plt.title(title)
-	plt.show()
+	return plt
