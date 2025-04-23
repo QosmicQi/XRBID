@@ -182,7 +182,7 @@ M101_notes.to_csv("../testdata/M101_XRB_notes.txt")
 
 In the "Class" column of the file, I manually write 'Nucleus', 'AGN', 'Star', or 'Cluster' for the appropriate source using my preferred text editing software. If a source only has a single optical counterpart or a counterpart is one of these classifications, you can go ahead and update the "Best Star" value to reflect the appropriate candidate ID for that source as well. So, for the example of CXO001, I write 'Nucleus' as the "Class" and '3' as the "Best Star".
 
-## Identifying SNR from X-ray colors
+## Identifying SNR from X-ray properties
 
 While true SNR identification is a multi-wavelength process that requires a lot of analysis of data we don't typically have for these XRB surveys, a shortcut using just X-ray colors was developed in {cite:p}`hunt21` based on the X-ray properties of known SNRs in M83. It defines hardness ratio (HR) and X-ray luminosity (Lx) cuts, such that the majority of X-ray sources below the pre-defined limits are likely SNRs. Ideally, these cuts would be tested against SNR in a sample of additional galaxies, but for now, we define SNR candidates as those having HR ≤ −0.75 and a log(Lx) ≤ 37.5, as shown in {numref}`fig-snr`.
 

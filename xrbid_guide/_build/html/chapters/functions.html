@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>XRBID: A Guide to Direct X-ray Binary Analysis &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+    <title>Examples of XRBID Functions &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
   
   
   
@@ -57,12 +57,10 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/title';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/functions';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Overview of Process" href="intro.html" />
+    <link rel="prev" title="Errors and How to Fix Them" href="errors.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -125,8 +123,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -145,7 +141,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="title.html">
   
   
   
@@ -176,13 +172,13 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="title.html">
                     XRBID: A Guide to Direct X-ray Binary Analysis
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
@@ -196,7 +192,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
-<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -268,7 +264,7 @@
       
       
       
-      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/title.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/functions.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -298,7 +294,7 @@
       
       
       
-      <li><a href="../_sources/chapters/title.md" target="_blank"
+      <li><a href="../_sources/chapters/functions.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -308,7 +304,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.md</span>
+<span class="btn__text-container">.ipynb</span>
 </a>
 </li>
       
@@ -369,9 +365,7 @@ document.write(`
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -382,21 +376,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>XRBID: A Guide to Direct X-ray Binary Analysis</h1>
+    <h1>Examples of XRBID Functions</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#about-xrbid-code">About XRBID Code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chapters">Chapters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bibliography">Bibliography</a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -406,71 +390,13 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="xrbid-a-guide-to-direct-x-ray-binary-analysis">
-<h1>XRBID: A Guide to Direct X-ray Binary Analysis<a class="headerlink" href="#xrbid-a-guide-to-direct-x-ray-binary-analysis" title="Link to this heading">#</a></h1>
-<p>This guide is an introduction to my personal methodology for the direct detection and analysis of X-ray binaries in nearby galaxy using the <em>Chandra X-ray Observatory</em> (<em>CXO</em>) and the <em>Hubble Space Telescope</em> (<em>HST</em>), as developed and used for my Ph.D. Thesis. As of writing, I used these techniques (or some version of them) in <span id="id1">[<a class="reference internal" href="#id6" title="Qiana Hunt, Elena Gallo, Rupali Chandar, Paula Johns Mulia, Angus Mok, Andrea Prestwich, and Shengchen Liu. Calibrating x-ray binary luminosity functions via optical reconnaissance. i. the case of m83. The Astrophysical Journal, 912(1):31, Apr 2021. URL: http://dx.doi.org/10.3847/1538-4357/abe531, doi:10.3847/1538-4357/abe531.">HGC+21</a>]</span>, <span id="id2">[<a class="reference internal" href="#id7" title="Qiana Hunt, Elena Gallo, Rupali Chandar, Angus Mok, and Andrea Prestwich. Calibrating x-ray binary luminosity functions via optical reconnaissance. ii. the high-mass xlf and globular cluster population of x-ray binaries in the low star-forming spiral m81. The Astrophysical Journal, 947(1):31, apr 2023. URL: https://dx.doi.org/10.3847/1538-4357/ac78da, doi:10.3847/1538-4357/ac78da.">HGC+23</a>]</span>, and <span id="id3">[<a class="reference internal" href="#id8" title="Qiana Hunt, Rupali Chandar, Elena Gallo, Matthew Floyd, Thomas J. Maccarone, and David A. Thilker. The x-ray binary-star cluster connection in late-type galaxies. The Astrophysical Journal, 953(2):126, aug 2023. URL: http://dx.doi.org/10.3847/1538-4357/ace162, doi:10.3847/1538-4357/ace162.">HCG+23</a>]</span>. I imagine as more galaxies are analyzed in this way, better techniques will be settle upon, and I will try to update this document accordingly.</p>
-<p>I intend for this to be a totally comprehensive analysis guide that includes everything from installing <code class="docutils literal notranslate"><span class="pre">CSC</span></code> to pulling data from the HLA, to what kind of things can be done to analyze the data. This guide will also include experimental codes I’ve entertained, which may hopefully lead to breakthroughs that will make this entire survey exponentially faster to compile.</p>
-<section id="about-xrbid-code">
-<h2>About XRBID Code<a class="headerlink" href="#about-xrbid-code" title="Link to this heading">#</a></h2>
-<p>Throughout this guide, the user will be provided with examples on how to use XRBID to conduct this XRB analysis research. This relies on custom <code class="docutils literal notranslate"><span class="pre">python</span></code> functions accessible through the XRBID GitHub repository: <a class="github reference external" href="https://github.com/QosmicQi/XRBID">QosmicQi/XRBID</a></p>
-<p>Before starting this guide, one should follow the instructions on the repository README file to install XRBID and obtain the custom functions and auxiliary data files (or download them directly from the XRBID directory). Since this project is under active development (as of 2025), one should also update their version of XRBID frequently. A quick-reference breakdown of the functions used in this guide will be added to the end of the guide at a later date.</p>
-</section>
-<section id="chapters">
-<h2>Chapters<a class="headerlink" href="#chapters" title="Link to this heading">#</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hst-data.html#handling-hst-data">Handling <em>HST</em> Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
-<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
-</ul>
+  <section class="tex2jax_ignore mathjax_ignore" id="examples-of-xrbid-functions">
+<h1>Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions<a class="headerlink" href="#examples-of-xrbid-functions" title="Link to this heading">#</a></h1>
+<p>Throughout this guide, I’ve included several examples of how to use the functions accessible through <code class="docutils literal notranslate"><span class="pre">XRBID</span></code>. Here, I compile more examples of the functions in <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> and how they may be used, especially those not discussed in the main guide.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This section is under construction!</p>
 </div>
-</section>
-<section id="bibliography">
-<h2>Bibliography<a class="headerlink" href="#bibliography" title="Link to this heading">#</a></h2>
-<div class="docutils container" id="id4">
-<div role="list" class="citation-list">
-<div class="citation" id="id8" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">HCG+23</a><span class="fn-bracket">]</span></span>
-<p>Qiana Hunt, Rupali Chandar, Elena Gallo, Matthew Floyd, Thomas J. Maccarone, and David A. Thilker. The x-ray binary-star cluster connection in late-type galaxies. <em>The Astrophysical Journal</em>, 953(2):126, aug 2023. URL: <a class="reference external" href="http://dx.doi.org/10.3847/1538-4357/ace162">http://dx.doi.org/10.3847/1538-4357/ace162</a>, <a class="reference external" href="https://doi.org/10.3847/1538-4357/ace162">doi:10.3847/1538-4357/ace162</a>.</p>
-</div>
-<div class="citation" id="id6" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">HGC+21</a><span class="fn-bracket">]</span></span>
-<p>Qiana Hunt, Elena Gallo, Rupali Chandar, Paula Johns Mulia, Angus Mok, Andrea Prestwich, and Shengchen Liu. Calibrating x-ray binary luminosity functions via optical reconnaissance. i. the case of m83. <em>The Astrophysical Journal</em>, 912(1):31, Apr 2021. URL: <a class="reference external" href="http://dx.doi.org/10.3847/1538-4357/abe531">http://dx.doi.org/10.3847/1538-4357/abe531</a>, <a class="reference external" href="https://doi.org/10.3847/1538-4357/abe531">doi:10.3847/1538-4357/abe531</a>.</p>
-</div>
-<div class="citation" id="id7" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">HGC+23</a><span class="fn-bracket">]</span></span>
-<p>Qiana Hunt, Elena Gallo, Rupali Chandar, Angus Mok, and Andrea Prestwich. Calibrating x-ray binary luminosity functions via optical reconnaissance. ii. the high-mass xlf and globular cluster population of x-ray binaries in the low star-forming spiral m81. <em>The Astrophysical Journal</em>, 947(1):31, apr 2023. URL: <a class="reference external" href="https://dx.doi.org/10.3847/1538-4357/ac78da">https://dx.doi.org/10.3847/1538-4357/ac78da</a>, <a class="reference external" href="https://doi.org/10.3847/1538-4357/ac78da">doi:10.3847/1538-4357/ac78da</a>.</p>
-</div>
-<div class="citation" id="id9" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>KKW+07<span class="fn-bracket">]</span></span>
-<p>Minsun Kim, Dongwoo Kim, Belinda Jane Wilkes, Paul Joseph Green, Eunhyeuk Kim, Craig S Anderson, Wayne Barkhouse, Nancy Remage Evans, Zeljko Ivezic, Margarita Karovska, Vinay Kashyap, Myung Gyoon Lee, Peter Maksym, Amy E. Mossman, John David Silverman, and Harvey Dale Tananbaum. Chandra Multiwavelength Project X‐Ray Point Source Catalog. In <em>Chandra Multiwavelength Project X‐Ray Point Source Catalog</em>. 2007.</p>
-</div>
-<div class="citation" id="id5" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>ChandarJohnsMok+20<span class="fn-bracket">]</span></span>
-<p>Rupali Chandar, Paula Johns, Angus Mok, Andrea Prestwich, Elena Gallo, and Qiana Hunt. A New Window into the Nature of X-Ray Binaries in M101 from Their Optical Emission. <em>\apj </em>, 890(2):150, February 2020. <a class="reference external" href="https://doi.org/10.3847/1538-4357/ab6b27">doi:10.3847/1538-4357/ab6b27</a>.</p>
-</div>
-<div class="citation" id="id10" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>LehmerEufrasioTzanavaris+19<span class="fn-bracket">]</span></span>
-<p>Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. <em>\apjs </em>, 243(1):3, Jul 2019. <a class="reference external" href="https://arxiv.org/abs/1905.05197">arXiv:1905.05197</a>, <a class="reference external" href="https://doi.org/10.3847/1538-4365/ab22a8">doi:10.3847/1538-4365/ab22a8</a>.</p>
-</div>
-</div>
-</div>
-<p><br />
-<br />
-<em>This Jupyter Book was last updated on April 20, 2025</em><br />
-<em>Special thanks to Pau Bosch-Cabot and Dev Khullar for their aid in the creation of this guide.</em></p>
-</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -482,16 +408,16 @@ document.write(`
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "jupyterbook"
         },
         kernelOptions: {
-            name: "python3",
+            name: "jupyterbook",
             path: "./chapters"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'jupyterbook'</script>
 
                 </article>
               
@@ -503,14 +429,14 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="right-next"
-       href="intro.html"
-       title="next page">
+    <a class="left-prev"
+       href="errors.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Overview of Process</p>
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Errors and How to Fix Them</p>
       </div>
-      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -518,23 +444,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#about-xrbid-code">About XRBID Code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chapters">Chapters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bibliography">Bibliography</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

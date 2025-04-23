@@ -28,7 +28,7 @@ Once you install Anaconda, you can use the `conda` command to handle future comm
 `stenv` is a pre-made astronomy-based environment that will automatically install a ton of astronomy-related packages. You can find instructions on setting up `stenv` here:
 https://stenv.readthedocs.io/en/latest/getting_started.html
 
-Follow the instructions under `Choose an stenv release`, making sure to follow the `conda` instructions (third tab) and not the `micromamba` or `mamba` instructions. To enter the `stenv` environment after setting it up, you'll simply type into the command line (AKA the terminal): 
+Follow the instructions under `Choose an stenv release` (including downloading the proper release for your environment [here](https://github.com/spacetelescope/stenv/releases)), making sure to follow the `conda` instructions (third tab) and not the `micromamba` or `mamba` instructions. To enter the `stenv` environment after setting it up, you'll simply type into the command line (AKA the terminal): 
 ```
 conda activate stenv
 ``` 
@@ -82,6 +82,10 @@ conda activate stenv
 ### The Chandra Source Catalog and related tools
 
 To find and download *CXO* sources, you will need the Chandra Source Catalog (`CSC`) desktop app (unless you're using their webpage). This requires `Java`: http://www.java.com
+
+```{note}
+If you're installing the Linux version of Java, you should move the downloaded `.tar` file to a directory called `/usr/java/` and open it there. Then, to create a simlink that can be use anywhere on your computer, run `sudo ln -s /usr/java/jre1.<distribution version>/bin/java /usr/local/bin/java`. This should cause `java` to show up in your `/usr/local/bin` file in the same color as any other simlinks you created. 
+```
 
 Next, install the `CSC` desktop app, `CSCview`: http://cda.cfa.harvard.edu/cscview/
 
