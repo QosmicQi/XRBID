@@ -11,6 +11,7 @@ from numpy import pi, sqrt, mean, median, log, log10, std
 import pandas as pd
 from astropy.stats import SigmaClip, sigma_clipped_stats
 from astropy.wcs import WCS
+from astropy.io import fits
 import time
 import random
 
@@ -44,7 +45,7 @@ WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
 
 ###-----------------------------------------------------------------------------------------------------
 
-def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, aperture_correction=True, suffix=""):
+def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
 
     """
     Generates the initial photometric files needed for the aperture currection and photometric analyses.
@@ -53,45 +54,54 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     (2) Generating a background-subtracted hdu image
     (3) Running the photometry for all DaoFind objects using the background-subtracted image.
         This includes a full aperture photometry between radii 1-30 pixels 
-        (used for aperture corrections), and the aperture photometry within 3 pixels 
-        (used for source analysis).
-    (4) Runs the interactive aperture correction code CorrectAp() on the full aperture photometry.
+        (used for aperture corrections), the aperture photometry within 3 pixels 
+        (used for source analysis), and the aperture photometry within the extended radius for clusters 
+	(defaulted to 10 pixels).
+    (4) Runs the interactive aperture correction code CorrectAp() on the full aperture photometry. 
+	Applies this correction to both the minimum aperture photometry and the extended aperture photometry
 
     PARAMETERS
     ----------
     hdu 		[FITS]	: 	The fits image of the HST field
     gal  		[str]	: 	Name of the galaxy of interest
-    instrument 	[str]	: 	Name of the instrument (ACS or WFC3)
+    instrument 		[str]	: 	Name of the instrument (ACS or WFC3)
     filter 		[str]	: 	Name of the hdu filter
-    fwhm_arcs 	[float]	: 	FWHM of stars in the hdu image
-    pixtoarcs   [float] :   Pixel to arcsecond conversion. Defaults to 0.05 for ACS and 0.03962 for WFC3.
-    zeropoint 	[float]	: 	Vega zeropoint magnitude, for converting photometry into Vega magnitudes. 
+    fwhm_arcs 		[float]	: 	FWHM of stars in the hdu image
+    pixtoarcs   	[float] :   Pixel to arcsecond conversion. Defaults to 0.05 for ACS and 0.03962 for WFC3.
+    zeropoint 		[float]	: 	Vega zeropoint magnitude, for converting photometry into Vega magnitudes. 
     				        Defaults to obtaining with Zeropoint() if none is given.
     EEF 		[float]	: 	The Encircled Energy Fraction at the maximum aperture pixel 
     			  	        radius (default 20) for the instrument/filter of interest.
     			  	        If none is given, will pull the ~20 pix EEF for the instrument given. 
-    sigma       [float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
-    threshold 	[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
+    sigma       	[float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
+    threshold 		[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
     apcorr		[float] (0) :	In the event that aperture_correction is set to false, 
     				            user can input a manual aperture correction to the photometry, 
     			            	which will be saved in the photometry files.
     aperr 		[float] (0) : 	Manual input of the error on the aperture correction 
     				            (estimated as the standard deviation of the photometric 
     			            	difference between min_rad and max_rad in the aperture correction).
-    num_stars 	[int]	    :	The number of target stars to use for the aperture correction.
-    min_rad 	[float] (3) : 	The pixel radius of the minimum aperture size
-    max_rad 	[float] (20): 	The pixel radius of the maximum aperture size
+    num_stars 		[int]	    :	The number of target stars to use for the aperture correction.
+    min_rad 		[float] (3) : 	The pixel radius of the minimum aperture size for a standard star
+    max_rad 		[float] (20): 	The pixel radius of the maximum aperture size
+    extended_rad 	[float] (10):	The pixel radius of the aperture size for extended sources (i.e. clusters)
     aperture_correction [bool]  :	If true, runs the aperture correction for the field. Defaults as True.
+    reg_correction 	[list]   :	Pixel correction on the [x,y] to add to the region file, if you find the region file 
+					created from photutils source extraction coordinates is misaligned with the HST 
+					image (Typically a correction of [1,1] pixel is sufficient.) 
     suffix 		[str]	:	Additional suffix to add to the end of filenames, if applicable. 
     			            	Good for if multiple fields are used for a single filter.
 
     RETURNS
     -------
-    apcorr 		[float]	    : 	Magnitude correction for sources in the given HDU field.
-    				Returns only if aperture_correction = True
-    aperr 		[float]     : 	Error on the aperture correction.
-    				Returns only if aperture_correction = True
-
+    apcorr 		[float]	    : 	Magnitude correction for point sources in the given HDU field.
+    					Returns only if aperture_correction = True
+    aperr 		[float]     : 	Error on the point source aperture correction.
+    					Returns only if aperture_correction = True
+    apcorr_ext 		[float]	    : 	Magnitude correction for extended sources in the given HDU field.
+    					Returns only if aperture_correction = True
+    aperr_ext 		[float]     : 	Error on the extended aperture correction.
+    					Returns only if aperture_correction = True
     OTHER PRODUCTS
     --------------
     [GALAXY]_daofind_[FILTER]_[INSTRUMENT][SUFFIX]_img.reg: 
@@ -102,6 +112,8 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     	Datafile containing the full 1-30 pixel aperture photometry of all sources in the field
     photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_sources[SUFFIX].ecsv: 
     	Datafile containing the 3 pixel aperture photometry of all sources in the field
+    photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_extended[SUFFIX].ecsv: 
+    	Datafile containing the extended pixel aperture photometry of all sources in the field
 
     """
 
@@ -130,16 +142,21 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     			 savereg=False)
     			 
     # Saving region files
-    # This adds a 1 pixel shift, because the region files appear shifted wrt the image.
-    # However, I assume the coordinates are correct when it comes to taking the photometry, 
+    # If given, this adds a pixel shift to the region file coordinates, because the region files appear shifted 
+    # wrt the image. However, I assume the coordinates are correct when it comes to taking the photometry, 
     # since these are the coordinates DAOFind is operating on. 
     
-    print("\nAdding 1 pixel correction to x & y coordinates.\nPlease double-check accuracy of region file.")
-    xcoord_img = [x+1 for x in objects['xcentroid'].tolist()]
-    ycoord_img = [y+1 for y in objects['ycentroid'].tolist()]
+    if reg_correction == False:
+        xcoord_img = objects['xcentroid'].tolist()
+        ycoord_img = objects['ycentroid'].tolist()
+    else: 
+        print("\nAdding",reg_correction,"pixel correction to x & y coordinates.\nPlease double-check accuracy of region file.")
+        xcoord_img = [x+reg_correction[0] for x in objects['xcentroid'].tolist()]
+        ycoord_img = [y+reg_correction[1] for y in objects['ycentroid'].tolist()]
+
     WriteReg(sources=[xcoord_img, ycoord_img], radius=3, coordsys="image", \
-    		 outfile=gal+"_daofind_"+filter.lower()+"_"+instrument.lower()+suffix+"_img.reg", \
-    		 label=objects["id"].tolist())
+    	     outfile=gal+"_daofind_"+filter.lower()+"_"+instrument.lower()+suffix+"_img.reg", \
+    	     label=objects["id"].tolist())
     		 
     wcs = WCS(hdu['PRIMARY'].header)
     xcoords_fk5, ycoords_fk5 = wcs.wcs_pix2world(xcoord_img, ycoord_img, 1)
@@ -153,13 +170,13 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     data_sub = SubtractBKG(data)
 
     positions = np.transpose((objects['xcentroid'], objects['ycentroid']))
-    #ap_rads = [1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,12,13,15,17,18,19,20,21,22,23,24,29,30]
     ap_rads = [i for i in range(1,31)]
     apertures_full = [CircularAperture(positions, r=r) for r in ap_rads]
-    apertures_source = CircularAperture(positions, r=3) # 3px aperture photometry used for sources
+    apertures_source = CircularAperture(positions, r=min_rad) # 3px aperture photometry used for sources by default
+    apertures_extended = CircularAperture(positions, r=extended_rad) # aperture photometry for clusters (default is 10 pixels)
 
     print("Photometry...")
-    # Generate aperture photometry with background subtraction on annulus 5px to 25px
+    # Generate aperture photometry with the background-subtracted data
     starttime = time.time()
     # Collects the photometry over the full range of the apertures needed for the aperture correction step
     phot_full = aperture_photometry(data_sub, apertures_full,method="center")
@@ -170,25 +187,37 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
 
     print("Time for full photometry:", (endtime-starttime)/60., "minutes")
 
-    startime = time.time()
+    starttime = time.time()
 
     ### Errors are estimated using exposure time as the effective gain and the ###
-    ### background-only image as the background noise			   ###
+    ### background-only image as the background noise			       ###
     
     # Collects the photometry that will be used as the 'true' photometry for the source, 
-    # collected within a 3px aperture
+    # collected within an aperture of radius min_rad
     phot_sources = aperture_photometry(data_sub, apertures_source, error=calc_total_error(data, \
-    				   data-data_sub, effective_gain=hdu[0].header["EXPTIME"]))
+    				       data-data_sub, effective_gain=hdu[0].header["EXPTIME"]))
     endtime = time.time()
     print("Time for source photometry:", (endtime-starttime)/60., "minutes")
+
+    starttime = time.time()
+    # Collects the photometry that will be used as the photometry for clusters, 
+    # collected within an aperture of radius extended_rad
+    phot_extended = aperture_photometry(data_sub, apertures_extended, error=calc_total_error(data, \
+    				       data-data_sub, effective_gain=hdu[0].header["EXPTIME"]))
+    endtime = time.time()
+    print("Time for extended photometry:", (endtime-starttime)/60., "minutes")
 
     # If aperture corrections need to be calculated, run CorrectAp()
     if aperture_correction:
     		print("Aperture corrections...")
-    		apcorr, aperr = CorrectAp(phot_full, radii=ap_rads, EEF=EEF, num_stars=num_stars,\
-                              		  zmag=zeropoint, min_rad=min_rad, max_rad=max_rad)
+    		apcorrections = CorrectAp(phot_full, radii=ap_rads, EEF=EEF, num_stars=num_stars, zmag=zeropoint, \
+                              		  min_rad=min_rad, max_rad=max_rad, extended_rad=extended_rad)
+    		apcorr = apcorrections[0]
+    		aperr = apcorrections[1]
+    		apcorr_ext = apcorrections[2]
+    		aperr_ext = apcorrections[3]
 
-    # Calculates magnitudes from the photometry. 
+    # Calculates magnitudes from the photometry on point sources
     # If an aperture correction is given or calculated, include that in the source photometry.
     print("Calculating magnitudes...") 
 
@@ -210,10 +239,25 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     phot_sources.write("photometry_"+gal+"_"+filter.lower()+"_"+instrument.lower()+"_sources"+suffix+".ecsv", overwrite=True)
     print("photometry_"+gal+"_"+filter.lower()+"_"+instrument.lower()+"_sources"+suffix+".ecsv", "saved")
 
+    ## REPEATING FOR EXTENDED SOURCES 
+    # Non-corrected magnitude from the photometry:
+    phot_extended["aperture_mag"] = -2.5 * np.log10(phot_extended['aperture_sum'])
+
+    # Error on the calculated magnitude: 
+    phot_extended["aperture_mag_err"] = 0.434 * -2.5 * phot_extended["aperture_sum_err"]/phot_extended["aperture_sum"]
+
+    # Corrected with the zeropoint and the aperture correction, if given
+    # NOTE: will use the aperture correction from CorrectAp, if that is run above
+    phot_extended["aperture_mag_corr"] = phot_extended["aperture_mag"] + zeropoint + apcorr_ext 
+
+    # Writing sources to a .ecsv file
+    phot_extended.write("photometry_"+gal+"_"+filter.lower()+"_"+instrument.lower()+"_extended"+suffix+".ecsv", overwrite=True)
+    print("photometry_"+gal+"_"+filter.lower()+"_"+instrument.lower()+"_extended"+suffix+".ecsv", "saved")
+
     print("DONE!")
 
     if aperture_correction:
-    		return apcorr, aperr
+    		return apcorr, aperr, apcorr_ext, aperr_ext
     else: return None   
 ###-----------------------------------------------------------------------------------------------------
 
@@ -287,7 +331,7 @@ def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, savereg=False)
     
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_rad=3, max_rad=20):
+def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_rad=3, max_rad=20, extended_rad=10):
     
     """
     Generating the correction on the aperture photometry, including the EEF correction from some 
@@ -302,21 +346,25 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
     PARAMETERS
     ----------
     tab 		[Table]		: The table result from running photutils.aperture_photometry on a 
-    				  particular HST image
+    				  	  particular HST image
     radii 		[list]		: The apertures on which the photometry was run
     EEF 		[float]		: The Encircled Energy Fraction at the maximum aperture pixel radius 
-                              (default 20) for the instrument/filter of interest
-    num_stars	[int] (20) 	: The number of ideal stars to use for the calculation.
-    return_err 	[bool] (True)	: When set to True (default), returns the standard deviatio of the aperture correction
+                              		  (default 20) for the instrument/filter of interest
+    num_stars		[int] (20) 	: The number of ideal stars to use for the calculation.
+    return_err 		[bool] (True)	: When set to True (default), returns the standard deviatio of the aperture correction
     zmag 		[float] (0)	: May input the zeropoint magnitude to adjust the photometry.
-    min_rad 	[float] (3)	: The pixel radius of the minimum aperture size
-    max_rad 	[float] (20)	: The pixel radius of the maximum aperture size
+    min_rad 		[int] (3)	: The pixel radius of the minimum aperture size (for point sources)
+    max_rad 		[int] (20)	: The pixel radius of the maximum aperture size
+    extended_rad 	[int] (10)	: The pixel radius of extended sources (i.e. clusters)
 
     RETURN
     ---------
-    correction (float): The full correction to be applied to magnitude measurements,
-                      equivalent to the median of the 3 to 20 pixel aperture correction + the EEF correction
-    err (float): The standard deviation of the 3 to 20 pixel aperture correction
+    correction 	(float): The full correction to be applied to magnitude measurements,
+                      	equivalent to the median of the 3 to 20 pixel aperture correction + the EEF correction
+    err 	(float): The standard deviation of the 3 to 20 pixel aperture correction
+    corr_ext 	(float): The full correction to be applied to magnitude measurements,
+                      	equivalent to the median of the extended aperture correction + the EEF correction
+    err_ext 	(float): The standard deviation of the extended pixel aperture correction
 
     """
 
@@ -359,7 +407,7 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
                   					plt.ylim(26,10)
                   					plt.xlabel("Aperture radius (pixels)")
                   					plt.ylabel("Magnitude")
-                  					plt.title(j)
+                  					plt.title("Star No. " + str(j))
                   					plt.show()
                   					if len(temp_select) > 0: print(temp_select)
                   					ans = input("Keep?").lower()
@@ -369,8 +417,8 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
     		#tester =+ 1
     	else: cont = False; pass;
 
-    temp_select.sort()
-    print(temp_select)
+    #temp_select.sort()
+    #print(temp_select)
     # Plotting the radial profile of all stars
     for i in temp_select:
     	plt.plot(radii, phots[i]) # where i is the index of the star
@@ -383,11 +431,15 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
     	# finding the indices of the min and max aperture radii (default 3 and 20 pixels)
     	ind_min = radii.index(min_rad)
     	ind_max = radii.index(max_rad)
+    	ind_ext = radii.index(extended_rad)
     	phot_diff = [phots[i][ind_max] - phots[i][ind_min] for i in temp_select]
+    	phot_diff_ext = [phots[i][ind_max] - phots[i][ind_ext] for i in temp_select]
     	correction = np.median(phot_diff) + (1-(1./EEF))
     	err = np.std(phot_diff)
-    	if return_err: return correction, err
-    	else: return correction
+    	corr_ext = np.median(phot_diff_ext) + (1-(1./EEF))
+    	err_ext = np.std(phot_diff_ext)
+    	if return_err: return correction, err, corr_ext, err_ext
+    	else: return correction, corr_ext
     else:
     	print("Rerun function to calculate aperture correction.")
     	return None

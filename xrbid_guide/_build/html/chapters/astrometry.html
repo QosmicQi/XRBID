@@ -489,9 +489,7 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
+9 calibrators found.
 Saving ../testdata/M101_calibrators.reg
 </pre></div>
 </div>
@@ -561,7 +559,7 @@ Saving ../testdata/M101_calibrators.reg
 <span class="c1"># The new DataFrame has 1 and 2sig added at the end of the columns list</span>
 <span class="n">display</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">)</span>
 
-<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
+<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -917,7 +915,7 @@ Saving ../testdata/M101_calibrators.reg
 <span class="c1"># Saving results to a DataFrame file</span>
 <span class="c1"># This file contains only rows from M101_CSC that has the </span>
 <span class="c1"># best 2sigma radius, based on the search performed above</span>
-<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)</span>
 </pre></div>
@@ -1244,15 +1242,15 @@ Saving ../testdata/M101_calibrators.reg
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the 1 and 2 sigma region files for DS9 use.</span>
 <span class="c1"># The 2sig region files have the CSC ID printed above each source.</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;../testdata/M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;../testdata/M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving M101_bestrads_2sig.reg
-Saving M101_bestrads_1sig.reg
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/M101_bestrads_2sig.reg
+Saving ../testdata/M101_bestrads_1sig.reg
 </pre></div>
 </div>
 </div>
