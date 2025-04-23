@@ -184,11 +184,16 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -385,9 +390,12 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-autophots-runphots-for-everything">Using <code class="docutils literal notranslate"><span class="pre">AutoPhots.RunPhots()</span></code> for Everything</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-point-sources-with-daostarfinder">Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-aperture-photometry">Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-aperture-corrections">Estimating Aperture Corrections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-source-identification-and-photometry-w-o-runphots">Manual Source Identification and Photometry (w/o <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code>)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-point-sources-with-daostarfinder">Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-aperture-photometry">Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-aperture-corrections">Estimating Aperture Corrections</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -435,8 +443,7 @@ document.write(`
 </figcaption>
 </figure>
 <p>To run <code class="docutils literal notranslate"><span class="pre">RunPhots</span></code>, you will simply need to read in the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> <code class="docutils literal notranslate"><span class="pre">HDU</span></code>, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AutoPhots</span> <span class="kn">import</span> <span class="n">RunPhots</span>
-<span class="o">%</span><span class="n">run</span> <span class="n">AutoPhots</span><span class="o">.</span><span class="n">py</span>     <span class="c1"># Only run if running in .ipynb</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.AutoPhots</span> <span class="kn">import</span> <span class="n">RunPhots</span>
 
 <span class="c1"># Running analysis on full mosaic. Can be done on individual</span>
 <span class="c1"># fields using the &#39;suffix&#39; parameter to differentiate savefile names</span>
@@ -457,9 +464,12 @@ document.write(`
 </figcaption>
 </figure>
 </section>
+<section id="manual-source-identification-and-photometry-w-o-runphots">
+<h2>Manual Source Identification and Photometry (w/o <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code>)<a class="headerlink" href="#manual-source-identification-and-photometry-w-o-runphots" title="Link to this heading">#</a></h2>
+<p>For those who prefer to run their own point source identification, whether because <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> did not produce acceptable results or because you value the skill, you can extract sources using <code class="docutils literal notranslate"><span class="pre">photutils</span></code> instead, which should already be included in your <code class="docutils literal notranslate"><span class="pre">python</span></code> installation. The following instructions walk you through one means of manually identifying point sources in your <em>HST</em> images, extracting their photometry, and estimating an aperture correction for each image/filter, which you can use <em>instead of</em> <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code>. There almost certainly are other methods that you could use as well, but those will not be discussed here.</p>
 <section id="identifying-point-sources-with-daostarfinder">
-<h2>Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code><a class="headerlink" href="#identifying-point-sources-with-daostarfinder" title="Link to this heading">#</a></h2>
-<p>For those who prefer to run their own point source identification, whether because <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> did not produce acceptable results or because you value the skill, you can extract sources using <code class="docutils literal notranslate"><span class="pre">photutils</span></code> instead, which should already be included in your <code class="docutils literal notranslate"><span class="pre">python</span></code> installation. The main function used to find stars in a <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file is the <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code><a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.</p>
+<h3>Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code><a class="headerlink" href="#identifying-point-sources-with-daostarfinder" title="Link to this heading">#</a></h3>
+<p>The main function used to find stars in a <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file is the <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code><a class="footnote-reference brackets" href="#id10" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.</p>
 <p>Open the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file in your imaging software of choice and use the analytics of that software to determine some reasonable measurement of the background noise in a dark area of the image, and the FWHM of a few average stars. For <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, you can use the instructions in <a class="reference internal" href="#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a> to find the FWHM. An important thing to note is that <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code> requires the FWHM in pixels, but <code class="docutils literal notranslate"><span class="pre">DS9</span></code> gives it in arcseconds. The pixel scale for is 0.05 arcsec per pixel for ACS/WFC and 0.03962 for WFC3/UVIS. This is usually stored under the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> <code class="docutils literal notranslate"><span class="pre">HDU</span></code> header <code class="docutils literal notranslate"><span class="pre">D001SCAL</span></code>.</p>
 <p>The background noise measurement is used to estimate a good threshold above which <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code> should search for stars. I use the standard deviation of the flux, which can be found easily in <code class="docutils literal notranslate"><span class="pre">CARTA</span></code> using the ‘Statistic Widget’ (the calculator button) on a selected region. This can also be obtained in <code class="docutils literal notranslate"><span class="pre">python</span></code> using <code class="docutils literal notranslate"><span class="pre">sigma_clipped_stats</span></code> from <code class="docutils literal notranslate"><span class="pre">astropy.stats</span></code>. I then use this value to define the threshold (by default, I use a threshold of 5 times the standard deviation):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
@@ -481,7 +491,7 @@ document.write(`
 <p><code class="docutils literal notranslate"><span class="pre">DAOStarFind</span></code> will return a table containing the coordinates of all identified sources, which can be used to make a region file that will plot in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> and <code class="docutils literal notranslate"><span class="pre">CARTA</span></code> (this can be done easily using my custom function <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>). For reasons I don’t understand, the region file that comes from these coordinates often doesn’t align very well with the image itself, even though I believe the photometry that comes from these coordinates is accurate. When creating a region file, it may be a good idea to do a minor coordinate shift, just so that the regions align with the image and don’t cause confusion during the aperture correction step. Also, you’ll want to check the region file to make sure <code class="docutils literal notranslate"><span class="pre">DAOStarFind</span></code> isn’t missing any obvious sources. If it is, you’ll need to adjust your parameters (such as the FWHM) and run it again.</p>
 </section>
 <section id="extracting-photometry-with-aperture-photometry">
-<h2>Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code><a class="headerlink" href="#extracting-photometry-with-aperture-photometry" title="Link to this heading">#</a></h2>
+<h3>Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code><a class="headerlink" href="#extracting-photometry-with-aperture-photometry" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> will conduct the aperture photometry for you with a default minimum radius of 3 pixels, but you can also run the aperture photometry yourself with <code class="docutils literal notranslate"><span class="pre">photutils.aperture_photometry</span></code>. The inputs for <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code> are fairly simple: all you need is the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> data (background subtracted) and a list of aperture radii at the positions of your sources of interest, built with <code class="docutils literal notranslate"><span class="pre">photutils.aperture.CircularAperture()</span></code>. Using the resulting <code class="docutils literal notranslate"><span class="pre">objects</span></code> table obtained from <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code> above:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">photutils.aperture</span> <span class="kn">import</span> <span class="n">CircularAperture</span>
 
@@ -524,7 +534,7 @@ document.write(`
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">.ecsv</span></code> file will contain the coordinates of each source and the integrated flux within each aperture radius (in this case, 1–30 pixels). For normal stars, I generally use the flux within a 3-pixel aperture to represent a single star, as this radius is usually large enough to collect most of the stellar light but small enough for the flux not to be influenced by contamination from a neighboring star. However, any defined aperture is sure to miss some of the light of the chosen star, which is why an aperture correction is also needed to fully represent the stellar flux of a star of interest.</p>
 </section>
 <section id="estimating-aperture-corrections">
-<h2>Estimating Aperture Corrections<a class="headerlink" href="#estimating-aperture-corrections" title="Link to this heading">#</a></h2>
+<h3>Estimating Aperture Corrections<a class="headerlink" href="#estimating-aperture-corrections" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> will automatically conduct the aperture corrections using a second custom function, <code class="docutils literal notranslate"><span class="pre">CorrectAp()</span></code>. The philosophy behind aperture corrections is described in detailed above in <a class="reference internal" href="#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a> or, in a more official capacity, here: <a class="reference external" href="https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections">https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections</a></p>
 <p>To perform a manual aperture correction, you will want to select a sufficient number of ‘ideal’ isolated stars and find the magnitude difference between the 3 pixel and 20 pixel aperture photometry for each star<a class="footnote-reference brackets" href="#id11" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>. Plot their radial profiles to check that it looks similar to the ideal case represented by <a class="reference internal" href="#fig-ap-example"><span class="std std-numref">Fig. 10</span></a>. The median of these difference values (or some other well-argued statistical measure) is the correction term you will apply to the 3-pixel photometry of all other stars of interest. An additional term representing the magnitude difference between the 20 pixel radius and infinity should also be applied; this value can be found in the aperture correction link above for ACS/WFC, or here for WFC3/UVIS: <a class="reference external" href="https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/photometric-calibration/uvis-encircled-energy">https://www.stsci.edu/hst/instrumentation/wfc3/data-analysis/photometric-calibration/uvis-encircled-energy</a></p>
 <p>This EEF value is given as the fraction of the light encircled by the maximum aperture, which should be used to calculate how much more light needs to be added to capture 100% of the stellar emissions (that is, out to infinity).</p>
@@ -561,6 +571,7 @@ document.write(`
 <p>3 and 20 pixels are the typical apertures I use to represent a star and its environment, respectively. However, you may choose to use a different minimum and maximum radius, so long as the minimum radius sufficiently isolates your chosen star from the flux of its environment, and the maximum radius is sufficiently far from the star to capture that plateau of the stellar flux as the light fades into the background. You will want your choice in maximum radius to be one that is found in the EEF tables for the observing instrument, or at least close to one of radii given.</p>
 </aside>
 </aside>
+</section>
 </section>
 </section>
 
@@ -629,9 +640,12 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-autophots-runphots-for-everything">Using <code class="docutils literal notranslate"><span class="pre">AutoPhots.RunPhots()</span></code> for Everything</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-point-sources-with-daostarfinder">Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-aperture-photometry">Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-aperture-corrections">Estimating Aperture Corrections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-source-identification-and-photometry-w-o-runphots">Manual Source Identification and Photometry (w/o <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code>)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-point-sources-with-daostarfinder">Identifying Point Sources with <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-aperture-photometry">Extracting Photometry with <code class="docutils literal notranslate"><span class="pre">aperture_photometry</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-aperture-corrections">Estimating Aperture Corrections</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -656,7 +670,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

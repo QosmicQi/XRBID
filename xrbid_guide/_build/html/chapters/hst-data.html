@@ -184,11 +184,16 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -384,11 +389,25 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hla-image-search-manual">HLA Image Search (Manual)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Retrieving Optical Images from the HLA</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-image-searches">Manual Image Searches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#downloading-images-from-the-hla">Downloading Images from the HLA</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#downloading-images-from-mast">Downloading Images from MAST</a></li>
 </ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-image-searches">Automatic Image Searches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-color-images-in-python">Plotting color images in <code class="docutils literal notranslate"><span class="pre">python</span></code></a></li>
+</ul>
+</li>
+</ul>
+
             </nav>
         </div>
     </div>
@@ -403,12 +422,16 @@ document.write(`
 <span id="chap-hst-data"></span><h1>Retrieving Optical Images from the HLA<a class="headerlink" href="#retrieving-optical-images-from-the-hla" title="Link to this heading">#</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you intend to make a mosaic of your galaxy, this step can usually be skipped. It is recommended, however, that you look at what images are available in the HLA and jot down the <code class="docutils literal notranslate"><span class="pre">PropID</span></code>, <code class="docutils literal notranslate"><span class="pre">Spectral_Elt</span></code>, and <code class="docutils literal notranslate"><span class="pre">Detector</span></code> of images you want to use to make the mosaic step easier! See <a class="reference internal" href="astrodrizzle.html#chap-astrodriz"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a></p>
+<p>If you intend to make a mosaic of your galaxy, this step can usually be skipped. It is recommended, however, that you look at what images are available in MAST or the HLA and jot down the <code class="docutils literal notranslate"><span class="pre">PropID</span></code>, <code class="docutils literal notranslate"><span class="pre">Spectral_Elt</span></code>, and <code class="docutils literal notranslate"><span class="pre">Detector</span></code> of images you want to use to make the mosaic step easier! See <a class="reference internal" href="astrodrizzle.html#chap-astrodriz"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a></p>
 </div>
 <p>There are two ways to retrieve data from the HLA. The first is manually, and the second requires you to query the HLA from within <code class="docutils literal notranslate"><span class="pre">python</span></code>. The benefit to the latter technique is that this makes data retrieval practically automatic, although it does require a lot of user input that may take longer than it’s worth, depending on your workflow. It also allows you to pull data directly from from archive without having to download it to your computer, which is an enormous memory saver! However, with the way I’ve written my query, I’ve found it may not capture all <em>HST</em> images available on the HLA. I haven’t figured out how to solve for that issue quite yet. The only solution I have for now is to double-check everything with the manual process, and download any data that may be missing from the automatic query onto your computer to incorporate into your workflow.</p>
-<p>First, I will demonstrate the  manual way to retrieve <em>HST</em> data. Then, I will give my new code for automatic data retrieval. Again, use the latter with caution, as it takes a long time and doesn’t always return all of the data available!</p>
-<section id="hla-image-search-manual">
-<span id="sec-hla-search"></span><h2>HLA Image Search (Manual)<a class="headerlink" href="#hla-image-search-manual" title="Link to this heading">#</a></h2>
+<p>First, I will demonstrate the  manual way to retrieve <em>HST</em> data. Then, I will demonstrate the use of <code class="docutils literal notranslate"><span class="pre">XRBID.ImageSearch</span></code> for automatic data retrieval. Again, use the latter with caution, as it takes a long time and doesn’t always return all of the data available!</p>
+<section id="manual-image-searches">
+<h2>Manual Image Searches<a class="headerlink" href="#manual-image-searches" title="Link to this heading">#</a></h2>
+<p>For projects in which many XRBs of a single galaxy are being surveyed, it’s recommended to do a manual image search (unless you’re making a mosaic, in which case you can skip ahead to <a class="reference internal" href="astrodrizzle.html#chap-astrodriz"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>). Otherwise, using the ‘automatic’ method may be far more time-consuming than it’s worth.</p>
+<p>There are two methods for manual image retrieval: using the <a class="reference external" href="https://hla.stsci.edu">Hubble Legacy Archive (HLA)</a>, or using the <a class="reference external" href="https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html">STScI Mikulski Archive for Space Telescopes (MAST)</a>. Each has its benefits, so it’s mostly a matter of taste. MAST will lay out the <em>HST</em> footprints on top of an image of the target galaxy, making it easy to see everything that’s available and how they fit together, but it includes so much information that the search can be quite slow for well-studied galaxies. The HLA, on the other hand, does not always give you a mosaic view of all of the observations, but is often extremely quick when it comes to data retrieval.</p>
+<section id="downloading-images-from-the-hla">
+<span id="sec-hla-search"></span><h3>Downloading Images from the HLA<a class="headerlink" href="#downloading-images-from-the-hla" title="Link to this heading">#</a></h3>
 <p>To pull images from the HLA, <a class="reference external" href="https://hla.stsci.edu">go to the website</a> and type in the name of your galaxy. If the galaxy has been observed with <em>HST</em>, a list of observations will appear under the <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> tab. For my research, I require observations using the WCF3/UVIS<a class="footnote-reference brackets" href="#id6" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> or ACS/WFC<a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> detectors. I narrow down the observations by specifying the detector under the <code class="docutils literal notranslate"><span class="pre">Detector</span></code> tab (to my knowledge, this can only be done one at a time).</p>
 <figure class="align-default" id="fig-hla">
 <img alt="../_images/hla.png" src="../_images/hla.png" />
@@ -417,6 +440,11 @@ document.write(`
 </figcaption>
 </figure>
 <p>It’s useful to view what the actual images look like before downloading them. To do this, switch from the <code class="docutils literal notranslate"><span class="pre">Inventory</span></code> tab to the <code class="docutils literal notranslate"><span class="pre">Images</span></code> tab. Select the appropriate images (you’ll more than likely want the ones with science data) and add them to your cart by clicking the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Data:</span> <span class="pre">FITS-Science</span></code> link beneath each image.  This will add them to the shopping cart tab, which you can use to retrieve your FITS data files once all desired images are selected.</p>
+<p>Alternatively, you can click the <code class="docutils literal notranslate"><span class="pre">More...</span></code> link beneath each image to gather more information about the image (including the proposal ID needed for the <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> step, which is the number beside ‘Information for HST observing program’) and to download the science data directly without adding it to the cart.</p>
+<p>If you have files in your cart to download, you can do so by clicking on the <code class="docutils literal notranslate"><span class="pre">Cart</span></code> tab, selecting the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Sequentially</span></code> bubble (or <code class="docutils literal notranslate"><span class="pre">Zipped</span> <span class="pre">File</span></code>, if you prefer), and clicking <code class="docutils literal notranslate"><span class="pre">Fetch</span> <span class="pre">HLA</span> <span class="pre">Data</span></code>. This will initiate the download process. As these data files are usually pretty large, the download may take a while.</p>
+</section>
+<section id="downloading-images-from-mast">
+<span id="sec-mast-search"></span><h3>Downloading Images from MAST<a class="headerlink" href="#downloading-images-from-mast" title="Link to this heading">#</a></h3>
 <p>Alternatively, you can use the <a class="reference external" href="https://mast.stsci.edu/portal/Mashup/Clients/Mast/Portal.html">STSci MAST database</a> to get a better visual of how much of the galaxy has been covered and by what filters. This is usually a good option, but be aware that the target search includes all observations made by all telescopes in the database, so if you are searching for a well-documented galaxy, it may take a very long time to load!</p>
 <figure class="align-default" id="fig-mast">
 <img alt="../_images/mast.png" src="../_images/mast.png" />
@@ -424,10 +452,16 @@ document.write(`
 <p><span class="caption-number">Fig. 3 </span><span class="caption-text">Example search using the STSci MAST database. Here, the search was narrowed down to include only HST ACS/WFC science (HAP-SVM) observations made with the F435W, F555W, and F814W filters.</span><a class="headerlink" href="#fig-mast" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>To download data from MAST, narrow down the search results in the <code class="docutils literal notranslate"><span class="pre">Filters</span></code> tab on the left; in particular, you will want to select <code class="docutils literal notranslate"><span class="pre">science</span></code> in the <code class="docutils literal notranslate"><span class="pre">Observation</span> <span class="pre">Type</span></code> drop-down list, <code class="docutils literal notranslate"><span class="pre">HST</span></code> or <code class="docutils literal notranslate"><span class="pre">HLA</span></code> in <code class="docutils literal notranslate"><span class="pre">Missions</span></code>, <code class="docutils literal notranslate"><span class="pre">ACS/WFC</span></code> or <code class="docutils literal notranslate"><span class="pre">WFC3/UVIS</span></code> (or whatever other detectors you need for your specific project) in <code class="docutils literal notranslate"><span class="pre">Instrument</span></code>, and, if you want, the <code class="docutils literal notranslate"><span class="pre">Filters</span></code> of interest. You can then select the images you are interested in by either checking the appropriate box in the <code class="docutils literal notranslate"><span class="pre">List</span> <span class="pre">View</span></code> (center table) or clicking the footprint squares in the <code class="docutils literal notranslate"><span class="pre">AstroView</span></code> image on the right (see <a class="reference internal" href="#fig-mast"><span class="std std-numref">Fig. 3</span></a>). You can also switch from <code class="docutils literal notranslate"><span class="pre">List</span> <span class="pre">View</span></code> to <code class="docutils literal notranslate"><span class="pre">Album</span> <span class="pre">View</span></code> to see exactly which images corresponds to which square in the <code class="docutils literal notranslate"><span class="pre">AstroView</span></code> section.</p>
+<p>Add the images to your basket by clicking the button above the <code class="docutils literal notranslate"><span class="pre">List</span> <span class="pre">View</span></code> and <code class="docutils literal notranslate"><span class="pre">Album</span> <span class="pre">View</span></code> table that looks like an orange basket with 3 green arrows pointing into the basket (the button that is second from the end, greyed out, in <a class="reference internal" href="#fig-mast"><span class="std std-numref">Fig. 3</span></a>). This will bring you to the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Basket</span></code>. Select the files you want to download and click the <code class="docutils literal notranslate"><span class="pre">Download</span></code> button on the top right. This will download the images in a series of nested directories, which you will likely want to reorganize in accordance with your preferred workflow.</p>
 </section>
+</section>
+<section id="automatic-image-searches">
+<h2>Automatic Image Searches<a class="headerlink" href="#automatic-image-searches" title="Link to this heading">#</a></h2>
+<p>If your project requires images of only a couple of X-ray sources, or a handful of X-ray sources scattered across a sample of different galaxies, then you may find it useful to conduct a ‘automatic’ image search. It’s important to note that these searches aren’t fully automatic and require some input from the user, which is why they may not be ideal for studies of hundred of X-ray sources at a time. If you aren’t sure which search is best for your purposes, a manual search is usually sufficient, unless you are worried about storage space on your computer.</p>
 <section id="python-hla-query-with-pyvo">
-<span id="sec-pyvo-search"></span><h2><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="headerlink" href="#python-hla-query-with-pyvo" title="Link to this heading">#</a></h2>
-<p>The code that I use for querying the HLA through <code class="docutils literal notranslate"><span class="pre">python</span></code> is included in the script <code class="docutils literal notranslate"><span class="pre">ImageSearch.py</span></code>. This is heavily based on <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, which you should have already installed during the setup phase, and is mostly useful when you have a small number of sources to analyze.</p>
+<span id="sec-pyvo-search"></span><h3><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="headerlink" href="#python-hla-query-with-pyvo" title="Link to this heading">#</a></h3>
+<p>The code that I use for querying the HLA through <code class="docutils literal notranslate"><span class="pre">python</span></code> is included in <code class="docutils literal notranslate"><span class="pre">XRBID.ImageSearch</span></code>. This is heavily based on <code class="docutils literal notranslate"><span class="pre">PyVO</span></code><a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, which you should have already installed during the setup phase, and is mostly useful when you have a small number of sources to analyze.</p>
 <p>To use <code class="docutils literal notranslate"><span class="pre">ImageSearch.FindHST()</span></code>, you will need to provide the function with either a list containing the RA and Dec of a single source (in units degrees), or a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the coordinates of multiple sources. So, for example, either :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FindHST</span><span class="p">([</span><span class="o">&lt;</span><span class="n">RA</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">Dec</span><span class="o">&gt;</span><span class="p">],</span> <span class="n">galaxy</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">galaxy</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">savefile</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
@@ -438,13 +472,13 @@ document.write(`
 </div>
 <p>will work, as long as the coordinates, galaxy name, and some output file name are given. In either case, <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code> will search the HLA for any optical image containing the coordinates given and present them as a list – first searching for ACS/WFC observations, then searching for WFC3/UVIS observations. Upon user request, it will plot the images with the coordinate of the source marked as a red <code class="docutils literal notranslate"><span class="pre">X</span></code> and prompt the user to input the indices of the best image files to save. You will want to select at least one image for each of the filters you’re interested in, where applicable. It will then save the image information to a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file matching your designated <code class="docutils literal notranslate"><span class="pre">savefile</span></code> name. This <code class="docutils literal notranslate"><span class="pre">.csv</span></code> will include a URL that can be used to read in the image file directly from the HLA without having to download the image to your computer!</p>
 <p>If you just want to use <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code> to look for all images associated with the galaxy, not necessarily for each individual XRB, you can do so by providing the coordinates of the galaxy and setting the search radius to the radius of the galaxy, in arcseconds. This will likely return many potential images, so in this case it’s recommended to save the initial HLA search using the <code class="docutils literal notranslate"><span class="pre">savesearch</span></code> parameter and decide in conjunction with the HLA website which images are appropriate from that image list. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ImageSearch</span> <span class="kn">import</span> <span class="n">FindHST</span>
-<span class="o">%</span><span class="n">run</span> <span class="n">ImageSearch</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.ImageSearch</span> <span class="kn">import</span> <span class="n">FindHST</span>
 
-<span class="n">FindHST</span><span class="p">([</span><span class="mf">210.802368</span><span class="p">,</span> <span class="mf">54.359667</span><span class="p">],</span> <span class="n">galaxy</span><span class="o">=</span><span class="s1">&#39;M101&#39;</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> \
+<span class="n">FindHST</span><span class="p">([</span><span class="mf">210.802368</span><span class="p">,</span> <span class="mf">54.359667</span><span class="p">],</span> <span class="n">galaxy</span><span class="o">=</span><span class="s1">&#39;M101&#39;</span><span class="p">,</span> <span class="n">search_rad</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> 
         <span class="n">savefile</span><span class="o">=</span><span class="s1">&#39;Obslog_M101.csv&#39;</span><span class="p">,</span> <span class="n">savesearch</span><span class="o">=</span><span class="s1">&#39;M101_HLAsearch.csv&#39;</span><span class="p">)</span>
         
-<span class="c1"># This code will produce a table with nearly 200 images. You can choose to go through each one sequentially, </span>
+<span class="c1"># This code will produce a table with nearly 200 images. </span>
+<span class="c1"># You can choose to go through each one sequentially, </span>
 <span class="c1"># or use the M101_HLAsearch.csv + HLA to identify the best images manually</span>
 </pre></div>
 </div>
@@ -452,11 +486,13 @@ document.write(`
 <p>The downside of this procedure (as opposed to the manual HLA search) is that if you’re reading in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing all X-ray sources in a galaxy, then you will need to confirm the appropriate <em>HST</em> image for every XRB individually, which can take a lot of time for galaxies with many XRBs. However, you will not need to download the actual <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files to access them, which saves a ton of memory and makes reading in each image faster. This procedure also saves all of the <em>HST</em> information about the observation that you could need, which is an added bonus that comes in handy when you’re writing a paper on your results!</p>
 </section>
 <section id="python-hla-query-with-astroquery">
-<span id="sec-astroquery-search"></span><h2><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code><a class="headerlink" href="#python-hla-query-with-astroquery" title="Link to this heading">#</a></h2>
+<span id="sec-astroquery-search"></span><h3><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code><a class="headerlink" href="#python-hla-query-with-astroquery" title="Link to this heading">#</a></h3>
 <p>As an alternative to <code class="docutils literal notranslate"><span class="pre">PyVO</span></code>, one can use <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> to find and download HST data. <code class="docutils literal notranslate"><span class="pre">PyVO</span></code> is still a requirement for <code class="docutils literal notranslate"><span class="pre">astroquery</span></code>, so even if you decide not to use the <code class="docutils literal notranslate"><span class="pre">PyVO</span></code> method above, you’ll probably still need to install it. I use <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> in <a class="reference internal" href="astrodrizzle.html#chap-astrodriz"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a> as part of my drizzling workflow, as it will find the FLC files needed for the drizzling and mosaic creation for you. For more information, see <a class="reference internal" href="astrodrizzle.html#sec-astrodriz-files"><span class="std std-ref">Downloading HST Observations with astroquery</span></a>.</p>
 </section>
-<section id="handling-hst-data">
-<h2>Handling <em>HST</em> Data<a class="headerlink" href="#handling-hst-data" title="Link to this heading">#</a></h2>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="handling-hst-data">
+<h1>Handling <em>HST</em> Data<a class="headerlink" href="#handling-hst-data" title="Link to this heading">#</a></h1>
 <p>The image data files from <em>HST</em> is given in <code class="docutils literal notranslate"><span class="pre">FITS</span></code> format<a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>. This may be read in as an <code class="docutils literal notranslate"><span class="pre">HDU</span></code><a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> object with some form of <code class="docutils literal notranslate"><span class="pre">python</span></code> code resembling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
 <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="o">&lt;</span><span class="n">FITS</span> <span class="n">file</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">)</span>
@@ -465,9 +501,9 @@ document.write(`
 </div>
 <p>The last line of that code will print a name and type of data stored in the <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, as well as the index you can use to access the data (<code class="docutils literal notranslate"><span class="pre">No.</span></code>). The <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code> element contains information regarding the image observation and reduction (e.g. the instrument configuration, calibrations applied, exposure time, etc.), and can be accessed with <code class="docutils literal notranslate"><span class="pre">.header</span></code> via <code class="docutils literal notranslate"><span class="pre">hdu[0].header</span></code>, where the index used is the index of the primary data, or <code class="docutils literal notranslate"><span class="pre">hdu['PRIMARY'].header</span></code>.</p>
 <p>Importantly, the image from which the photometry is extracted is (usually) stored under <code class="docutils literal notranslate"><span class="pre">SCI</span></code>. The header information under <code class="docutils literal notranslate"><span class="pre">SCI</span></code> may also contain a lot of good information, including image statistics like the signal-to-noise (if the image reduction team was thorough in their record keeping), so it’s a good idea to take a look. Keep in mind, if you choose to create a mosaic and set <code class="docutils literal notranslate"><span class="pre">build=False</span></code> in <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> (see <span class="xref std std-ref">sec:astrodriz</span>), the science data will be stored under <code class="docutils literal notranslate"><span class="pre">PRIMARY</span></code> rather than under its own extension.</p>
-<p>If you used the automatic HLA search method (<code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>), then you can read in the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file associated with each source using <code class="docutils literal notranslate"><span class="pre">ImageSearch.GetFITS()</span></code>, which requires you provide the name of the file saved by <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>, the source of interest, the detector (in my case, ACS/WFC or WFC3/UVIS), and the filter (e.g. F814W, F555W, etc). <code class="docutils literal notranslate"><span class="pre">GetFITS()</span></code> reads in the image URL and returns an <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, so instead of the code above (which you would use if you saved a <code class="docutils literal notranslate"><span class="pre">FITS</span></code> directly to your computer), you can instead use something like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ImageSearch</span> <span class="kn">import</span> <span class="n">GetFITS</span>
-<span class="o">%</span><span class="n">run</span> <span class="n">ImageSearch</span><span class="o">.</span><span class="n">py</span>
+<p>If you used the automatic HLA search method (<code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>), then you can read in the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file associated with each source using <code class="docutils literal notranslate"><span class="pre">ImageSearch.GetFITS()</span></code>, which requires you provide the name of the file saved by <code class="docutils literal notranslate"><span class="pre">FindHST()</span></code>, the source of interest, the detector (in my case, ACS/WFC or WFC3/UVIS), and the filter (e.g. F814W, F555W, etc). <code class="docutils literal notranslate"><span class="pre">GetFITS()</span></code> reads in the image URL and returns an <code class="docutils literal notranslate"><span class="pre">HDU</span></code> object, so instead of the code above (which you would use if you saved a <code class="docutils literal notranslate"><span class="pre">FITS</span></code> directly to your computer), you can use something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.ImageSearch</span> <span class="kn">import</span> <span class="n">GetFITS</span>
+
 <span class="n">hdu</span> <span class="o">=</span> <span class="n">GetFITS</span><span class="p">(</span><span class="n">infile</span><span class="o">=&lt;</span><span class="n">FindHST</span> <span class="n">savefile</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">source_id</span><span class="o">=&lt;</span><span class="n">source</span> <span class="n">ID</span><span class="o">&gt;</span><span class="p">,</span>
               <span class="n">detector</span><span class="o">=&lt;</span><span class="s1">&#39;ACS/WFC&#39;</span> <span class="ow">or</span> <span class="s1">&#39;WFC3/UVIS&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=&lt;</span><span class="nb">filter</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
@@ -478,7 +514,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">astropy.wcs</span> <span class="kn">import</span> <span class="n">WCS</span> <span class="c1"># defining the coordinate system, e.g. RA/Dec</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
 
-<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">info</span><span class="p">())</span> <span class="c1"># Display the hdu info to get more information about what it contains</span>
 
 <span class="c1"># Setting up the figure</span>
@@ -488,7 +524,7 @@ document.write(`
 <span class="c1"># But you may need to check your specific hdu file</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">WCS</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span>
-          <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">.5</span><span class="p">))</span>
+           <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">.5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -496,15 +532,17 @@ document.write(`
 <a class="reference internal image-reference" href="../_images/fits_bw.png"><img alt="../_images/fits_bw.png" src="../_images/fits_bw.png" style="width: 500px;" />
 </a>
 </figure>
+<section id="plotting-color-images-in-python">
+<h2>Plotting color images in <code class="docutils literal notranslate"><span class="pre">python</span></code><a class="headerlink" href="#plotting-color-images-in-python" title="Link to this heading">#</a></h2>
 <p>To get a color image, you can use <code class="docutils literal notranslate"><span class="pre">make_lupton_rgb()</span></code> from <code class="docutils literal notranslate"><span class="pre">astropy.visualization</span></code> to generate a scaleable RGB color image, create your own logarithmic scaling algorithm, or simply use either
 <code class="docutils literal notranslate"><span class="pre">ImageSearch.MakePostage()</span></code> or <code class="docutils literal notranslate"><span class="pre">ImageSearch.PlotField()</span></code> (which does basically the same, but is a semi-automatic plotting function that will lead you through each of the steps). Below is an example of creating a color image using a custom logarithmic scaling algorithm, which is my preferred method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">reproject</span> <span class="kn">import</span> <span class="n">reproject_interp</span>    <span class="c1"># May need to install first</span>
 
 <span class="c1"># Calling FITS files as the RGB filters</span>
-<span class="n">hdu_r</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f814w_example.fits&#39;</span><span class="p">)</span>
-<span class="n">hdu_g</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f555w_example.fits&#39;</span><span class="p">)</span>
-<span class="n">hdu_b</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_r</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f814w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_g</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f555w_example.fits&#39;</span><span class="p">)</span>
+<span class="n">hdu_b</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_acs_wfc_f435w_example.fits&#39;</span><span class="p">)</span>
 <span class="n">data_g</span> <span class="o">=</span> <span class="n">hdu_g</span><span class="p">[</span><span class="s1">&#39;SCI&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>   <span class="c1"># Pulling data from FITS HDU</span>
 
 <span class="c1"># Resizing images that don&#39;t match the base HDU, hdu_g (required)</span>
@@ -637,11 +675,25 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hla-image-search-manual">HLA Image Search (Manual)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Retrieving Optical Images from the HLA</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-image-searches">Manual Image Searches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#downloading-images-from-the-hla">Downloading Images from the HLA</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#downloading-images-from-mast">Downloading Images from MAST</a></li>
 </ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-image-searches">Automatic Image Searches</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-pyvo"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">PyVO</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-hla-query-with-astroquery"><code class="docutils literal notranslate"><span class="pre">python</span></code> HLA query with <code class="docutils literal notranslate"><span class="pre">astroquery</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-hst-data">Handling <em>HST</em> Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-color-images-in-python">Plotting color images in <code class="docutils literal notranslate"><span class="pre">python</span></code></a></li>
+</ul>
+</li>
+</ul>
+
   </nav></div>
 
 </div></div>
@@ -665,7 +717,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

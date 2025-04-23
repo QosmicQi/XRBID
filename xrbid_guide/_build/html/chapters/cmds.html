@@ -1,0 +1,858 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Estimating XRB Masses with CMDs and CCDs &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/cmds';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Final Thoughts" href="final.html" />
+    <link rel="prev" title="Classifying Optical Counterparts" href="sourceids.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="title.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/XRB.png" class="logo__image only-light" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>
+    <script>document.write(`<img src="../_static/XRB.png" class="logo__image only-dark" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="title.html">
+                    XRBID: A Guide to Direct X-ray Binary Analysis
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/cmds.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/cmds.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Estimating XRB Masses with CMDs and CCDs</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="estimating-xrb-masses-with-cmds-and-ccds">
+<span id="chap-cmds"></span><h1>Estimating XRB Masses with CMDs and CCDs<a class="headerlink" href="#estimating-xrb-masses-with-cmds-and-ccds" title="Link to this heading">#</a></h1>
+<p>X-ray sources that are associated with point sources (i.e. stars) or compact star clusters and that are not flagged as SNR are considered genuine XRBs. The masses of their donor stars, then, are obtained by comparing their photometry across the filters available to us to stellar evolutionary models. The most useful tools for this process are color-magnitude diagrams (CMDs) and color-color diagrams (CCDs). The former is used to estimate the mass of isolated XRBs, while the latter allows us to approximate the most likely donor star mass of XRBs that exist within compact star clusters.</p>
+<figure class="align-default" id="fig-example-cmd">
+<a class="reference internal image-reference" href="../_images/example_cmd.png"><img alt="../_images/example_cmd.png" src="../_images/example_cmd.png" style="width: 500px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">An example of a color-magnitude diagram (CMD) using XRBs in M81. The color on the x-axis is calculated by subtracting the red magnitude by the green magnitude of the donor star. The models, which represent the evolution of a standard solar-metallicity star of a given mass, are derived from stellar evolutionary models for either ACS/WFC or WFC3/UVIS, so the observations taken of the donor stars should be done in at least 2 filters of the same intstrument (ACS or WFC3).</span><a class="headerlink" href="#fig-example-cmd" title="Link to this image">#</a></p>
+<div class="legend">
+<p>Here, we see that there is a fairly even population of XRBs with visible donor stars measuring as low-mass (falling below the 3 solar mass line), intermediate-mass (falling above the 3 solar mass line), and high-mass high-mass (falling above the 8 solar mass line).</p>
+</div>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-example-ccd">
+<a class="reference internal image-reference" href="../_images/example_ccd.png"><img alt="../_images/example_ccd.png" src="../_images/example_ccd.png" style="width: 400px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">An example of a color-color diagram of XRB-hosting clusters in M81, compared to the standard color evolution of a cluster with solar-metallicity stars. 10 Myr and 400 Myr are denoted by black triangles; these are the ages that separate very young clusters, intermediate-age clusters, and globular clusters.</span><a class="headerlink" href="#fig-example-ccd" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>This chapter demonstrates how to pull the photometry of each point source or cluster, calculate their magnitudes, and compare their magnitudes and colors to the models included in the <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> package.</p>
+<section id="extracting-photometry-with-getdaophots">
+<span id="sec-getphots"></span><h2>Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code><a class="headerlink" href="#extracting-photometry-with-getdaophots" title="Link to this heading">#</a></h2>
+<p>Before we can create a CMD or CCD, we need to extract the photometry of each optical counterpart in each filter. Following the procedures in <a class="reference internal" href="selection.html#sec-crossref"><span class="std std-ref">Cross-referencing sources across filters</span></a>, the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> named <code class="docutils literal notranslate"><span class="pre">DaoCleanMatch</span></code> now contains the name of each X-ray source (<code class="docutils literal notranslate"><span class="pre">CSC</span> <span class="pre">ID</span></code>), and the ID of each point source that falls within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> in each filter (<code class="docutils literal notranslate"><span class="pre">F555W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F435W</span> <span class="pre">ID</span></code>, <code class="docutils literal notranslate"><span class="pre">F814W</span> <span class="pre">ID</span></code>). To pull each point source’s photometry from the appropriate filter data file, we use <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.GetDaoPhots()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetDaoPhots</span>
+
+<span class="c1"># Ideally, you would run this on a DataFrame containing only point sources or clusters,</span>
+<span class="c1"># but for this demonstration, I&#39;ll pull the info for all previously-identified </span>
+<span class="c1"># objects from the DaoClean() step of this guide</span>
+<span class="n">DaoCleanMatch</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daoclean_matches.frame&quot;</span><span class="p">)</span>
+
+<span class="n">dist</span> <span class="o">=</span> <span class="mf">6.4e6</span> <span class="c1"># units pc, from Chandar et al. 2020</span>
+<span class="n">dmod</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span>
+
+<span class="n">DaoCleanPhots</span> <span class="o">=</span> <span class="n">GetDaoPhots</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">,</span> 
+                            <span class="n">photfiles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;../testdata/photometry_M101_f555w_acs_sources.ecsv&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;../testdata/photometry_M101_f435w_acs_sources.ecsv&quot;</span><span class="p">,</span>
+                                       <span class="s2">&quot;../testdata/photometry_M101_f814w_acs_sources.ecsv&quot;</span><span class="p">],</span>  
+                            <span class="n">idheads</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W ID&quot;</span><span class="p">,</span> <span class="s2">&quot;F435W ID&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W ID&quot;</span><span class="p">],</span> 
+                            <span class="n">filters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F435W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> 
+                            <span class="n">magheader</span><span class="o">=</span><span class="s2">&quot;aperture_mag_corr&quot;</span><span class="p">,</span> <span class="n">dmod</span><span class="o">=</span><span class="n">dmod</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/M101_daoclean_matches.frame...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Searching ../testdata/photometry_M101_f555w_acs_sources.ecsv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Searching ../testdata/photometry_M101_f435w_acs_sources.ecsv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Searching ../testdata/photometry_M101_f814w_acs_sources.ecsv
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+      <th>F555W ID</th>
+      <th>F435W ID</th>
+      <th>F814W ID</th>
+      <th>CSC ID</th>
+      <th>F555W</th>
+      <th>F435W</th>
+      <th>F814W</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>101364</td>
+      <td>143088.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.008009</td>
+      <td>-8.693963</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>101394</td>
+      <td>143125.0</td>
+      <td>148555.0</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.229914</td>
+      <td>-8.773200</td>
+      <td>-9.919766</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>101442</td>
+      <td>143189.0</td>
+      <td>148645.0</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-8.117305</td>
+      <td>-7.383763</td>
+      <td>-9.247246</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>101505</td>
+      <td>143293.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-9.178998</td>
+      <td>-8.697017</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>101528</td>
+      <td>143332.0</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>-10.077190</td>
+      <td>-9.155895</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1397</th>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>3143</td>
+      <td>4807.0</td>
+      <td>6523.0</td>
+      <td>2CXO J140346.1+541615</td>
+      <td>-8.644579</td>
+      <td>-7.398538</td>
+      <td>-10.176378</td>
+    </tr>
+    <tr>
+      <th>1398</th>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>52656</td>
+      <td>74953.0</td>
+      <td>71911.0</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>-11.382241</td>
+      <td>-11.394625</td>
+      <td>-11.491202</td>
+    </tr>
+    <tr>
+      <th>1399</th>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>52713</td>
+      <td>74989.0</td>
+      <td>72017.0</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>-5.801205</td>
+      <td>-5.828547</td>
+      <td>-7.045369</td>
+    </tr>
+    <tr>
+      <th>1400</th>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>68</td>
+      <td>105.0</td>
+      <td>100.0</td>
+      <td>2CXO J140338.3+541355</td>
+      <td>-5.285409</td>
+      <td>-3.928275</td>
+      <td>-7.542093</td>
+    </tr>
+    <tr>
+      <th>1401</th>
+      <td>4105.006500</td>
+      <td>4868.306051</td>
+      <td>307</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2CXO J140353.7+541430</td>
+      <td>-4.486746</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>1402 rows × 9 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="estimating-stellar-masses-on-a-cmd">
+<h2>Estimating Stellar Masses on a CMD<a class="headerlink" href="#estimating-stellar-masses-on-a-cmd" title="Link to this heading">#</a></h2>
+<p>The mass of a star can be estimated by comparing their magnitudes and colors to stellar evolutionary models of stars of different masses. Below is an example of two blank CMDs, as plotted by <code class="docutils literal notranslate"><span class="pre">XRBID.CMDs.MakeCMD()</span></code>. Each line represents a different solar mass, with the color of the star evolving over time from left (where the main sequence lies) to right (towards redder overall colors).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCMD</span>
+
+<span class="c1"># The color and magnitude must be read in for the code to work. </span>
+<span class="c1"># The smaller wavelength should always be first when calculating colors.</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F435W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F814W&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F435W - F814W&#39;, ylabel=&#39;F814W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" src="../_images/fdfed22867333178cc4f5bdf2637b5a7039e69db8bc95e4bc30344104a88a160.png" />
+<img alt="../_images/24b74dce17d5855419ce173ba29d01a0fed92ec7d6ef8880ee78221d83a02606.png" src="../_images/24b74dce17d5855419ce173ba29d01a0fed92ec7d6ef8880ee78221d83a02606.png" />
+</div>
+</div>
+<p>To plot points on the CMD, read in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the magnitudes of the sources, such as the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> produced by GetDaoPhots. For simplicity the header containing the magnitudes should match the name of the filter represented. Because the models are instrument dependent, you should also read in the instrument the stars were observed with (ACS or WFC3). In the example below, I am simply printing <em>all</em> optical point sources identified within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of the X-ray sources in my sample; in actuality, you would only want to plot the sources that you know are stars.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MakeCMD</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;ACS&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" src="../_images/cdc08ce26f782962b8c8310b6c5a402d8f98ca4416be3baa5600e363b467ad2f.png" />
+</div>
+</div>
+<p>In order to determine the best candidate donor star for a particular X-ray source, one should isolate that source and plot only its donor stars on a CMD. If there are several stars associated with a single source, it may not be possible to identify the exact XRB donor star, but in most cases it’s not necessary: if, for an X-ray source only associated with stars, there exists at least one high-mass star within 2-<span class="math notranslate nohighlight">\(\sigma\)</span>, then that source is considered a high-mass XRB; if the source has a mix of low- and intermediate-mass stars, then that source is considered a low-mass XRB; and only if there are only intermediate-mass stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> should an XRB be classified as intermediate-mass. See <a class="reference internal" href="selection.html#sec-selection"><span class="std std-ref">Selecting the Best Counterpart</span></a> for more information.</p>
+<p>Below, I demonstrate the selection of the candidate donor stars of a single X-ray source and plot its CMD. In this case, the source has a mix of both high-mass and intermediate-mass stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. Therefore, based on the selection heirarchy we use, this XRB is defined as a high-mass XRB – albeit with an unidentifable donor star.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">Find</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="s2">&quot;CSC ID = 2CXO J140312.7+541743&quot;</span><span class="p">)</span>
+<span class="n">MakeCMD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">xcolor</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> <span class="s2">&quot;F814W&quot;</span><span class="p">],</span> <span class="n">ycolor</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 600x400 with 1 Axes&gt;,
+ &lt;Axes: xlabel=&#39;F555W - F814W&#39;, ylabel=&#39;F555W&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" src="../_images/576499b21e62e3d438b05a8155b005fddf6c991f9cb957121fdf653b8792b1e0.png" />
+</div>
+</div>
+</section>
+<section id="aging-clusters-on-a-ccd">
+<h2>Aging Clusters on a CCD<a class="headerlink" href="#aging-clusters-on-a-ccd" title="Link to this heading">#</a></h2>
+<p>If an X-ray source is associated with a cluster rather than a point source (i.e. star), then one should use <code class="docutils literal notranslate"><span class="pre">XRBID.CMDs.MakeCCD()</span></code> instead of <code class="docutils literal notranslate"><span class="pre">MakeCMD()</span></code>; this will plot the photometry of each source against an evolutionary model for a solar-mass cluster instead. Because color is quite sensitive to reddening, it is recommended that one looks up the estimated extinction towards the coordinate of the cluster, which can be done by entering the coordinates in the <a class="reference external" href="https://ned.ipac.caltech.edu/extinction_calculator">NASA/IPAC Extragalactic Database</a> and calculating it as B-V.</p>
+<p>On this plot, as demonstrated below, the crucial ages of 10 Myr and 400 Myr are plotted, indicating the division between very young clusters (which are argued to most likely host high-mass XRBs), intermediate-age clusters (which may host intermediate-mass XRBs, though this is inconclusive at the moment), and globular clusters (which <em>only</em> contain low-mass XRBs).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Depending on the general size of the clusters in your galaxy, you may need to pull the photometry for a larger aperture size than the default of 3. This may also require you to redo the aperture photometry. I’m in the process of testing this and applying it to the <code class="docutils literal notranslate"><span class="pre">RunPhots</span></code> code, to make it easier to pull the photometry of clusters in the future.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.CMDs</span> <span class="kn">import</span> <span class="n">MakeCCD</span>
+<span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">RemoveElse</span><span class="p">,</span> <span class="n">FindUnique</span>
+
+<span class="c1"># Picking out a few clusters to plot</span>
+<span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;2CXO J140309.7+542114&quot;</span><span class="p">,</span> <span class="s2">&quot;2CXO J140313.9+542136&quot;</span><span class="p">,</span> 
+           <span class="s2">&quot;2CXO J140304.6+542037&quot;</span><span class="p">,</span> <span class="s2">&quot;2CXO J140319.2+542149&quot;</span><span class="p">]</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">RemoveElse</span><span class="p">(</span><span class="n">FindUnique</span><span class="p">(</span><span class="n">DaoCleanPhots</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">),</span> 
+                         <span class="n">clusters</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)</span>
+
+<span class="c1"># Testing with and without extinction correction.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting WITHOUT extinction correction:&quot;</span><span class="p">)</span>
+<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">correct_ext</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting with extinction correction:&quot;</span><span class="p">)</span>
+<span class="n">MakeCCD</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">E_BV</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">correct_ext</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting WITHOUT extinction correction:
+Plotting reddening arrow for V-I vs. B-V
+</pre></div>
+</div>
+<img alt="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" src="../_images/65c3dfa6b9d12c595f53111ade30d3a0d758dc7ecfa7baab37fe1d08a877e343.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting with extinction correction:
+Plotting reddening arrow for V-I vs. B-V
+</pre></div>
+</div>
+<img alt="../_images/ab17b4b1a10c9fbaa44c830a932fe117d0e784c91751e87d9edfe07358af3ccb.png" src="../_images/ab17b4b1a10c9fbaa44c830a932fe117d0e784c91751e87d9edfe07358af3ccb.png" />
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "jupyterbook"
+        },
+        kernelOptions: {
+            name: "jupyterbook",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'jupyterbook'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sourceids.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Classifying Optical Counterparts</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="final.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Final Thoughts</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-photometry-with-getdaophots">Extracting photometry with <code class="docutils literal notranslate"><span class="pre">GetDaoPhots()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimating-stellar-masses-on-a-cmd">Estimating Stellar Masses on a CMD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aging-clusters-on-a-ccd">Aging Clusters on a CCD</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Qiana Hunt
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

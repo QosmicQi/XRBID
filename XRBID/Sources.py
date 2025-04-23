@@ -22,7 +22,6 @@ warnings.filterwarnings("ignore")
 imext = [0., 13500.]
 import os
 
-from XRBID.Headers import heads, tabheads, tabheads_split, Greenx, Greeny, Redx, Redy, Bluex, Bluey, Radius, DaoNo, headers_dict, ID, Class, Class2, Conf, Notes, X, Y
 from XRBID.DataFrameMod import BuildFrame, Find, Convert_to_Number
 
 ###-----------------------------------------------------------------------------------------------------
@@ -53,14 +52,12 @@ def LoadSources(infile=None, verbose=True):
 		try: return Convert_to_Number(pd.read_csv(infile, sep=",", converters={"ID": str}, dtype=None).drop("Unnamed: 0", axis=1))
 		# If ID not in the file, just return this
 		except: 
-			try: return Convert_to_Number(pd.read_csv(infile, sep=",", dtype=None).drop("Unnamed: 0", axis=1))
-			except: print("ERROR: Reading in datafile failed.") 
+			return Convert_to_Number(pd.read_csv(infile, sep=",", dtype=None).drop("Unnamed: 0", axis=1))
+			
 	except: 
 		try: return Convert_to_Number(pd.read_csv(infile, sep=",", dtype=None))
 		except: 
-			try: return Convert_to_Number(pd.read_csv(infile, dtype=None))
-			except: 
-				print("ERROR: Reading in datafile failed.") 
+			return Convert_to_Number(pd.read_csv(infile, dtype=None))
 
 ###-----------------------------------------------------------------------------------------------------
 
@@ -257,66 +254,6 @@ def GetIDs(infile=None, verbose=True):
 
 ###-----------------------------------------------------------------------------------------------------
 
-def SourceID(infile=None): 
-
-	"""
-	Reads in initial identifications from the *_IDs.txt file and returns a new DataFrame. 
-	Once this is read in once, the file may be saved as a .txt file that can be read by LoadSources().
-	This function has a very specific use and is not useful for most people. Please ignore!
-	"""
-
-	if infile == None: infile = raw_input("ID file name? : ")
-	if len(infile.split(".")) <= 1: infile = infile + ".txt" 
-	
-	try: 
-		with open(infile) as f: 
-			lines = f.readlines()[1:]
-	except: print("File not found.") 
-
-	sourceid = pd.DataFrame(columns=[ID, DaoNo, Class, Class2, Conf, Notes])
-	sourceid[ID] = [" "]*len(lines) # setting the length of the DataFrame
-
-	try: 
-		try: 
-			for i in range(len(lines)): 
-				j = lines[i].split()
-				sourceid[ID][i] = j[0]
-				sourceid[DaoNo][i] = j[1]
-				sourceid[Class][i] = j[2]
-				sourceid[Class2][i] = j[3]
-				sourceid[Conf][i] = float(j[4])
-				try: sourceid[Notes][i] = " ".join(j[5:])
-				except: sourceid[Notes][i] = "None"
-		except: print("Error on " + j[0] + ". DataFrame not created.")
-
-		for i in range(len(sourceid)): 
-			# Resetting classifications to something more readable
-			if sourceid[Class][i] == "H": sourceid[Class][i] = "HMXB"
-			elif sourceid[Class][i] == "I": sourceid[Class][i] = "IMXB"
-			elif sourceid[Class][i] == "L": sourceid[Class][i] = "LMXB"
-			elif sourceid[Class][i] == "A": sourceid[Class][i] = "AGN"
-			elif sourceid[Class][i] == "S": sourceid[Class][i] = "SNR"
-			elif sourceid[Class][i] == "Q": sourceid[Class][i] = "Quasar"
-			elif sourceid[Class][i] == "C": sourceid[Class][i] = "Cluster"
-			elif sourceid[Class][i] == "?": sourceid[Class][i] = "Unknown" 
-
-			if sourceid[Class2][i] == "H": sourceid[Class2][i] = "HMXB"
-			elif sourceid[Class2][i] == "I": sourceid[Class2][i] = "IMXB"
-			elif sourceid[Class2][i] == "L": sourceid[Class2][i] = "LMXB"
-			elif sourceid[Class2][i] == "A": sourceid[Class2][i] = "AGN"
-			elif sourceid[Class2][i] == "S": sourceid[Class2][i] = "SNR"
-			elif sourceid[Class2][i] == "Q": sourceid[Class2][i] = "Quasar"
-			elif sourceid[Class2][i] == "C": sourceid[Class2][i] = "Cluster"
-			elif sourceid[Class2][i] == "X": sourceid[Class2][i] = "N/A"
-			elif sourceid[Class2][i] == "?": sourceid[Class2][i] = "Unknown"
-
-		return sourceid
-
-	except: print("Error creating DataFrame.")
-
-###-----------------------------------------------------------------------------------------------------
-
-
 def SourceList(savefile, df=None, columns=['ID']):
 
 	""" 
@@ -480,7 +417,7 @@ def Crossref(df=None, regions=False, catalogs=False, coords=False, sourceid="ID"
 
 	RETURNS
 	---------
-	Matches		[pd.DataFrame]	: DataFrame containing the original ID of each source, its coordinates,  and the ID of all 
+	Matches		[pd.DataFrame]	: DataFrame containing the original ID of each source, its coordinates, and the ID of all 
 					  corresponding matches in each of the input region files or coordinates. 
 	
 	"""
@@ -667,9 +604,8 @@ def GalComponents(sources, rad=[0], locs=["Disk", "Outskirt"], theta=0, center=N
 	function InEllipse. GalComponents returns the same DataFrame with an added header, Location, which details which component 
 	the source appears within.
 	"""
-
-
-	from WriteScript import WriteReg
+	
+	from XRBID.WriteScript import WriteReg
 
 	sources = sources.copy()
 	locations = ["Outskirt"]*len(sources)
@@ -681,8 +617,8 @@ def GalComponents(sources, rad=[0], locs=["Disk", "Outskirt"], theta=0, center=N
 	else: 
 		temp = Find(sources, "Class = Nucleus")
 		try: 
-			xcenter = temp[X][0]
-			ycenter = temp[Y][0]
+			xcenter = temp["X"][0]
+			ycenter = temp["Y"][0]
 		except: 
 			xcenter = temp["x (mosaic)"][0]
 			ycenter = temp["y (mosaic)"][0]
@@ -690,8 +626,8 @@ def GalComponents(sources, rad=[0], locs=["Disk", "Outskirt"], theta=0, center=N
 	## Start with the outermost region and work inwords
 	for i in range(len(sources)): 
 		try: 
-			xtemp = sources[X][i]
-			ytemp = sources[Y][i]
+			xtemp = sources["X"][i]
+			ytemp = sources["Y"][i]
 		except: 
 			xtemp = sources["x (mosaic)"][i]
 			ytemp = sources["y (mosaic)"][i]
@@ -792,75 +728,6 @@ def InEllipse(x,y,center,rad1,rad2,theta):
 
 	# Return True with the source is within the ellipse
 	return pos <= 1
-
-###-----------------------------------------------------------------------------------------------------
-
-def FindField(df=None, coords=None, fieldframes=["M81_fields_red.frame", "M81_fields_green.frame", "M81_fields_blue.frame"]):
-
-	""" 
-	Automatically detects the best frames that each X-ray source falls within, for red, green, and blue. Requires you 
-	to have already created a Dataframe file for each filter of the fields which gives the minimum and maximum of the 
-	x and y coordinates of each field. Assumes the fields are a perfect square, so will need to be double-checked. 
-	Also assumes all coordinates are in pixels (img). Currently, this code only finds the coordinates for three fields. 
-	Will need to be modified if more are needed! In the case where the source falls within more than one field, it takes 
-	the first field of the red or the one nearest the red field for green and blue. Currently returns a list of the fields 
-	(will need to modify to return a DataFrame instead).
-
-	"""
-
-	if len(df) > 0: coords = [df["x"].values.tolist(),df["y"].values.tolist()]
-	else: pass;
-	
-	redfield = []
-	greenfield = []
-	bluefield = []
-
-	# Loading the coordinates of the fields in each filter
-	FieldsRed = LoadSources(fieldframes[0])
-	FieldsGreen = LoadSources(fieldframes[1])
-	FieldsBlue = LoadSources(fieldframes[2])
-
-	for i in range(len(coords[0])): 
-		tempx = coords[0][i]
-		tempy = coords[1][i]
-		
-		# Finding which field source falls within
-		Temp = Find(FieldsRed, ["Min x <= " + str(tempx), "Max x >= " + str(tempx), "Min y <= " + str(tempy), "Max y >= " + str(tempy)])
-
-		# For the red field, choose the first field
-		if len(Temp) == 0: redfield.append(np.nan)
-		else: redfield.append(Temp["Field"][0])
-	
-		# Finding the Green frame
-		Temp = Find(FieldsGreen, ["Min x <= " + str(tempx), "Max x >= " + str(tempx), "Min y <= " + str(tempy), "Max y >= " + str(tempy)])
-		
-		# If none found, set to np.nan. 
-		# If more than one is found, default to the one that matches redfield or the first, 
-		# if there is no red field given
-
-		if len(Temp) == 0: greenfield.append(np.nan)
-		else: 
-			Temp2  = Find(Temp, "Field = " + str(redfield[-1]))
-			if len(Temp2) == 0: greenfield.append(Temp["Field"][0])
-			else: greenfield.append(Temp2["Field"][0])
-
-		# Finding the Blue frame
-		Temp = Find(FieldsBlue, ["Min x <= " + str(tempx), "Max x >= " + str(tempx), "Min y <= " + str(tempy), "Max y >= " + str(tempy)])		
-
-		# If none found, set to np.nan. 
-		# If more than one is found, default to the one that matches redfield or the first, 
-		# if there is no red field given
-
-		if len(Temp) == 0: bluefield.append(np.nan)
-		else: 
-			Temp2  = Find(Temp, "Field = " + str(redfield[-1]))
-			if len(Temp2) == 0: bluefield.append(Temp["Field"][0])
-			else: bluefield.append(Temp2["Field"][0])
-
-	print("Finished. Please manually verify the field assignments.")
-
-	# Return the list of fields. Remember to double-check!
-	return [redfield,greenfield,bluefield]
 
 ###-----------------------------------------------------------------------------------------------------
 

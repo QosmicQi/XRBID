@@ -12,4 +12,8 @@ chapters:
 - file: chapters/photometry
 - file: chapters/astrometry
 - file: chapters/selection
+- file: chapters/sourceids
+- file: chapters/cmds
+- file: chapters/final
 - file: chapters/errors
+- file: chapters/functions

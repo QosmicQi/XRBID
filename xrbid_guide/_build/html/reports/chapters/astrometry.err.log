@@ -1,0 +1,75 @@
+Traceback (most recent call last):
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/qianahunt/anaconda3/envs/jupyterbook/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from XRBID.DataFrameMod import BuildFrame
+
+# Pulling the ID of each unique CSC source
+ids = FindUnique(M101_CSC, header="CSC ID")["CSC ID"].values.tolist()
+
+# Building an empty DataFrame, which I will fill below
+M101_best = BuildFrame()
+
+for i in ids: # for each unique ID pulled from CSC...
+    
+    # Search for all instances (i.e. observations) of each source
+    Temp = Find(M101_CSC, "CSC ID = " + i)
+    
+    # Try to avoid sources where counts = NaN (invalid observations) 
+    if len(Find(Temp, ["Counts != NaN", "Theta != NaN"])) > 0: 
+        Temp = Find(Temp, ["Counts != NaN", "Theta != NaN"])
+    
+    # Specifically focus on those with a valid number of counts
+    if len(Find(Temp, "Counts > 0")) > 0: 
+        Temp = Find(Temp, ["Counts > 0"])
+        
+    # Otherwise, all instances with counts = 0 have the same measurements, 
+    # so it doesn't matter which row is chosen for the best radii
+    else: pass;
+    
+    # Take the source with the smallest 2sig. 
+    # If there's more than one, take the first on the list.
+    Tempbest = Find(Temp, "2Sig =< " + str(min(Temp["2Sig"]))).iloc[:1]
+    
+    # Add the chosen source observation to the new DataFrame
+    M101_best = pd.concat([M101_best, Tempbest], ignore_index=True)
+
+# Saving results to a DataFrame file
+# This file contains only rows from M101_CSC that has the 
+# best 2sigma radius, based on the search performed above
+M101_best.to_csv("M101_csc_bestrads.frame")
+
+display(M101_best)
+
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[5], line 12[0m
+[1;32m      7[0m M101_best [38;5;241m=[39m BuildFrame()
+[1;32m      9[0m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m ids: [38;5;66;03m# for each unique ID pulled from CSC...[39;00m
+[1;32m     10[0m     
+[1;32m     11[0m     [38;5;66;03m# Search for all instances (i.e. observations) of each source[39;00m
+[0;32m---> 12[0m     Temp [38;5;241m=[39m [43mFind[49m(M101_CSC, [38;5;124m"[39m[38;5;124mCSC ID = [39m[38;5;124m"[39m [38;5;241m+[39m i)
+[1;32m     14[0m     [38;5;66;03m# Try to avoid sources where counts = NaN (invalid observations) [39;00m
+[1;32m     15[0m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(Find(Temp, [[38;5;124m"[39m[38;5;124mCounts != NaN[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mTheta != NaN[39m[38;5;124m"[39m])) [38;5;241m>[39m [38;5;241m0[39m: 
+
+[0;31mNameError[0m: name 'Find' is not defined
+

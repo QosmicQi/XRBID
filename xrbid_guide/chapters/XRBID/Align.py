@@ -7,6 +7,7 @@
 import re
 import numpy as np
 from numpy import median, mean, std, sqrt
+from math import isnan
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.io.votable import parse
@@ -344,7 +345,7 @@ def CorrectAstrometry(base_coords, cat_coords, autoresid=True, returnshifts=True
   # Saving median shifts
   medshiftx = median(offsets_x)
   medshifty = median(offsets_y)
-  print("Median offsets in x and y", medshiftx, medshifty)
+  print("Median offsets in x and y (deg):", medshiftx, medshifty)
 
   # Plotting the residuals
   resids_x = good_cat_x - medshiftx - good_base_x
@@ -457,20 +458,26 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False):
 	for i in range(len(theta)):
 		oaa = theta[i]
 		C = np.log10(counts[i]) 
-	
-		# 95% confidence
-		if 0 < C <= 2.1393: sig2.append(10**(0.1145*oaa - 0.4958*C + 0.1932))	
-		elif 2.1393 < C <= 3.3: sig2.append(10**(0.0968*oaa - 0.2064*C - 0.4260))
-		elif sig2search: sig2.append(df[sig2search][i])
-		else: 	
-			print("Invalid observation for source", i, ". Setting radius to 0.")
-			sig2.append(0)
-
-		# 68% confidence
-		if  0 < C <= 2.1227: sig1.append(10**(0.1137*oaa - 0.4600*C - 0.2398))
-		elif 2.1227 < C <= 3.3000: sig1.append(10**(0.1031*oaa -0.1945*C - 0.8034))
-		elif sig2search: sig1.append(df[sig2search][i]*0.5)
-		else: sig1.append(0)
+        
+		if isnan(oaa) or not 0 < C < 3.3:
+			if sig2search:	# for invalid counts/oaa, use default error radius, if given
+				#print("Invalid observation for source", i, ". Setting radius to", df[sig2search][i])
+				sig2.append(df[sig2search][i])
+				sig1.append(df[sig2search][i]*0.5)
+			else: 
+				#print("Invalid observation for source", i, ". Setting radius to 0.")
+				sig2.append(0)
+				sig1.append(0)
+            
+		else: 
+			#print(i, "good. Continuing")
+			# 95% confidence
+			if 0 < C <= 2.1393: sig2.append(10**(0.1145*oaa - 0.4958*C + 0.1932))	
+			elif 2.1393 < C <= 3.3: sig2.append(10**(0.0968*oaa - 0.2064*C - 0.4260))
+                
+			# 68% confidence
+			if  0 < C <= 2.1227: sig1.append(10**(0.1137*oaa - 0.4600*C - 0.2398))
+			elif 2.1227 < C <= 3.3000: sig1.append(10**(0.1031*oaa -0.1945*C - 0.8034))
 
 	# Calculating the errors from the standard deviations
 	sig_std = sqrt(std[0]**2 + std[1]**2)
@@ -479,5 +486,3 @@ def CalcPU(df=False, theta=False, counts=False, std=[0,0], sig2search=False):
 	sig2 = [sqrt(sig**2 + (2*sig_std)**2) for sig in sig2]
 
 	return sig1, sig2
-
-	

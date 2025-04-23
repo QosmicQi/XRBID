@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Classifiying XRB Donor Stars &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+    <title>Identifying Optical Counterparts to X-ray Sources &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
   
   
   
@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/selection';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Errors and How to Fix Them" href="errors.html" />
+    <link rel="next" title="Classifying Optical Counterparts" href="sourceids.html" />
     <link rel="prev" title="Astrometric Corrections" href="astrometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -186,11 +186,16 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Classifiying XRB Donor Stars</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -292,7 +297,7 @@
       
       
       
-      <li><a href="../_sources/chapters/selection.md" target="_blank"
+      <li><a href="../_sources/chapters/selection.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -302,7 +307,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.md</span>
+<span class="btn__text-container">.ipynb</span>
 </a>
 </li>
       
@@ -376,7 +381,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Classifiying XRB Donor Stars</h1>
+    <h1>Identifying Optical Counterparts to X-ray Sources</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -386,7 +391,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#isolating-candidate-counterparts-with-daoclean">Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-referencing-sources-across-filters">Cross-referencing sources across filters</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incorporating-other-catalogs">Incorporating Other Catalogs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-the-best-counterpart">Selecting the Best Counterpart</a></li>
 </ul>
             </nav>
         </div>
@@ -398,19 +406,1194 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="classifiying-xrb-donor-stars">
-<span id="chap-selection"></span><h1>Classifiying XRB Donor Stars<a class="headerlink" href="#classifiying-xrb-donor-stars" title="Link to this heading">#</a></h1>
-<p>From this point on, the methodolgy for identifying the best candidate counterpart for each XRB and becomes fairly open ended. While there are still specific steps that need to be taken, there are a countless number of ways to do so! Here, I detail the steps I typically take to optimize my workflow. The details of ones workflow do not matter as long as you accomplish the following:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="chap-selection">
+<span id="identifying-optical-counterparts-to-x-ray-sources"></span><h1>Identifying Optical Counterparts to X-ray Sources<a class="headerlink" href="#chap-selection" title="Link to this heading">#</a></h1>
+<p>From this point on, the methodolgy for identifying the best candidate counterpart for each XRB and becomes fairly open ended. While there are still specific steps that need to be taken, there are a countless number of ways to do so! Here, I detail the steps I typically take to optimize my workflow. The details of one’s workflow do not matter as long as you accomplish the following:</p>
 <ol class="arabic simple">
 <li><p>Identify optical counterparts that fall within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of each X-ray source;</p></li>
 <li><p>Within this population, identify contaminants (i.e. foreground stars, background galaxies), clusters, and point-sources (i.e. candidate donor stars);</p></li>
-<li><p>Extract the photometry from clusters and point-sources;</p></li>
+<li><p>Extract the photometry from clusters and point-sources (AKA stars);</p></li>
 <li><p>Estimate the masses of point-sources and ages of clusters to determine the most likely mass classification (low, intermediate, or high) of each XRB; and</p></li>
 <li><p>Flag possible supernova remnants (SNR).</p></li>
 </ol>
+<p>This chapter covers step 1. The next chapter, <a class="reference internal" href="sourceids.html#chap-sourceids"><span class="std std-ref">Classifying Optical Counterparts</span></a>, will cover step 2 and 5. <a class="reference internal" href="cmds.html#chap-cmds"><span class="std std-ref">Estimating XRB Masses with CMDs and CCDs</span></a> covers steps 3 and 4.</p>
+<section id="isolating-candidate-counterparts-with-daoclean">
+<span id="sec-daoclean"></span><h2>Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code><a class="headerlink" href="#isolating-candidate-counterparts-with-daoclean" title="Link to this heading">#</a></h2>
+<p>Now that we’ve identified all <em>HST</em> optical point sources with <code class="docutils literal notranslate"><span class="pre">XRBID.AutoPhots.RunPhots()</span></code> or <code class="docutils literal notranslate"><span class="pre">photutils.detection.DAOStarFinder()</span></code> and calculated the best positions and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii of each <em>CXO</em> X-ray source, we can finally select the candidate optical counterparts for each XRB. This is done by isolating all sources that fall within the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius of each X-ray source. One can do so manually, but the easiest way is to run <code class="docutils literal notranslate"><span class="pre">Sources.DaoClean()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> works by taking the coordinates of each source in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (read in as <code class="docutils literal notranslate"><span class="pre">sources</span></code>) and searching for sources in a second <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (read in as <code class="docutils literal notranslate"><span class="pre">daosources</span></code>) that fall within a given radius. It returns a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> equivalent to that read in as <code class="docutils literal notranslate"><span class="pre">daosources</span></code>, but only containing sources that fall within the search radius of a <code class="docutils literal notranslate"><span class="pre">sources</span></code> source. So, for XRBs in this example, the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> given as <code class="docutils literal notranslate"><span class="pre">sources</span></code> would contain each X-ray source, their coordinates, and their calculated 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii. The <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> given as <code class="docutils literal notranslate"><span class="pre">daosources</span></code>, on the other hand, contains the point sources identified by <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> (or <code class="docutils literal notranslate"><span class="pre">DAOStarFinder()</span></code>) in your base filter of choice.</p>
+<p>Before running <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code>, you will need to place the coordinates of each <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code>/<code class="docutils literal notranslate"><span class="pre">DAOStarFinder()</span></code> point source into a new <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This can be done by using <code class="docutils literal notranslate"><span class="pre">DataFrameMod.BuildFrame()</span></code> or <code class="docutils literal notranslate"><span class="pre">Sources.LoadSources()</span></code> on the <code class="docutils literal notranslate"><span class="pre">.ecsv</span></code> data file that was produced in the previous chapter (by default, <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> saves this as something similar to <code class="docutils literal notranslate"><span class="pre">photometry_M101_f555w_acs_full.ecsv</span></code>), <em>but only if you did not apply an additional shift to your region file</em>. In my case, I decided to apply a shift during the <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> phase, because the region files that were produced did not align well to the <em>HST</em> images for reason unknown.</p>
+<p>Because my region files are shifted, and because my X-ray coordinates were aligned to these shifted regions, I need to create a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> using the coordinates of those shifted region files. While we’re at it, one may find it’s a good idea to compile both the <code class="docutils literal notranslate"><span class="pre">img</span></code> and <code class="docutils literal notranslate"><span class="pre">fk5</span></code> coordinates into a single <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, for greater flexibility later down the line.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">GetCoords</span><span class="p">,</span> <span class="n">GetIDs</span>
+<span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">BuildFrame</span>
+
+<span class="c1"># Pulling coordinate and ID information from region files</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daofind_f555w_acs_img.reg&quot;</span><span class="p">)</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">GetIDs</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daofind_f555w_acs_img.reg&quot;</span><span class="p">)</span>
+<span class="n">ra</span><span class="p">,</span><span class="n">dec</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daofind_f555w_acs_fk5.reg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Compiling into a single DataFrame</span>
+<span class="n">DaoFrame</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;DaoID&#39;</span><span class="p">,</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span><span class="s1">&#39;Dec&#39;</span><span class="p">],</span> 
+                      <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">ids</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">ra</span><span class="p">,</span><span class="n">dec</span><span class="p">])</span>
+<span class="n">DaoFrame</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daofind_acs_coords.frame&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># To read in and check the .frame file saved above:</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+
+<span class="c1"># I choose to use pd.read_csv here because of how big this file is</span>
+<span class="n">DaoFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daofind_acs_coords.frame&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;Unnamed: 0&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoFrame</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>DaoID</th>
+      <th>X</th>
+      <th>Y</th>
+      <th>RA</th>
+      <th>Dec</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>7710.069326</td>
+      <td>3655.196224</td>
+      <td>210.888379</td>
+      <td>54.225405</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>7712.935688</td>
+      <td>3688.774732</td>
+      <td>210.888312</td>
+      <td>54.225872</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>7926.745455</td>
+      <td>3696.670351</td>
+      <td>210.883232</td>
+      <td>54.225984</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>7740.506306</td>
+      <td>3722.354818</td>
+      <td>210.887658</td>
+      <td>54.226338</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>7802.588601</td>
+      <td>3728.903381</td>
+      <td>210.886183</td>
+      <td>54.226430</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>178097</th>
+      <td>178098</td>
+      <td>8939.411035</td>
+      <td>19364.831601</td>
+      <td>210.859372</td>
+      <td>54.443607</td>
+    </tr>
+    <tr>
+      <th>178098</th>
+      <td>178099</td>
+      <td>9082.172967</td>
+      <td>19379.774137</td>
+      <td>210.855963</td>
+      <td>54.443815</td>
+    </tr>
+    <tr>
+      <th>178099</th>
+      <td>178100</td>
+      <td>8920.492988</td>
+      <td>19385.066555</td>
+      <td>210.859824</td>
+      <td>54.443888</td>
+    </tr>
+    <tr>
+      <th>178100</th>
+      <td>178101</td>
+      <td>8947.054147</td>
+      <td>19392.263104</td>
+      <td>210.859190</td>
+      <td>54.443988</td>
+    </tr>
+    <tr>
+      <th>178101</th>
+      <td>178102</td>
+      <td>9038.069684</td>
+      <td>19406.788855</td>
+      <td>210.857016</td>
+      <td>54.444190</td>
+    </tr>
+  </tbody>
+</table>
+<p>178102 rows × 5 columns</p>
+</div></div></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> allows the user to attempt to do the radius search using the <code class="docutils literal notranslate"><span class="pre">fk5</span></code> (degree) coordinate system. However, because of how this system works and the image is stretched, you’ll find that the search may return unexpected results (e.g. returning <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> sources within an ellipse around XRBs instead of a circle). It is recommended that one used the <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinate system instead, which returns more predictable results.</p>
+</div>
+<p>As noted above, it is best to run <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> using the <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinate system, which gives coordinates and radii in pixel units relative to the reference image, so we will also need to get the <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinates of the X-ray sources (which up until this point have been plotted in <code class="docutils literal notranslate"><span class="pre">fk5</span></code> coordinates).</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, open one of the region files containing the corrected coordinates of the X-ray sources and resave it in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> using image coordinates. Then read in the image coordinates and save it to your X-ray source DataFrame. Here, I saved my new region file as <code class="docutils literal notranslate"><span class="pre">M101_bestrads_2sig_img.reg</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetCoords</span>
+
+<span class="c1"># Loading in the original DataFrame containing the best 2sig radii for each source</span>
+<span class="n">M101_best</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+
+<span class="c1"># Reading in the newly-saved img region file</span>
+<span class="n">xsources</span><span class="p">,</span> <span class="n">ysources</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_bestrads_2sig_img.reg&quot;</span><span class="p">)</span>
+<span class="c1"># Adding the image coordinates to the DataFrame</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xsources</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ysources</span>
+
+<span class="c1"># Convert the radius from arcseconds to pixels. </span>
+<span class="c1"># The conversion is 0.05 for ACS/WFC and 0.03962 for WFC3/UVIS</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;2Sig (pix)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;2Sig&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">0.05</span> 
+
+<span class="c1"># Saving the changes to the DataFrame</span>
+<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/M101_csc_bestrads.frame...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Retrieving coordinates from ../testdata/M101_bestrads_2sig_img.reg
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Separation</th>
+      <th>CSC ID</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>ExpTime</th>
+      <th>Theta</th>
+      <th>Err Ellipse Major</th>
+      <th>Err Ellipse Minor</th>
+      <th>Err Ellipse Angle</th>
+      <th>Significance</th>
+      <th>...</th>
+      <th>MS Ratio lolim</th>
+      <th>MS Ratio hilim</th>
+      <th>Counts</th>
+      <th>Counts lolim</th>
+      <th>Counts hilim</th>
+      <th>1Sig</th>
+      <th>2Sig</th>
+      <th>X</th>
+      <th>Y</th>
+      <th>2Sig (pix)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>98379.672624</td>
+      <td>1.280763</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.616490</td>
+      <td>-0.485322</td>
+      <td>234.492581</td>
+      <td>216.678502</td>
+      <td>252.306660</td>
+      <td>0.493011</td>
+      <td>0.988256</td>
+      <td>11333.8500</td>
+      <td>12549.3440</td>
+      <td>19.765113</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.951564</td>
+      <td>2CXO J140312.7+542055</td>
+      <td>210.803345</td>
+      <td>54.348663</td>
+      <td>49085.676020</td>
+      <td>4.725025</td>
+      <td>0.548072</td>
+      <td>0.380093</td>
+      <td>86.863933</td>
+      <td>2.648649</td>
+      <td>...</td>
+      <td>-1.000000</td>
+      <td>-0.715178</td>
+      <td>209.970149</td>
+      <td>192.843759</td>
+      <td>227.096539</td>
+      <td>0.516471</td>
+      <td>1.038077</td>
+      <td>11286.9600</td>
+      <td>12528.5350</td>
+      <td>20.761533</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.480949</td>
+      <td>2CXO J140312.5+542053</td>
+      <td>210.802221</td>
+      <td>54.348072</td>
+      <td>98379.672624</td>
+      <td>1.321652</td>
+      <td>0.296164</td>
+      <td>0.295733</td>
+      <td>84.016491</td>
+      <td>19.554042</td>
+      <td>...</td>
+      <td>-0.364147</td>
+      <td>-0.265459</td>
+      <td>252.846172</td>
+      <td>234.295673</td>
+      <td>271.396671</td>
+      <td>0.492957</td>
+      <td>0.988086</td>
+      <td>11334.1110</td>
+      <td>12486.0170</td>
+      <td>19.761726</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5.227586</td>
+      <td>2CXO J140313.1+542052</td>
+      <td>210.804553</td>
+      <td>54.347994</td>
+      <td>132129.439441</td>
+      <td>2.762119</td>
+      <td>0.880650</td>
+      <td>0.578584</td>
+      <td>29.467809</td>
+      <td>3.421053</td>
+      <td>...</td>
+      <td>-0.973766</td>
+      <td>-0.718926</td>
+      <td>23.229213</td>
+      <td>16.216620</td>
+      <td>30.241806</td>
+      <td>0.561749</td>
+      <td>1.188360</td>
+      <td>11236.2880</td>
+      <td>12480.3160</td>
+      <td>23.767200</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>9.124404</td>
+      <td>2CXO J140313.5+542053</td>
+      <td>210.806667</td>
+      <td>54.348188</td>
+      <td>98379.672624</td>
+      <td>1.410741</td>
+      <td>0.633314</td>
+      <td>0.466131</td>
+      <td>58.539300</td>
+      <td>1.739130</td>
+      <td>...</td>
+      <td>-1.000000</td>
+      <td>-0.370394</td>
+      <td>7.040343</td>
+      <td>2.992146</td>
+      <td>11.088540</td>
+      <td>0.593981</td>
+      <td>1.300029</td>
+      <td>11147.5470</td>
+      <td>12494.3280</td>
+      <td>26.000572</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>550</th>
+      <td>883.411465</td>
+      <td>2CXO J140138.8+541527</td>
+      <td>210.411860</td>
+      <td>54.257747</td>
+      <td>132129.439441</td>
+      <td>12.087047</td>
+      <td>8.647887</td>
+      <td>6.103176</td>
+      <td>111.468541</td>
+      <td>4.277778</td>
+      <td>...</td>
+      <td>-0.932542</td>
+      <td>-0.617739</td>
+      <td>76.034629</td>
+      <td>52.273807</td>
+      <td>99.795450</td>
+      <td>1.921653</td>
+      <td>4.517698</td>
+      <td>27753.7720</td>
+      <td>6032.4759</td>
+      <td>90.353960</td>
+    </tr>
+    <tr>
+      <th>551</th>
+      <td>884.529187</td>
+      <td>2CXO J140450.6+541721</td>
+      <td>211.211172</td>
+      <td>54.289330</td>
+      <td>139822.610581</td>
+      <td>9.951487</td>
+      <td>1.357801</td>
+      <td>1.057531</td>
+      <td>95.305118</td>
+      <td>8.976584</td>
+      <td>...</td>
+      <td>-0.472829</td>
+      <td>-0.270456</td>
+      <td>155.562531</td>
+      <td>135.448493</td>
+      <td>174.718757</td>
+      <td>0.793067</td>
+      <td>1.558488</td>
+      <td>-5851.2446</td>
+      <td>8301.6458</td>
+      <td>31.169764</td>
+    </tr>
+    <tr>
+      <th>552</th>
+      <td>886.380054</td>
+      <td>2CXO J140216.3+543313</td>
+      <td>210.567813</td>
+      <td>54.553731</td>
+      <td>131222.705704</td>
+      <td>13.887674</td>
+      <td>2.480733</td>
+      <td>2.445301</td>
+      <td>115.654637</td>
+      <td>6.783292</td>
+      <td>...</td>
+      <td>-0.322923</td>
+      <td>-0.118051</td>
+      <td>149.738677</td>
+      <td>121.454705</td>
+      <td>176.358886</td>
+      <td>1.676834</td>
+      <td>3.103807</td>
+      <td>21117.9750</td>
+      <td>27312.5690</td>
+      <td>62.076131</td>
+    </tr>
+    <tr>
+      <th>553</th>
+      <td>890.405834</td>
+      <td>2CXO J140445.4+541452</td>
+      <td>211.189426</td>
+      <td>54.247897</td>
+      <td>139819.410649</td>
+      <td>10.703677</td>
+      <td>4.581313</td>
+      <td>2.651713</td>
+      <td>135.472019</td>
+      <td>4.411765</td>
+      <td>...</td>
+      <td>0.501562</td>
+      <td>1.000000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.487466</td>
+      <td>0.974933</td>
+      <td>-4952.8736</td>
+      <td>5313.5560</td>
+      <td>19.498651</td>
+    </tr>
+    <tr>
+      <th>554</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>14276.493764</td>
+      <td>3.416463</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>7.591890</td>
+      <td>4.313574</td>
+      <td>10.870206</td>
+      <td>0.738103</td>
+      <td>1.710737</td>
+      <td>-5181.2993</td>
+      <td>19329.5700</td>
+      <td>34.214743</td>
+    </tr>
+  </tbody>
+</table>
+<p>555 rows × 33 columns</p>
+</div></div></div>
+</div>
+<p>Now everything should be ready to run through <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> using <code class="docutils literal notranslate"><span class="pre">img</span></code> coordinates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">DaoClean</span>
+<span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
+
+<span class="n">DaoCleanFrame</span> <span class="o">=</span> <span class="n">DaoClean</span><span class="p">(</span><span class="n">daosources</span><span class="o">=</span><span class="n">DaoFrame</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+                         <span class="n">coordsys</span><span class="o">=</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="n">coordheads</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">radheader</span><span class="o">=</span><span class="s2">&quot;2Sig (pix)&quot;</span><span class="p">)</span> 
+
+
+<span class="c1"># Renaming the DaoID header to &quot;F555W ID&quot;, to match the output of the other filters</span>
+<span class="n">DaoCleanFrame</span> <span class="o">=</span> <span class="n">DaoCleanFrame</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;DaoID&#39;</span><span class="p">:</span> <span class="s1">&#39;F555W ID&#39;</span><span class="p">})</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">)</span>
+
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> <span class="n">coordsys</span><span class="o">=</span><span class="s1">&#39;fk5&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;../testdata/M101_daoclean_f555w_acs_fk5.reg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cleaning DAOFind sources. This will take a few minutes. Please wait.. 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DONE WITH CLEANING. CREATING DATAFRAME...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>F555W ID</th>
+      <th>X</th>
+      <th>Y</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>CSC ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>101364</td>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>210.802294</td>
+      <td>54.348726</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>101394</td>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>210.802374</td>
+      <td>54.348767</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>101442</td>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>210.801963</td>
+      <td>54.348782</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>101505</td>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>210.802478</td>
+      <td>54.348807</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>101528</td>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>210.802264</td>
+      <td>54.348849</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1266</th>
+      <td>3143</td>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>210.942354</td>
+      <td>54.271014</td>
+      <td>2CXO J140346.1+541615</td>
+    </tr>
+    <tr>
+      <th>1267</th>
+      <td>52656</td>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>210.990268</td>
+      <td>54.315671</td>
+      <td>2CXO J140357.6+541856</td>
+    </tr>
+    <tr>
+      <th>1268</th>
+      <td>52713</td>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>210.99006</td>
+      <td>54.315681</td>
+      <td>2CXO J140357.6+541856</td>
+    </tr>
+    <tr>
+      <th>1269</th>
+      <td>68</td>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>210.909697</td>
+      <td>54.232264</td>
+      <td>2CXO J140338.3+541355</td>
+    </tr>
+    <tr>
+      <th>1270</th>
+      <td>307</td>
+      <td>4105.0065</td>
+      <td>4868.306051</td>
+      <td>210.97409</td>
+      <td>54.242176</td>
+      <td>2CXO J140353.7+541430</td>
+    </tr>
+  </tbody>
+</table>
+<p>1271 rows × 6 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/M101_daoclean_f555w_acs_fk5.reg
+</pre></div>
+</div>
+</div>
+</div>
+<p>Check the results of the search by plotting both the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii of X-ray sources and the <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> sources on the <em>HST</em> image on <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. If it looks like the search is missing sources as though the search radius is too small, you can modify the <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> parameters to increase the search radius with <code class="docutils literal notranslate"><span class="pre">wiggle</span></code> (in pixels or degrees). This will make the search a little less strict, so you can include sources a whose centroids fall <em>just</em> outside of the 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius of each X-ray source, if needed.</p>
+</section>
+<section id="cross-referencing-sources-across-filters">
+<span id="sec-crossref"></span><h2>Cross-referencing sources across filters<a class="headerlink" href="#cross-referencing-sources-across-filters" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> procedure above tells us which F555W source falls within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of an X-ray source. Next, we need to figure out what each of these F555W sources is called in the other filters, as identified by <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> in {ref}(sec:runphots, in order to pull the appropriate photometries from each of the photometric data files. This can be done with <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.Crossref()</span></code>.</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code>, <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing at least the source ID and coordiates and cross-references them with sources within one or more given region file. The region files are read in as a list under the <code class="docutils literal notranslate"><span class="pre">regions</span></code> parameter. You can define the name of each catalog the region files represent with the <code class="docutils literal notranslate"><span class="pre">catalogs</span></code> parameter; this defines the headers under which <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> will save the cross-referencing results for each region file. (See <a class="reference internal" href="#sec-catalogs"><span class="std std-ref">Incorporating Other Catalogs</span></a> below for a more general look at using <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code>)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">Sources.Crossref()</span></code> isn’t actually very different, functionally, from <code class="docutils literal notranslate"><span class="pre">Sources.DaoClean()</span></code>, except <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> will search through multiple region files (AKA catalogs) at once and add as many extra lines to the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as needed to accommodate all possible associations. Also, <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> will only keep information on the coordinates and ID of each source, and the IDs of sources that may be associated with it in the other catalogs. It is not recommended to use <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> instead of <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> to find daosources associated with each XRB, because several sources may be found within each XRB 2-<span class="math notranslate nohighlight">\(\sigma\)</span>, and they way the IDs of point sources in each catalog are organized may give the false impressions that they are associated with one another across catalogs (e.g. in a single line in the resulting <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, you could have an F555W ID from one nearby star, an F435W ID from another, and an F814W from a third; test it out using both <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> and <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code> to see what I mean). This is only mitigated by reducing the search radius, which I do in <code class="docutils literal notranslate"><span class="pre">Crossref</span></code> below.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">Crossref</span>
+
+<span class="c1"># The ID of each F555W source is saved in DaoCleanFrame under the header &#39;DaoID&#39;</span>
+<span class="n">DaoCleanMatch</span> <span class="o">=</span> <span class="n">Crossref</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> 
+                         <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;../testdata/M101_daofind_f435w_acs_img.reg&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;../testdata/M101_daofind_f814w_acs_img.reg&#39;</span><span class="p">],</span> 
+                         <span class="n">catalogs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;F435W&#39;</span><span class="p">,</span> <span class="s1">&#39;F814W&#39;</span><span class="p">],</span> <span class="n">coordheads</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> 
+                         <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;F555W ID&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_daoclean_matches.frame&quot;</span><span class="p">)</span>
+
+<span class="n">DaoCleanMatch</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Finding cross-references between sources. This will take a few minutes. Please wait.. 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DONE WITH CLEANING. CREATING DATAFRAME...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+      <th>F555W ID</th>
+      <th>F435W ID</th>
+      <th>F814W ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>101364</td>
+      <td>143088</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>101394</td>
+      <td>143125</td>
+      <td>148555</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>101442</td>
+      <td>143189</td>
+      <td>148645</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>101505</td>
+      <td>143293</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>101528</td>
+      <td>143332</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1397</th>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>3143</td>
+      <td>4807</td>
+      <td>6523</td>
+    </tr>
+    <tr>
+      <th>1398</th>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>52656</td>
+      <td>74953</td>
+      <td>71911</td>
+    </tr>
+    <tr>
+      <th>1399</th>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>52713</td>
+      <td>74989</td>
+      <td>72017</td>
+    </tr>
+    <tr>
+      <th>1400</th>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>68</td>
+      <td>105</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th>1401</th>
+      <td>4105.006500</td>
+      <td>4868.306051</td>
+      <td>307</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>1402 rows × 5 columns</p>
+</div></div></div>
+</div>
+<p>Note, it’s possible that each source above is associated with more than one source in one of the catalogs (region file) its being cross-referenced with. For example, a source that’s saturated in one filter may appear as multiple sources in a filter with a shorter exposure time. <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> keeps track of every possible association, so it’s likely that <code class="docutils literal notranslate"><span class="pre">DaoCleanMatch</span></code> ends up longer than <code class="docutils literal notranslate"><span class="pre">DaoCleanFrame</span></code>. Keeping the search radius low (the default is 3 pixels) is one way to prevent this as much as possible, which is what we’d want in this case.</p>
+<p>It’s also useful for the next step to add the CSC ID back onto the DataFrame, which can be done as so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">Find</span> 
+
+<span class="c1"># Adding &quot;CSC ID&quot; to columns in DaoCleanMatch</span>
+<span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># Adding the CSC IDs of each source the daosources are associated with</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">)):</span> 
+    <span class="c1"># Searches for the CSC ID associated with each F555W ID (DaoID in DaoCleanFrame)</span>
+    <span class="n">tempid</span> <span class="o">=</span> <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;F555W ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> 
+    <span class="n">tempcsc</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">DaoCleanFrame</span><span class="p">,</span> <span class="s2">&quot;F555W ID = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tempid</span><span class="p">))[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempcsc</span>
+    
+<span class="c1"># Updating the DataFrame</span>
+<span class="n">DaoCleanMatch</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_daoclean_matches.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+      <th>F555W ID</th>
+      <th>F435W ID</th>
+      <th>F814W ID</th>
+      <th>CSC ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>101364</td>
+      <td>143088</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>101394</td>
+      <td>143125</td>
+      <td>148555</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>101442</td>
+      <td>143189</td>
+      <td>148645</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>101505</td>
+      <td>143293</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>101528</td>
+      <td>143332</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1397</th>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>3143</td>
+      <td>4807</td>
+      <td>6523</td>
+      <td>2CXO J140346.1+541615</td>
+    </tr>
+    <tr>
+      <th>1398</th>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>52656</td>
+      <td>74953</td>
+      <td>71911</td>
+      <td>2CXO J140357.6+541856</td>
+    </tr>
+    <tr>
+      <th>1399</th>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>52713</td>
+      <td>74989</td>
+      <td>72017</td>
+      <td>2CXO J140357.6+541856</td>
+    </tr>
+    <tr>
+      <th>1400</th>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>68</td>
+      <td>105</td>
+      <td>100</td>
+      <td>2CXO J140338.3+541355</td>
+    </tr>
+    <tr>
+      <th>1401</th>
+      <td>4105.006500</td>
+      <td>4868.306051</td>
+      <td>307</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2CXO J140353.7+541430</td>
+    </tr>
+  </tbody>
+</table>
+<p>1402 rows × 6 columns</p>
+</div></div></div>
+</div>
+<p>It’s a good idea check the results of <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> by plotting the region files over the full-color image of the galaxy. If there are some obvious bad matches, you can remove or change them manually in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> save file.</p>
+<p>Finally, it’s a good idea to renumber the candidate counterparts, so that you’re not relying on the long Dao IDs. This will make the imaging and donor identification steps we do later a little easier.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For each X-ray source, number the associated stars starting from 1.</span>
+<span class="n">tempcsc</span> <span class="o">=</span> <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Keeping track of the current X-ray source</span>
+<span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;StarID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Storing the star number for each X-ray source</span>
+
+<span class="n">starno</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Star number counter</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">)):</span> 
+    <span class="c1"># If this is a new CSC ID, save it to tempcsc and restart starno counter</span>
+    <span class="k">if</span> <span class="n">tempcsc</span> <span class="o">!=</span> <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]:</span> 
+        <span class="n">tempcsc</span> <span class="o">=</span> <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">starno</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">DaoCleanMatch</span><span class="p">[</span><span class="s2">&quot;StarID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">starno</span>
+    <span class="n">starno</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># adds one to the starno counter</span>
+
+<span class="c1"># Saving the candidate region file with new numberings</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">,</span> <span class="n">coordsys</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">coordnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span><span class="s2">&quot;Y&quot;</span><span class="p">],</span> 
+         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;StarID&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+         <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_XRB_candidates.reg&quot;</span><span class="p">)</span>
+
+<span class="c1"># DaoCleanMatch has now renumbered each star associated with </span>
+<span class="c1"># an X-ray source for simplicity</span>
+<span class="n">display</span><span class="p">(</span><span class="n">DaoCleanMatch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/M101_XRB_candidates.reg
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X</th>
+      <th>Y</th>
+      <th>F555W ID</th>
+      <th>F435W ID</th>
+      <th>F814W ID</th>
+      <th>CSC ID</th>
+      <th>StarID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11331.067786</td>
+      <td>12533.111216</td>
+      <td>101364</td>
+      <td>143088</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>11327.699419</td>
+      <td>12536.055626</td>
+      <td>101394</td>
+      <td>143125</td>
+      <td>148555</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>11344.963322</td>
+      <td>12537.104504</td>
+      <td>101442</td>
+      <td>143189</td>
+      <td>148645</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11323.312878</td>
+      <td>12538.940418</td>
+      <td>101505</td>
+      <td>143293</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>11332.293329</td>
+      <td>12541.942013</td>
+      <td>101528</td>
+      <td>143332</td>
+      <td>NaN</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1397</th>
+      <td>5443.850802</td>
+      <td>6942.044065</td>
+      <td>3143</td>
+      <td>4807</td>
+      <td>6523</td>
+      <td>2CXO J140346.1+541615</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1398</th>
+      <td>3436.981758</td>
+      <td>10161.470633</td>
+      <td>52656</td>
+      <td>74953</td>
+      <td>71911</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1399</th>
+      <td>3445.711155</td>
+      <td>10162.184256</td>
+      <td>52713</td>
+      <td>74989</td>
+      <td>72017</td>
+      <td>2CXO J140357.6+541856</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1400</th>
+      <td>6813.402988</td>
+      <td>4150.018831</td>
+      <td>68</td>
+      <td>105</td>
+      <td>100</td>
+      <td>2CXO J140338.3+541355</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1401</th>
+      <td>4105.006500</td>
+      <td>4868.306051</td>
+      <td>307</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2CXO J140353.7+541430</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>1402 rows × 7 columns</p>
+</div></div></div>
+</div>
+</section>
 <section id="incorporating-other-catalogs">
-<h2>Incorporating Other Catalogs<a class="headerlink" href="#incorporating-other-catalogs" title="Link to this heading">#</a></h2>
-<p>One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they’ve identified. You should then create a DS9 region file of those sources with <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>. This will become important as you attempt to classify the optical counterparts of each X-ray source.</p>
+<span id="sec-catalogs"></span><h2>Incorporating Other Catalogs<a class="headerlink" href="#incorporating-other-catalogs" title="Link to this heading">#</a></h2>
+<p>One of the things you will want to keep in mind is that some of the work you may find yourself doing here may have already been done by other studies. In particular, keep an eye out for cluster and SNR catalogs that have been published by other groups. If those exist, you will want to download those catalogs and extract the coordinates of clusters/SNRs that they’ve identified. You should then create a DS9 region file of those sources with <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>. This will become important as you attempt to classify the optical counterparts of each X-ray source, as they can help inform your final classifications.</p>
+<p>If there is one or more catalog that you can use in your own research, you will likely find it useful to cross-reference the sources in your sample to sources in those catalog. As discussed above, <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> takes in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing source coordinates (e.g. a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> of your X-ray sources) and and cross-references them with sources within one or more given region file. This makes is useful not just for finding matches across filters, but across different types of source catalogs.</p>
+<p>For example, say I have a catalog for compact clusters and SNRs in M101. To identify matches between my X-ray source catalog and both of these, I will save the cluster/SNR catalogs as <code class="docutils literal notranslate"><span class="pre">DS9</span></code> region files and run <code class="docutils literal notranslate"><span class="pre">Crossref()</span></code> thusly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Crossref</span><span class="p">(</span><span class="o">&lt;</span><span class="n">CSC</span> <span class="n">DataFrame</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="o">&lt;</span><span class="n">Name</span> <span class="n">of</span> <span class="n">SNR</span> <span class="n">region</span> <span class="n">file</span><span class="o">&gt;</span><span class="p">,</span>
+                                   <span class="o">&lt;</span><span class="n">Name</span> <span class="n">of</span> <span class="n">Cluster</span> <span class="n">region</span> <span class="n">file</span><span class="o">&gt;</span><span class="p">],</span> 
+                         <span class="n">catalogs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="s1">&#39;Cluster&#39;</span><span class="p">],</span> 
+                         <span class="n">coordheads</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RA&#39;</span><span class="p">,</span><span class="s1">&#39;Dec&#39;</span><span class="p">],</span> <span class="n">coordsys</span><span class="o">=</span><span class="s1">&#39;fk5&#39;</span><span class="p">,</span> 
+                         <span class="n">search_radius</span><span class="o">=&lt;</span><span class="n">radius</span> <span class="ow">in</span> <span class="n">degrees</span> <span class="k">for</span> <span class="n">fk5</span><span class="o">&gt;</span><span class="p">,</span>
+                         <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=&lt;</span><span class="n">save</span> <span class="n">filename</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Crossref</span><span class="p">(</span><span class="o">&lt;</span><span class="n">CSC</span> <span class="n">DataFrame</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="o">&lt;</span><span class="n">Name</span> <span class="n">of</span> <span class="n">SNR</span> <span class="n">region</span> <span class="n">file</span><span class="o">&gt;</span><span class="p">,</span>
+                                   <span class="o">&lt;</span><span class="n">Name</span> <span class="n">of</span> <span class="n">Cluster</span> <span class="n">region</span> <span class="n">file</span><span class="o">&gt;</span><span class="p">],</span> 
+                         <span class="n">catalogs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SNR&#39;</span><span class="p">,</span> <span class="s1">&#39;Cluster&#39;</span><span class="p">],</span> 
+                         <span class="n">coordheads</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">,</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">coordsys</span><span class="o">=</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> 
+                         <span class="n">search_radius</span><span class="o">=&lt;</span><span class="n">radius</span> <span class="ow">in</span> <span class="n">pixels</span> <span class="k">for</span> <span class="n">img</span><span class="o">&gt;</span><span class="p">,</span>
+                         <span class="n">sourceid</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=&lt;</span><span class="n">save</span> <span class="n">filename</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will result in a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the CSC ID of each source, its coordinates, and the ID of all corresponding matches from each catalog. The matches will be saved to the data file defined by <code class="docutils literal notranslate"><span class="pre">outfile</span></code>.</p>
+</section>
+<section id="selecting-the-best-counterpart">
+<span id="sec-selection"></span><h2>Selecting the Best Counterpart<a class="headerlink" href="#selecting-the-best-counterpart" title="Link to this heading">#</a></h2>
+<p>Selecting the best optical counterpart for each X-ray source is a multi-step process that requires some manual choices using reasonable arguments. There are several different types of objects within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> of an X-ray source with <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code>, which will be covered in the next few chapters. The ‘best’ counterpart to any given X-ray source depends on what sort of object you see, as there is a heirarchy of how the sources are prioritized as the ‘best’ counterpart. In order of highest priority, this heirarchy is:</p>
+<ul class="simple">
+<li><p>Background galaxies and foreground stars;</p></li>
+<li><p>Clusters;</p></li>
+<li><p>High-mass stars;</p></li>
+<li><p>Low-mass stars, and finally;</p></li>
+<li><p>Intermediate-mass stars.</p></li>
+</ul>
+<p>Background galaxies and foreground stars are considered contaminants in any XRB catalog, so we remove those first. Since clusters are generally considered the birthplace of most XRBs, they are more likely associated with an XRB than a single isolated star. Finally, if the only counterparts of an X-ray source are a handful of stars, we argue that high-mass stars are more likely to form XRBs than low-mass stars in the disk, while low-mass stars are more likely to survive in an active XRB than intermediate-mass stars. Thus, a high-mass star is more likely to be the donor than a low-mass star, while a low-mass star is more likely to be the donor than an intermediate-mass star. In my work, it usually isn’t necessary to identify the exact donor star if all of the stars within 2-<span class="math notranslate nohighlight">\(\sigma\)</span> are of the same mass class (high, intermediate, or low), although some studies opt to define the donor star as the brightest star, the star closest to the center, or some combination of those factors.</p>
+<p>So, the selection of the best optical counterpart for X-ray sources with multiple optical counterparts should be done sychronously with the steps in the next few chapters.</p>
 </section>
 </section>
 
@@ -423,16 +1606,16 @@ document.write(`
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "jupyterbook"
         },
         kernelOptions: {
-            name: "python3",
+            name: "jupyterbook",
             path: "./chapters"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'jupyterbook'</script>
 
                 </article>
               
@@ -454,11 +1637,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="errors.html"
+       href="sourceids.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Errors and How to Fix Them</p>
+        <p class="prev-next-title">Classifying Optical Counterparts</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -478,7 +1661,10 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#isolating-candidate-counterparts-with-daoclean">Isolating Candidate Counterparts with <code class="docutils literal notranslate"><span class="pre">DaoClean</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-referencing-sources-across-filters">Cross-referencing sources across filters</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incorporating-other-catalogs">Incorporating Other Catalogs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-the-best-counterpart">Selecting the Best Counterpart</a></li>
 </ul>
   </nav></div>
 
@@ -503,7 +1689,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

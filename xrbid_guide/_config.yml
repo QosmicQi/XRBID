@@ -4,6 +4,7 @@
 title: A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)
 author: Qiana Hunt
 logo: images/XRB.png
+copyright: '2025'
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
