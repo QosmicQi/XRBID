@@ -115,7 +115,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     # The WFC3 EEF is going to slightly underestimate the correction, because there is no 20 pix correction
     if not EEF: 
         if instrument.lower() == 'acs': EEF = ACS_EEFs[ACS_EEFs['Filter']==filter.upper()].reset_index()['20'][0]
-        else: EEF = WCF3_EEFs[WCF3_EEFs['Filter']==filter.upper()].reset_index()['20.75'][0]
+        else: EEF = WFC3_EEFs[WFC3_EEFs['Filter']==filter.upper()].reset_index()['20.75'][0]
         
     # Setting up the pixel scale, if not given 
     if not pixtoarcs: 
@@ -326,7 +326,7 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
         instrument = input('No EEF given. Please define instrument (acs or wfc3): ')
         print("Will pull EEF from 20 pixel radius. If max_rad is different, please define EEF manually.")
         if instrument.lower() == 'acs': EEF = ACS_EEFs[ACS_EEFs['Filter']==filter.upper()].reset_index()['20'][0]
-        else: EEF = WCF3_EEFs[WCF3_EEFs['Filter']==filter.upper()].reset_index()['20.75'][0]
+        else: EEF = WFC3_EEFs[WFC3_EEFs['Filter']==filter.upper()].reset_index()['20.75'][0]
         
     # Calculating magnitudes from the aperture sums
     for i in range(len(radii)):
