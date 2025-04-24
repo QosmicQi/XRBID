@@ -133,7 +133,7 @@ data_sub = data - bkg.background
 This background-subtracted data can then be used in the aperture photometry extraction (for cleaner photometry, you can also add an error calculation):
 
 ```
-from photutils import aperture_photometry
+from photutils.aperture import aperture_photometry
 
 phot_full = aperture_photometry(data_sub, apertures_full, method="center")
 
