@@ -29,6 +29,7 @@ pwd = os.getcwd
 from XRBID.WriteScript import WriteReg
 
 from acstools import acszpt # for zeropoint retrieval
+from XRBID.DataFrameMod import Find
 
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -187,7 +188,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
 
     print("Time for full photometry:", (endtime-starttime)/60., "minutes")
 
-    startime = time.time()
+    starttime = time.time()
 
     ### Errors are estimated using exposure time as the effective gain and the ###
     ### background-only image as the background noise			       ###
@@ -199,7 +200,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     endtime = time.time()
     print("Time for source photometry:", (endtime-starttime)/60., "minutes")
 
-    startime = time.time()
+    starttime = time.time()
     # Collects the photometry that will be used as the photometry for clusters, 
     # collected within an aperture of radius extended_rad
     phot_extended = aperture_photometry(data_sub, apertures_extended, error=calc_total_error(data, \
@@ -242,10 +243,6 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     ## REPEATING FOR EXTENDED SOURCES 
     # Non-corrected magnitude from the photometry:
     phot_extended["aperture_mag"] = -2.5 * np.log10(phot_extended['aperture_sum'])
-
-    # Ignoring the aperture error for now, as it seems to mess up measurements
-    # phot_extended["aperture_mag_err"] = np.sqrt((0.434 * -2.5 * phot_extended["aperture_sum_err"]/
-    # 					     phot_extended["aperture_sum"])**2 + aperr_ext**2)
 
     # Error on the calculated magnitude: 
     phot_extended["aperture_mag_err"] = 0.434 * -2.5 * phot_extended["aperture_sum_err"]/phot_extended["aperture_sum"]
@@ -359,7 +356,7 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
     zmag 		[float] (0)	: May input the zeropoint magnitude to adjust the photometry.
     min_rad 		[int] (3)	: The pixel radius of the minimum aperture size (for point sources)
     max_rad 		[int] (20)	: The pixel radius of the maximum aperture size
-    extended_rad 	[int]		: The pixel radius of extended sources (i.e. clusters)
+    extended_rad 	[int] (10)	: The pixel radius of extended sources (i.e. clusters)
 
     RETURN
     ---------
@@ -421,8 +418,8 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
     		#tester =+ 1
     	else: cont = False; pass;
 
-    temp_select.sort()
-    print(temp_select)
+    #temp_select.sort()
+    #print(temp_select)
     # Plotting the radial profile of all stars
     for i in temp_select:
     	plt.plot(radii, phots[i]) # where i is the index of the star

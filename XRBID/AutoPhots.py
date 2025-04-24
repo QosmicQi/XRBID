@@ -29,6 +29,7 @@ pwd = os.getcwd
 from XRBID.WriteScript import WriteReg
 
 from acstools import acszpt # for zeropoint retrieval
+from XRBID.DataFrameMod import Find
 
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
