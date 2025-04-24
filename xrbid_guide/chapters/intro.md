@@ -5,15 +5,16 @@ In general, the process I use can be broken down into these basic steps:
 
 1. Select a galaxy (or galaxies) of interest;
 2. Obtain the *CXO* X-ray Data from the Chandra Source Catalog (`CSC`);
-3. Obtain the optical imaging from the *HST* from the Hubble Legacy Archive (HLA) or MAST either directly or through an HLA query;
-4. Calculate the photometric corrections on each *HST* field;
-5. If necessary, combine the *HST* images into a single mosaic using `AstroDrizzle` (this step isn't strictly required, but may be useful for a variety of reasons);
-6. Perform astrometric corrections on the X-ray coordinates to align them to the optical image;
-7. Identify candidate optical counterparts for each X-ray source;
-8. Identify supernova remnants, background galaxies, and foreground stars among the optical counterparts; 
-9. Take the photometry of candidate donor stars and host star clusters, including photometric corrections; 
-10. Create a color-magnitude diagram of candidate donor stars or color-color diagrams of candidate host star clusters to estimate the masses of the XRB donor stars; and
-11. Perform any other analysis necessary on the XRB populations. 
+3. If necessary, obtain the optical imaging from the *HST* from the Hubble Legacy Archive (HLA) or MAST either directly or through an HLA query;
+4. If necessary, combine the *HST* images into a single mosaic using `AstroDrizzle` (this step isn't strictly required, but may be useful for a variety of reasons);
+5. Identify point sources in HST image(s);
+6. Calculate the photometric corrections on each *HST* field/image;
+7. Perform astrometric corrections on the X-ray coordinates to align them to the optical image;
+8. Identify candidate optical counterparts for each X-ray source;
+9. Identify supernova remnants, background galaxies, and foreground stars among the optical counterparts; 
+10. Extract the photometry of candidate donor stars and host star clusters, including photometric corrections; 
+11. Create a color-magnitude diagram of candidate donor stars or color-color diagrams of candidate host star clusters to estimate the masses of the XRB donor stars; and
+12. Perform any other analysis necessary on the XRB populations. 
 
 ## Helpful Links and Other Resources
 * [Chandra Source Catalog Quick Search](http://cda.cfa.harvard.edu/cscweb/index.do)

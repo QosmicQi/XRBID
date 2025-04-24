@@ -1,0 +1,720 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Classifying Optical Counterparts &#8212; A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/sourceids';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Estimating XRB Masses with CMDs and CCDs" href="cmds.html" />
+    <link rel="prev" title="Identifying Optical Counterparts to X-ray Sources" href="selection.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="title.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/XRB.png" class="logo__image only-light" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>
+    <script>document.write(`<img src="../_static/XRB.png" class="logo__image only-dark" alt="A Personal Guide to Direct X-Ray Binary Analysis (as performed by me for my Ph.D. Thesis) - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="title.html">
+                    XRBID: A Guide to Direct X-ray Binary Analysis
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview of Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fchapters/sourceids.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/sourceids.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Classifying Optical Counterparts</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imaging-x-ray-sources-with-writeds9">Imaging X-ray sources with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manually-defining-the-scale-parameters-at-each-image-location">Manually defining the scale parameters at each image location</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-scale-parameters-of-each-x-ray-source">Defining the scale parameters of each X-ray source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-a-bash-script-with-writeds9">Making a bash script with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-bash-script">Running the bash script</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flagging-out-of-bounds-x-ray-sources">Flagging out-of-bounds X-ray sources</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classifying-sources-by-eye">Classifying sources by eye</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-snr-from-x-ray-properties">Identifying SNR from X-ray properties</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="classifying-optical-counterparts">
+<span id="chap-sourceids"></span><h1>Classifying Optical Counterparts<a class="headerlink" href="#classifying-optical-counterparts" title="Link to this heading">#</a></h1>
+<p>Once the  2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii and optical counterpart(s) of each X-ray source are identified, one will often find that not all X-ray sources are associated with stars. The optical counterpart of an X-ray source may be:</p>
+<ul class="simple">
+<li><p>the nucleus of the galaxy,</p></li>
+<li><p>a background galaxy,</p></li>
+<li><p>a foreground star,</p></li>
+<li><p>a compact star cluster,</p></li>
+<li><p>a genuine luminous star,</p></li>
+<li><p>a supernova remnant (SNR), or</p></li>
+<li><p>nothing (suggesting the counterpart is a low-mass star that’s too dim to be detected by the <em>HST</em> observations)</p></li>
+</ul>
+<p>Flagging these classifications is a crucial step in building a clean XRB catalog. For the most part, many of these classifications can be done through visual inspection. For example, in <a class="reference internal" href="astrometry.html#chap-astrometry"><span class="std std-ref">Astrometric Corrections</span></a> we saw several examples of visibly-identifiable source types:</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/astrometric_calibrators.png"><img alt="../_images/astrometric_calibrators.png" src="../_images/astrometric_calibrators.png" style="width: 750px;" />
+</a>
+</figure>
+<p>Some cases (such as SNR) require additional analysis to identify, especially if a catalog does not already exist for your galaxy. This chapter outlines both visual and analytical source classification methods.</p>
+<section id="imaging-x-ray-sources-with-writeds9">
+<h2>Imaging X-ray sources with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code><a class="headerlink" href="#imaging-x-ray-sources-with-writeds9" title="Link to this heading">#</a></h2>
+<p>Rather than spend time panning to each source in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> individually, you may find it useful to take <code class="docutils literal notranslate"><span class="pre">jpeg</span></code> or <code class="docutils literal notranslate"><span class="pre">png</span></code> postage stamp images of each X-ray source so that you can browse through them quickly. The quickest way to accomplish this is with <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteDS9()</span></code>. This custom function writes an executable bash script that opens a color image and any input region files in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, flashes to the coordinates of each input source, and saves a zoomed-in and zoomed-out image at that location. You can then open the image files to visually determine which are background galaxies, foreground stars, compact star clusters, etc.</p>
+<p>Before one uses <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code>, there are a few steps you should take to make sure the images of each X-ray source are visible and high-quality. This is a fairly involved process. In general, the best procedure for setting up <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code> is:</p>
+<ol class="arabic simple">
+<li><p>Manually create an autoscaling file with a list of [redscale, greenscale, bluescale, xmin, xmax, ymin, ymax];</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteScalings()</span></code> using the new autoscaling file name as the <code class="docutils literal notranslate"><span class="pre">scalings</span></code> argument to create a file with a list of unique location-based scalings for each source;</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteDS9()</span></code> using <code class="docutils literal notranslate"><span class="pre">unique_scale=True</span></code> and the new unique scaling file as the <code class="docutils literal notranslate"><span class="pre">scales</span></code> argument;</p></li>
+<li><p>Run the resulting <code class="docutils literal notranslate"><span class="pre">.sh</span></code> bash file to get scaled images of each source.</p></li>
+</ol>
+<section id="manually-defining-the-scale-parameters-at-each-image-location">
+<h3>Manually defining the scale parameters at each image location<a class="headerlink" href="#manually-defining-the-scale-parameters-at-each-image-location" title="Link to this heading">#</a></h3>
+<p>Just as each color filter requires a different brightness scaling to adjust the color of the entire galaxy image (see <a class="reference internal" href="astrodrizzle.html#sec-astrodrizzle"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>), different parts of the galaxy will require different brightness scalings due to higher or lower levels of background light. In particular, as you get closer to the center of the galaxy, you will almost always require higher maximum scale parameters in order to lower the overall image brightness and make individual stars visible above the background.</p>
+<p>The best scaling for each region is determined manually through experimenting in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. In a simple text editing program, open a blank <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file to record your scale parameters; I usually name this <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code> or something to that effect. This file will be used to record the user-defined maximum scale parameter of the red, green, and blue filters (respectively), and the x and y coordinates of the corners of the rectangle within which these scalings apply. These scalings will be read from the outside-in — that is, the first rectangle defined in the <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code> file represents the outer-most region that requires a unique scaling, the next rectangle represents a region nested within the first rectangle that requires even higher scale parameters to see stars within that region, the next rectangle is nested within <em>that</em> rectangle, and so on. This is visualized in <a class="reference internal" href="#fig-autoscalings-regs"><span class="std std-numref">Fig. 13</span></a> below.</p>
+<figure class="align-default" id="fig-autoscalings-regs">
+<a class="reference internal image-reference" href="../_images/M101_autoscalings.png"><img alt="../_images/M101_autoscalings.png" src="../_images/M101_autoscalings.png" style="width: 500px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Examples of regions that require higher maximum scale parameters. In my case, I defined 3 regions in a file called <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code>, given in <a class="reference internal" href="#fig-autoscalings"><span class="std std-numref">Fig. 14</span></a> below. Anything outside of Region 1 defaults to <code class="docutils literal notranslate"><span class="pre">zscale</span></code> for all 3 filters. Sources that fall between Region 1 and Region 2 will be given the scale parameters defined in the first row of <code class="docutils literal notranslate"><span class="pre">autoscaling.txt</span></code>: 0.9 for red, 0.4 for green, and 0.22 for blue. Sources that fall between Region 2 and 3 will be given the scale parameters in the second row; notice the increase in the maximum scale parameters as the background within the region gets brighter. Everything within Region 3 will be given the parameters defined in the last row, which has the highest scale parameters in all three filters.</span><a class="headerlink" href="#fig-autoscalings-regs" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-autoscalings">
+<a class="reference internal image-reference" href="../_images/autoscalings.png"><img alt="../_images/autoscalings.png" src="../_images/autoscalings.png" style="width: 350px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">Examples of user-defined scale parameters and the regions within which they apply. For each row, I define the max scale parameter of the red, green, and blue filters, followed by the minimum x coordinate, maximum x coordinate, minimum y coordinate, and maximum y coordinate (in image/pixel units) of the rectangular region encompassing these parameters (see <a class="reference internal" href="#fig-autoscalings-regs"><span class="std std-numref">Fig. 13</span></a> above).</span><a class="headerlink" href="#fig-autoscalings" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, open a <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">RGB</span> <span class="pre">Frame</span></code> and import the appropriate <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files into the RGB filters.
+The appropriate scaling for the outskirts of the galaxy is usually <code class="docutils literal notranslate"><span class="pre">zscale</span></code> across all three filters; this is the default for any source that falls outside the regions defined in <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code>.</p>
+<p>Closer to the center of the galaxy, there will be some point at which the background brightness becomes so high that the point sources are difficult to see. Mark this region with a rectangle (you can use the <code class="docutils literal notranslate"><span class="pre">edit</span> <span class="pre">&gt;</span> <span class="pre">region</span></code> and <code class="docutils literal notranslate"><span class="pre">Region</span> <span class="pre">&gt;</span> <span class="pre">Shape</span> <span class="pre">&gt;</span> <span class="pre">Box</span></code> tool to help keep track, or write down the minimum x coordinate, maximum x coordinate, minimum y coordinate, and maximum y coordinate of the region in <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code>). Adjust the scale parameter of each RGB filter by selecting the filter, opening the <code class="docutils literal notranslate"><span class="pre">Scale</span> <span class="pre">&gt;</span> <span class="pre">Scale</span> <span class="pre">Parameter</span></code> window, and adjusting the <code class="docutils literal notranslate"><span class="pre">High</span></code> value until the background brightness and stars in the region of interest look reasonable. Record the new RGB scale parameters in <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code>, in the format used in <a class="reference internal" href="#fig-autoscalings"><span class="std std-numref">Fig. 14</span></a>.</p>
+<p>Repeat this process for increasingly bright central regions until you have a good set of scale parameters for each region within which the X-ray sources fall. You can create as many nested regions as needed, and you can adjust them later if you find some sources are still difficult to see or exhibit strange colors once you create the postage stamp images with the new scale parameters you provided.</p>
+</section>
+<section id="defining-the-scale-parameters-of-each-x-ray-source">
+<h3>Defining the scale parameters of each X-ray source<a class="headerlink" href="#defining-the-scale-parameters-of-each-x-ray-source" title="Link to this heading">#</a></h3>
+<p>The function <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteScalings()</span></code> takes the scale parameters from the text file created above (which I called <code class="docutils literal notranslate"><span class="pre">autoscalings.txt</span></code>) and determines which applies to each source in a given <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. The <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> should contain the ID and image coordinates (which I define under the headers <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code>) of each source you want to image.</p>
+<p>In the example below, I want to create images that include the 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> region files of each X-ray source, so I choose to use the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> saved in <code class="docutils literal notranslate"><span class="pre">M101_csc_bestrads.frame</span></code> as my base <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. I elect to simplify each source ID, to avoid having to use the full CSC ID from this point on. This is totally optional, and if working with multiple galaxies, it’s advisable to chose source IDs that include the galaxy name (e.g. M101X001, M101X002, etc.) so that you can differentiate the XRBs at a glance.</p>
+<p>Once I read in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, I run <code class="docutils literal notranslate"><span class="pre">WriteScalings()</span></code> to create a new scalings file that contains the ID of each source and their RGB scale parameters, which <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code> will use to rescale the full-color image as it images each X-ray source.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span>
+<span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteScalings</span>
+
+<span class="n">M101_best</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+
+<span class="c1"># Renaming each X-ray source as CXO001, CXO002, CXO003, etc. under header &quot;ID&quot;</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CXO</span><span class="si">%03d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">M101_best</span><span class="p">))]</span>
+
+<span class="c1"># Outputs a new scalings file </span>
+<span class="n">WriteScalings</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_XRB_scalings.txt&quot;</span><span class="p">,</span> 
+              <span class="n">scalings</span><span class="o">=</span><span class="s2">&quot;../testdata/autoscalings.txt&quot;</span><span class="p">,</span> <span class="n">idheader</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default" id="fig-xrbscalings">
+<a class="reference internal image-reference" href="../_images/M101_XRB_scalings.png"><img alt="../_images/M101_XRB_scalings.png" src="../_images/M101_XRB_scalings.png" style="width: 500px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">Example of the output file from <code class="docutils literal notranslate"><span class="pre">WriteScalings()</span></code>. For each XRB, which have been renumbered for simplicity, the maximum red, green, and blue scale parameters that will produce the best image are given. In my case, since my X-ray sources are sorted by distance from the center of the galaxy, it’s natural that the sources at the top of the file have higher scale parameters (lowering the brightness of the background sky) than those farther down the file.</span><a class="headerlink" href="#fig-xrbscalings" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="making-a-bash-script-with-writeds9">
+<h3>Making a bash script with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code><a class="headerlink" href="#making-a-bash-script-with-writeds9" title="Link to this heading">#</a></h3>
+<p>Once a scaling file is created, you can run <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code> to create the bash script that will ultimately create the <code class="docutils literal notranslate"><span class="pre">DS9</span></code> postage stamp images.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you don’t create a scalings file as we have just done, <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code> will assume a scale of <code class="docutils literal notranslate"><span class="pre">zscale</span></code> for all sources. This will result in several images that are too bright to see, particularly towards the center.</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code> takes as parameters the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the sources you want to image, a list of the <code class="docutils literal notranslate"><span class="pre">FITS</span></code> files to be read into the RGB frame (<code class="docutils literal notranslate"><span class="pre">colorfiles</span></code>), a list of any region files you want to include in the images (<code class="docutils literal notranslate"><span class="pre">regions</span></code>), and the name of the scaling file created by <code class="docutils literal notranslate"><span class="pre">WriteScalings()</span></code> (<code class="docutils literal notranslate"><span class="pre">scales</span></code>, with <code class="docutils literal notranslate"><span class="pre">unique_scales</span> <span class="pre">=</span> <span class="pre">True</span></code>). You’ll also want to select one of the filters to use as the base over which the regions are printed (in my case, I use green for F555W), <code class="docutils literal notranslate"><span class="pre">imgnames</span></code> if you want to define a naming convention for the images, and the name of the output <code class="docutils literal notranslate"><span class="pre">.sh</span></code> file. You can also define the <code class="docutils literal notranslate"><span class="pre">zoom</span></code> scale of <code class="docutils literal notranslate"><span class="pre">DS9</span></code>, which is especially useful for sources with a large 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WriteDS9</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">galaxy</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+         <span class="n">unique_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_XRB_scalings.txt&quot;</span><span class="p">,</span>
+         <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;../testdata/M101_XRB_candidates.reg&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;../testdata/M101_bestrads_1sig.reg&quot;</span><span class="p">,</span> 
+                  <span class="s2">&quot;../testdata/M101_bestrads_2sig.reg&quot;</span><span class="p">],</span>
+         <span class="n">colorfiles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;../testdata/M101_mosaic_acs_f814w_drc_sci.fits&quot;</span><span class="p">,</span> 
+                    <span class="s2">&quot;../testdata/M101_mosaic_acs_f555w_drc_sci.fits&quot;</span><span class="p">,</span> 
+                    <span class="s2">&quot;../testdata/M101_mosaic_acs_f435w_drc_sci.fits&quot;</span><span class="p">],</span> 
+         <span class="n">basefilter</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;green&#39;</span><span class="p">],</span> <span class="n">imgnames</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_XRB_candidates&quot;</span><span class="p">,</span> 
+         <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_XRB_candidates.sh&quot;</span><span class="p">,</span> <span class="n">idheader</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="running-the-bash-script">
+<h3>Running the bash script<a class="headerlink" href="#running-the-bash-script" title="Link to this heading">#</a></h3>
+<p>In a terminal, from the directory where the <code class="docutils literal notranslate"><span class="pre">.sh</span></code> bash script is saved, open a <code class="docutils literal notranslate"><span class="pre">xterm</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xterm</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>This should pull up a new window with a different font than your typical terminal. Then, run the bash script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bash</span> <span class="n">M101_XRB_candidates</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>This should open a full color image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> and begin flashing through each of the X-ray sources in your <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as it saves the images. By default, it saves to two versions: one image at normal zoom, and a second with a farther zoom that has the suffix <code class="docutils literal notranslate"><span class="pre">_env</span></code>. It’s best to run the bash script without the <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> so that you can use <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> to shut down the bash script if something goes wrong, or if you notice the user-defined scalings need to be tweaked.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you encounter a display error trying to run the bash script, follow the instructions in <a class="reference internal" href="errors.html#chap-errors"><span class="std std-ref">Errors and How to Fix Them</span></a>.</p>
+</div>
+<p>Below are <code class="docutils literal notranslate"><span class="pre">M101_XRB_candidates_CXO001.png</span></code> and <code class="docutils literal notranslate"><span class="pre">M101_XRB_candidates_CXO012.png</span></code>, two of the images that result from running the <code class="docutils literal notranslate"><span class="pre">.sh</span></code> bash script. As we can see, I plotted the  1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> regions for each X-ray sources, which are labeled with the original “CSC ID”, and regions indicating which stars were detected by <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> and determined by <code class="docutils literal notranslate"><span class="pre">DaoClean()</span></code> to fall within 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. The stars have been renumbered for simplicity. CXO001 is the nucleus of M101, and rescaling the maximum scale parameters allows us to see the X-ray source instead of the source being outshined by the background brightness of the galaxy’s core! By rescaling, we are able to get images of similar relative brightness, regardless of where they fall in the galaxy. This allows us to see what kind of source it may be at a glance – in this case, CXO001 is the nucleus, while CXO012 appears to be a regular star, likely of high mass.</p>
+<p><img alt="alt" src="../_images/M101_XRB_candidates_CXO001.png" /> <img alt="alt" src="../_images/M101_XRB_candidates_CXO012.png" /></p>
+</section>
+<section id="flagging-out-of-bounds-x-ray-sources">
+<h3>Flagging out-of-bounds X-ray sources<a class="headerlink" href="#flagging-out-of-bounds-x-ray-sources" title="Link to this heading">#</a></h3>
+<p>It’s likely that some of the X-ray sources fall outside the bounds of the <em>HST</em> image or within a chip gap and cannot be used for analysis. The easiest way to flag these is to delete the image files for those sources, read in a list of the remaining image files, and flag those X-ray sources as ‘good’.</p>
+<p>In the example below, I’ve manually removed all images of ‘bad’ sources from the image directory before reading in a list of the image files.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># The only images that remain in this folder are &#39;good&#39; X-ray sources</span>
+<span class="n">imgfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*_env.png&quot;</span><span class="p">)</span>
+<span class="n">imgfiles</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">goodxrbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imgfiles</span><span class="p">]</span>
+
+<span class="c1"># Sets all X-ray sources as out-of-bounds by default</span>
+<span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;Bounds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
+
+<span class="c1"># Then, sets the sources in the list above as within the bounds of the mosaic</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)):</span> 
+    <span class="k">if</span> <span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">goodxrbs</span><span class="p">:</span> 
+        <span class="n">M101_best</span><span class="p">[</span><span class="s2">&quot;Bounds&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="classifying-sources-by-eye">
+<h2>Classifying sources by eye<a class="headerlink" href="#classifying-sources-by-eye" title="Link to this heading">#</a></h2>
+<p>With the images complete, one should be able to visually inspect and flag any source that looks like a background galaxy (extended, red, and usually disk-like or blobby) or a foreground star (with diffraction spikes).  I recommend creating a file in which you can keep track of the classification of each X-ray source. There are some tools within <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> that can help (such as <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.SourceList()</span></code> or <code class="docutils literal notranslate"><span class="pre">XRBID.DataFrameMod.BuildFrame()</span></code>, depending on how you prefer to work). For M101, I chose to create a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file that I will use to classify contaminants and keep track of the XRB donor star mass categories in <a class="reference internal" href="cmds.html#chap-cmds"><span class="std std-ref">Estimating XRB Masses with CMDs and CCDs</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a DataFrame of good XRBs only</span>
+<span class="n">M101_xrbs</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="s2">&quot;Bounds = In&quot;</span><span class="p">)</span>
+
+<span class="c1"># Adding empty columns that I&#39;ll use later</span>
+<span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Best Star&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Mass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Notes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="n">M101_notes</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;Class&quot;</span><span class="p">,</span> 
+                               <span class="s2">&quot;Best Star&quot;</span><span class="p">,</span> <span class="s2">&quot;Mass&quot;</span><span class="p">,</span> <span class="s2">&quot;Notes&quot;</span><span class="p">],</span> 
+                       <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">],</span> 
+                               <span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">],</span> 
+                               <span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">],</span> 
+                               <span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Best Star&quot;</span><span class="p">],</span> 
+                               <span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Mass&quot;</span><span class="p">],</span> 
+                               <span class="n">M101_xrbs</span><span class="p">[</span><span class="s2">&quot;Notes&quot;</span><span class="p">]])</span>
+
+<span class="c1"># Saving to a new .txt file. Can also use .frame</span>
+<span class="n">M101_notes</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_XRB_notes.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the “Class” column of the file, I manually write ‘Nucleus’, ‘AGN’, ‘Star’, or ‘Cluster’ for the appropriate source using my preferred text editing software. If a source only has a single optical counterpart or a counterpart is one of these classifications, you can go ahead and update the “Best Star” value to reflect the appropriate candidate ID for that source as well. So, for the example of CXO001, I write ‘Nucleus’ as the “Class” and ‘3’ as the “Best Star”.</p>
+</section>
+<section id="identifying-snr-from-x-ray-properties">
+<h2>Identifying SNR from X-ray properties<a class="headerlink" href="#identifying-snr-from-x-ray-properties" title="Link to this heading">#</a></h2>
+<p>While true SNR identification is a multi-wavelength process that requires a lot of analysis of data we don’t typically have for these XRB surveys, a shortcut using just X-ray colors was developed in <span id="id1">[<a class="reference internal" href="title.html#id6" title="Qiana Hunt, Elena Gallo, Rupali Chandar, Paula Johns Mulia, Angus Mok, Andrea Prestwich, and Shengchen Liu. Calibrating x-ray binary luminosity functions via optical reconnaissance. i. the case of m83. The Astrophysical Journal, 912(1):31, Apr 2021. URL: http://dx.doi.org/10.3847/1538-4357/abe531, doi:10.3847/1538-4357/abe531.">HGC+21</a>]</span> based on the X-ray properties of known SNRs in M83. It defines hardness ratio (HR) and X-ray luminosity (Lx) cuts, such that the majority of X-ray sources below the pre-defined limits are likely SNRs. Ideally, these cuts would be tested against SNR in a sample of additional galaxies, but for now, we define SNR candidates as those having HR ≤ −0.75 and a log(Lx) ≤ 37.5, as shown in <a class="reference internal" href="#fig-snr"><span class="std std-numref">Fig. 16</span></a>.</p>
+<figure class="align-default" id="fig-snr">
+<a class="reference internal image-reference" href="../_images/example_SNR.png"><img alt="../_images/example_SNR.png" src="../_images/example_SNR.png" style="width: 350px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See <span id="id2">[<a class="reference internal" href="title.html#id6" title="Qiana Hunt, Elena Gallo, Rupali Chandar, Paula Johns Mulia, Angus Mok, Andrea Prestwich, and Shengchen Liu. Calibrating x-ray binary luminosity functions via optical reconnaissance. i. the case of m83. The Astrophysical Journal, 912(1):31, Apr 2021. URL: http://dx.doi.org/10.3847/1538-4357/abe531, doi:10.3847/1538-4357/abe531.">HGC+21</a>]</span> for more information.</span><a class="headerlink" href="#fig-snr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>There are several ways one can keep track of these sources, depending on your workflow. Based on the current data files I’ve created in these examples, I would probably use <code class="docutils literal notranslate"><span class="pre">Find()</span></code> on <code class="docutils literal notranslate"><span class="pre">M101_best</span></code> to identify SNR candidates from the X-ray properties of each source. Then for each source in <code class="docutils literal notranslate"><span class="pre">M101_xrb</span></code>, I would check to see if the source appears in the SNR <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> I just created and update the <code class="docutils literal notranslate"><span class="pre">Class</span></code> header to <code class="docutils literal notranslate"><span class="pre">(SNR)</span></code> if it does, where the parentheses indicate that these are candidate SNR rather than SNR definitively identified by some other catalog. Alternatively, I have also, in previous surveys, added a <code class="docutils literal notranslate"><span class="pre">(SNR)</span></code> column to my main working <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and flagged them as <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> (1 or 0) based on the cuts.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="selection.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Identifying Optical Counterparts to X-ray Sources</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cmds.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Estimating XRB Masses with CMDs and CCDs</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imaging-x-ray-sources-with-writeds9">Imaging X-ray sources with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#manually-defining-the-scale-parameters-at-each-image-location">Manually defining the scale parameters at each image location</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-scale-parameters-of-each-x-ray-source">Defining the scale parameters of each X-ray source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-a-bash-script-with-writeds9">Making a bash script with <code class="docutils literal notranslate"><span class="pre">WriteDS9()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-bash-script">Running the bash script</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flagging-out-of-bounds-x-ray-sources">Flagging out-of-bounds X-ray sources</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classifying-sources-by-eye">Classifying sources by eye</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identifying-snr-from-x-ray-properties">Identifying SNR from X-ray properties</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Qiana Hunt
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

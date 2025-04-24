@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/astrometry';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Classifiying XRB Donor Stars" href="selection.html" />
+    <link rel="next" title="Identifying Optical Counterparts to X-ray Sources" href="selection.html" />
     <link rel="prev" title="HST Source Identification and Photometry" href="photometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -186,11 +186,16 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="csc-data.html">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Classifiying XRB Donor Stars</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -388,7 +393,11 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrator-selection">Calibrator Selection</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correction-calculation-and-application">Correction Calculation and Application</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-positional-uncertainty">Calculating Positional Uncertainty</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-positional-uncertainty">Calculating Positional Uncertainty</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-the-best-2-sigma-radius-per-source">Selecting the best 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius per source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-the-positional-uncertainties-as-region-files">Saving the positional uncertainties as region files</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -416,50 +425,42 @@ document.write(`
 </section>
 <section id="correction-calculation-and-application">
 <h2>Correction Calculation and Application<a class="headerlink" href="#correction-calculation-and-application" title="Link to this heading">#</a></h2>
-<p>As you may have guessed, I’ve written a function that will calculate the astrometric corrections automatically, called <code class="docutils literal notranslate"><span class="pre">CorrectAstrometry</span></code>. It takes in the coordinates of your selected X-ray sources (<code class="docutils literal notranslate"><span class="pre">cat_coords</span></code>) and finds the nearest optical source from the coordinates of some base catalog (<code class="docutils literal notranslate"><span class="pre">base_coords</span></code>, which in this case are the coordinates from the <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code> catalog from <a class="reference internal" href="photometry.html#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a>). Alternatively, you can calculate the astrometric correction yourself by hand-selecting the best optical source position of each calibrator and finding the median x- and y-coordinate offset between the optical and X-ray positions, as well as the standard deviation of those offsets.</p>
+<p>Astrometric corrections are handled by the function <code class="docutils literal notranslate"><span class="pre">XRBID.Align.CorrectAstrometry()</span></code>. It takes in the coordinates of your selected X-ray sources (<code class="docutils literal notranslate"><span class="pre">cat_coords</span></code>) and finds the nearest optical source from the coordinates of some base catalog (<code class="docutils literal notranslate"><span class="pre">base_coords</span></code>, which in this case are the coordinates from the <code class="docutils literal notranslate"><span class="pre">DAOStarFinder</span></code> catalog from <a class="reference internal" href="photometry.html#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a>). Alternatively, you can calculate the astrometric correction yourself by hand-selecting the best optical source position of each calibrator and finding the median x- and y-coordinate offset between the optical and X-ray positions, as well as the standard deviation of those offsets.</p>
 <p>If the standard deviations on the offsets are larger than the median offsets, then that suggests the <em>CXO</em> sources are already well-aligned with the <em>HST</em> image and no coordinate shift is necessary. The standard deviations on those shifts, however, are still needed to calculate the positional uncertainties, as it represents the variations in where the optical counterparts fall with respect to the X-ray coordinates of the selected sources. Ideally these will be small, but they’re expected to be non-zero.</p>
 <p>Below is the code I use to find the X-ray calibrators and call <code class="docutils literal notranslate"><span class="pre">CorrectAstrometry</span></code> to calculate the correction:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="n">cd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span>
-<span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span>
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
-
-<span class="kn">from</span> <span class="nn">Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetCoords</span>
-<span class="o">%</span><span class="k">run</span> Sources.py
-<span class="kn">from</span> <span class="nn">WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
-<span class="o">%</span><span class="k">run</span> WriteScript.py
-<span class="kn">from</span> <span class="nn">DataFrameMod</span> <span class="kn">import</span> <span class="n">RemoveElse</span><span class="p">,</span> <span class="n">FindUnique</span>
-<span class="o">%</span><span class="k">run</span> DataFrameMod.py
-<span class="kn">from</span> <span class="nn">Align</span> <span class="kn">import</span> <span class="n">CorrectAstrometry</span>
-<span class="o">%</span><span class="k">run</span> Align.py
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
+<span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span><span class="p">,</span> <span class="n">GetCoords</span>
+<span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">RemoveElse</span><span class="p">,</span> <span class="n">FindUnique</span>
+<span class="kn">from</span> <span class="nn">XRBID.Align</span> <span class="kn">import</span> <span class="n">CorrectAstrometry</span>
 
 <span class="c1"># Reading in sources from the DataFrame containing all of the X-ray sources</span>
 <span class="c1"># You can use pd.read_csv() instead of LoadSources, if you prefer</span>
-<span class="n">M101_CSC</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;cscresults_M101.frame&quot;</span><span class="p">)</span>
+<span class="n">M101_CSC</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101_renamed.frame&quot;</span><span class="p">)</span>
 
 <span class="c1"># Find X-ray sources with a unique CSC ID,</span>
 <span class="c1"># in case multiple rows in the the DataFrame have the same CSC ID</span>
 <span class="n">M101_unique</span> <span class="o">=</span> <span class="n">FindUnique</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)</span>
 
 <span class="c1"># Saving M101 to a region file that can be opened in DS9</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_unique</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;M101_cscsources.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-         <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_unique</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_cscsources.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+         <span class="n">radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">radunit</span><span class="o">=</span><span class="s2">&quot;arcsec&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from cscresults_M101.frame...
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/cscresults_M101_renamed.frame...
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving M101_cscsources.reg
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/M101_cscsources.reg
 </pre></div>
 </div>
 </div>
 </div>
-<p>The code above reads in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (CSV) file containing the X-ray sources (created in <a class="reference internal" href="csc-data.html#sec-csc-dataframe"><span class="std std-ref">Converting from VOTable to Pandas DataFrame</span></a>) and saves a region file of these sources called <code class="docutils literal notranslate"><span class="pre">M101_cscsources.reg</span></code>. Open whatever image you want to align these sources to in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> (I use the F555W mosaic file created in <a class="reference internal" href="astrodrizzle.html#sec-astrodrizzle"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>) with <code class="docutils literal notranslate"><span class="pre">Region</span> <span class="pre">&gt;</span> <span class="pre">Open</span></code>. Then, inspect the image to select a handful of good astrometric calibrator sources (see <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 11</span></a>).</p>
+<p>The code above reads in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (CSV) file containing the X-ray sources (created in <a class="reference internal" href="csc-data.html#sec-csc-dataframe"><span class="std std-ref">Converting from VOTable to Pandas DataFrame</span></a>) and saves a region file of these sources called <code class="docutils literal notranslate"><span class="pre">M101_cscsources.reg</span></code>. By default, because this <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> only contains RA and Dec for coordinates, <code class="docutils literal notranslate"><span class="pre">WriteReg()</span></code> will save a region file using galaxy coordinate units (<code class="docutils literal notranslate"><span class="pre">fk5</span></code> in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>). I define the color as hotpink (the default is a variation on yellow) and label each source with the CSC ID, as defined by <code class="docutils literal notranslate"><span class="pre">idname</span></code> and <code class="docutils literal notranslate"><span class="pre">showlabel</span></code>. You can pass any header in your <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> under <code class="docutils literal notranslate"><span class="pre">idname</span></code>, and it will use those entries to label each of the sources/regions.</p>
+<p>Open whatever image you want to align these sources to in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> (I use the F555W mosaic file created in <a class="reference internal" href="astrodrizzle.html#sec-astrodrizzle"><span class="std std-ref">Creating Mosaics with AstroDrizzle</span></a>) with <code class="docutils literal notranslate"><span class="pre">Region</span> <span class="pre">&gt;</span> <span class="pre">Open</span></code>. Then, inspect the image to select a handful of good astrometric calibrator sources (see <a class="reference internal" href="#fig-astrometric-calibrators"><span class="std std-numref">Fig. 11</span></a>). Save the CSC ID names of these sources in a list, and pull the information for these sources from the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>; the <code class="docutils literal notranslate"><span class="pre">RemoveElse()</span></code> function from <code class="docutils literal notranslate"><span class="pre">XRBID.DataFrameMod</span></code> is useful for removing all entries except for those that match the IDs in your list.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># List of source names to use as calibrators in the Astrometric Correction</span>
@@ -482,21 +483,19 @@ document.write(`
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">),</span> <span class="s2">&quot;calibrators found.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Saving these as a region file, in case we want to double-check</span>
-<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;M101_calibrators&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_calibrators</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/M101_calibrators.reg&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators to match...
+9 calibrators found.
+Saving ../testdata/M101_calibrators.reg
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9 calibrators found.
-Saving M101_calibrators.reg
-</pre></div>
 </div>
 </div>
-</div>
-<p>The catalog coordinates you’ll want to use are the coordiates of the calibrators, while the base coordinates you’re aligning them to come from the source extraction conducted in <a class="reference internal" href="photometry.html#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a>. Make sure you’re using the same coordinate system for both lists (in my case, I’m using the galaxy coordiates, which are designated <code class="docutils literal notranslate"><span class="pre">fk5</span></code> in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. Thus, I pull the base coordinates from <code class="docutils literal notranslate"><span class="pre">M101_daofind_f555w_acs_fk5.reg</span></code>).</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">CorrectAstrometry</span></code>, the catalog coordinates you’ll want to use are the coordiates of the calibrators, while the base coordinates you’re aligning them to come from the source extraction conducted in <a class="reference internal" href="photometry.html#sec-runphots"><span class="std std-ref">Using AutoPhots.RunPhots() for Everything</span></a>. Make sure you’re using the same coordinate system for both lists (in my case, I’m using the galaxy coordiates, which are designated <code class="docutils literal notranslate"><span class="pre">fk5</span></code> in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. Thus, I pull the base coordinates from <code class="docutils literal notranslate"><span class="pre">M101_daofind_f555w_acs_fk5.reg</span></code>).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the base and the catalog coordinates for CorrectAstrometry</span>
 <span class="n">base_coords</span> <span class="o">=</span> <span class="n">GetCoords</span><span class="p">(</span><span class="s2">&quot;testdata/M101_daofind_f555w_acs_fk5.reg&quot;</span><span class="p">)</span>
 <span class="n">cat_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">M101_calibrators</span><span class="p">[</span><span class="s2">&quot;RA&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> 
@@ -519,7 +518,7 @@ Saving M101_calibrators.reg
 <a class="reference internal image-reference" href="../_images/astrocorrect-3.png"><img alt="../_images/astrocorrect-3.png" src="../_images/astrocorrect-3.png" style="width: 550px;" />
 </a>
 </figure>
-<p>Here we see that the median x and y shifts are smaller than their standard deviation. This means the alignment is already pretty good, and that we just need to use the standard deviations to calculate the positional uncertainty radii! Otherwise, you will want to take the median shifts and apply this astrometric correction to the coordinates of your X-ray catalog. <em><code class="docutils literal notranslate"><span class="pre">CorrectAstrometry</span></code> will not do this for you!</em></p>
+<p>Here we see that the median x and y shifts are smaller than their standard deviation. This means the alignment is already pretty good and that we just need to use the standard deviations to calculate the positional uncertainty radii! Otherwise, you will want to take the median shifts and apply this astrometric correction to the coordinates of your X-ray catalog. <em><code class="docutils literal notranslate"><span class="pre">CorrectAstrometry</span></code> will not do this for you!</em></p>
 </section>
 <section id="calculating-positional-uncertainty">
 <span id="sec-calcpu"></span><h2>Calculating Positional Uncertainty<a class="headerlink" href="#calculating-positional-uncertainty" title="Link to this heading">#</a></h2>
@@ -542,10 +541,7 @@ Saving M101_calibrators.reg
 <p>All of these steps are handled by <code class="docutils literal notranslate"><span class="pre">Align.CalcPU()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">Align</span> <span class="kn">import</span> <span class="n">CalcPU</span>
-<span class="o">%</span><span class="k">run</span> Align.py
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../testdata&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Align</span> <span class="kn">import</span>  <span class="n">CalcPU</span>
 
 <span class="c1"># Takes in DataFrame or Off-axis Angle/Counts and returns 1 and 2sig</span>
 <span class="c1"># NOTE: theta needs to be in arcminutes, which is the default CSC unit</span>
@@ -557,13 +553,13 @@ Saving M101_calibrators.reg
 <p><code class="docutils literal notranslate"><span class="pre">CalcPU</span></code> calculates the total 1- and 2-<span class="math notranslate nohighlight">\(\sigma\)</span> positional uncertainty from both the X-ray data and the input standard deviations on the astrometric correction. This can be saved directly into to your <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig1</span>  <span class="c1"># Saves sig1 to a new header called &#39;1Sig&#39;</span>
+<span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig2</span>  <span class="c1"># Saves sig2 to a new header called &#39;2Sig&#39;</span>
 
-<span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig1</span>
-<span class="n">M101_CSC</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig2</span>
+<span class="c1"># The new DataFrame has 1 and 2sig added at the end of the columns list</span>
 <span class="n">display</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">)</span>
 
-<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
+<span class="n">M101_CSC</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;../testdata/M101_csc_astrocorrected.frame&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -879,17 +875,25 @@ Saving M101_calibrators.reg
 <p>3492 rows × 30 columns</p>
 </div></div></div>
 </div>
-<p>Depending on what information you chose to pull from <code class="docutils literal notranslate"><span class="pre">CSCview</span></code>, you may see that some sources have multiple observations listed in your DataFrame. These different observations may have different 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii associated with them. To get the best localization of each X-ray source, we should select the observation with the smallest 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. I use the code below to select what I think is likely the best observation:</p>
+<section id="selecting-the-best-2-sigma-radius-per-source">
+<h3>Selecting the best 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius per source<a class="headerlink" href="#selecting-the-best-2-sigma-radius-per-source" title="Link to this heading">#</a></h3>
+<p>Depending on what information you chose to pull from <code class="docutils literal notranslate"><span class="pre">CSCview</span></code>, you may see that some sources have multiple observations listed in your DataFrame. These different observations may have different 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radii associated with them. To get the best localization of each X-ray source, we should select the observation with the smallest 2-<span class="math notranslate nohighlight">\(\sigma\)</span>. I use the code below to select what I think is likely the best observation (though you may make arguments for using a different method, depending on the project):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="n">FindUnique</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">BuildFrame</span><span class="p">,</span> <span class="n">Find</span>
+
+<span class="c1"># Pulling the ID of each unique CSC source</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">FindUnique</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">)[</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<span class="c1"># Building an empty DataFrame, which I will fill below</span>
 <span class="n">M101_best</span> <span class="o">=</span> <span class="n">BuildFrame</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span> 
-    <span class="c1"># Search for all instances of each source</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span> <span class="c1"># for each unique ID pulled from CSC...</span>
+    
+    <span class="c1"># Search for all instances (i.e. observations) of each source</span>
     <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">M101_CSC</span><span class="p">,</span> <span class="s2">&quot;CSC ID = &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
     
-    <span class="c1"># If none of the events have a valid count, try to avoid sources where counts = NaN</span>
+    <span class="c1"># Try to avoid sources where counts = NaN (invalid observations) </span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts != NaN&quot;</span><span class="p">,</span> <span class="s2">&quot;Theta != NaN&quot;</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
         <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts != NaN&quot;</span><span class="p">,</span> <span class="s2">&quot;Theta != NaN&quot;</span><span class="p">])</span>
     
@@ -897,17 +901,21 @@ Saving M101_calibrators.reg
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
         <span class="n">Temp</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Counts &gt; 0&quot;</span><span class="p">])</span>
         
-    <span class="c1"># Otherwise, all instances with counts = 0 have the same measurements, so it doesn&#39;t matter</span>
+    <span class="c1"># Otherwise, all instances with counts = 0 have the same measurements, </span>
+    <span class="c1"># so it doesn&#39;t matter which row is chosen for the best radii</span>
     <span class="k">else</span><span class="p">:</span> <span class="k">pass</span><span class="p">;</span>
     
-    <span class="c1"># Take the source with the smallest 2sig. If there&#39;s more than one, take the first on the list.</span>
+    <span class="c1"># Take the source with the smallest 2sig. </span>
+    <span class="c1"># If there&#39;s more than one, take the first on the list.</span>
     <span class="n">Tempbest</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">Temp</span><span class="p">,</span> <span class="s2">&quot;2Sig =&lt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">Temp</span><span class="p">[</span><span class="s2">&quot;2Sig&quot;</span><span class="p">])))</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
     
     <span class="c1"># Add the chosen source observation to the new DataFrame</span>
     <span class="n">M101_best</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">Tempbest</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Saving results to a DataFrame file</span>
-<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
+<span class="c1"># This file contains only rows from M101_CSC that has the </span>
+<span class="c1"># best 2sigma radius, based on the search performed above</span>
+<span class="n">M101_best</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/M101_csc_bestrads.frame&quot;</span><span class="p">)</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">M101_best</span><span class="p">)</span>
 </pre></div>
@@ -1225,21 +1233,24 @@ Saving M101_calibrators.reg
 <p>555 rows × 30 columns</p>
 </div></div></div>
 </div>
+</section>
+<section id="saving-the-positional-uncertainties-as-region-files">
+<h3>Saving the positional uncertainties as region files<a class="headerlink" href="#saving-the-positional-uncertainties-as-region-files" title="Link to this heading">#</a></h3>
 <p>You now have the RA and Dec of each source (ideally updated based on the results from your astrometric correction) and the best positional uncertainty radii of each one. Save these radii as region files that can be plotted over the <em>HST</em> image in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> using <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the 1 and 2 sigma region files for DS9 use.</span>
 <span class="c1"># The 2sig region files have the CSC ID printed above each source.</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;2Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;../testdata/M101_bestrads_2sig.reg&#39;</span><span class="p">)</span>
 <span class="n">WriteReg</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">M101_best</span><span class="p">[</span><span class="s1">&#39;1Sig&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">radunit</span><span class="o">=</span><span class="s1">&#39;arcsec&#39;</span><span class="p">,</span> \
-         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
+         <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;../testdata/M101_bestrads_1sig.reg&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving M101_bestrads_2sig.reg
-Saving M101_bestrads_1sig.reg
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/M101_bestrads_2sig.reg
+Saving ../testdata/M101_bestrads_1sig.reg
 </pre></div>
 </div>
 </div>
@@ -1254,6 +1265,7 @@ Saving M101_bestrads_1sig.reg
 </figure>
 </section>
 </section>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -1264,16 +1276,16 @@ Saving M101_bestrads_1sig.reg
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "jupyterbook"
         },
         kernelOptions: {
-            name: "python3",
+            name: "jupyterbook",
             path: "./chapters"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'jupyterbook'</script>
 
                 </article>
               
@@ -1299,7 +1311,7 @@ Saving M101_bestrads_1sig.reg
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Classifiying XRB Donor Stars</p>
+        <p class="prev-next-title">Identifying Optical Counterparts to X-ray Sources</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1321,7 +1333,11 @@ Saving M101_bestrads_1sig.reg
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrator-selection">Calibrator Selection</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correction-calculation-and-application">Correction Calculation and Application</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-positional-uncertainty">Calculating Positional Uncertainty</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-positional-uncertainty">Calculating Positional Uncertainty</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#selecting-the-best-2-sigma-radius-per-source">Selecting the best 2-<span class="math notranslate nohighlight">\(\sigma\)</span> radius per source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-the-positional-uncertainties-as-region-files">Saving the positional uncertainties as region files</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1346,7 +1362,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>

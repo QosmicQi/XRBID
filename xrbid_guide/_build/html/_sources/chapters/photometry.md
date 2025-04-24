@@ -16,8 +16,8 @@ Assuming you don't mind black boxes, the quickest way to extract and correct the
 * Find point sources with `photutils.detection.DAOStarFinder`;
 * Measure the photometry within apertures with radius ranging from 1 to 30 pixels with `photutils.aperture.CircularAperture`; 
 * Calculate the apparent magnitudes of each object at each aperture radius; 
-* Calculate an aperture correction from 3--20 pixels and 20--infinity by prompting user to identify 'ideal' stars;
-* Apply aperture corrections to the apparent magnitudes; 
+* Calculate an aperture correction from 3--20 pixels (by default) and 20--infinity by prompting user to identify 'ideal' stars; use these ideal stars to also calculate aperture correction from 10--20 (by default) and 20--infinity pixels for extended sources (i.e. clusters);
+* Apply aperture corrections to the apparent magnitudes and return the aperture correction factor and the correction error (both for point sources and extended sources as of version 1.5.0); 
 
 
 Running this code is fairly easy, but before you do, you will need to know the FWHM (full width at half maximum, the width of a Gaussian at half of its maximum height) of stars within the `FITS` file of interest. This can be measured within `DS9`[^2]. Open your `FITS` file (be sure to set the scaling to something visible) and navigate to a relatively dark area with bright, isolated stars; you may have to set your cursor to pan using `Edit > Pan` first. Once in a good location, set your cursor to create a new region by selecting `Edit > Region`. Then under the `Region` menu located in the upper menu bar, go to `Shape > Annulus`. Click and drag somewhere on the image to create the annulus region. This region will be used to make a measurement of the radial profile of stars in this image, which will be used to estimate their FWHM. 
@@ -43,8 +43,7 @@ Example radial profile of an *HST* star. In this case, half-max occurs at around
 To run `RunPhots`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
 
 ```
-from AutoPhots import RunPhots
-%run AutoPhots.py     # Only run if running in .ipynb
+from XRBID.AutoPhots import RunPhots
 
 # Running analysis on full mosaic. Can be done on individual
 # fields using the 'suffix' parameter to differentiate savefile names
@@ -58,7 +57,9 @@ This code may take a few minutes to run for each step, depending on the size of 
 
 The idea behind an aperture correction is to ensure that all of the light from a given star is captured and reflected in its measured flux/magnitude; since an aperture of infinite radius will detect the flux of an infinite number of sources other than the one you're interested in, you need to select an aperture small enough to only measure the light from your selected star, but this aperture will undoubtedly 'miss' some of the light the star is giving off. An aperture correction is a means by which you can estimate and correct for the light that is presumably 'cut off' when you select an aperture of a given size. To do so, one should look at the radial profile of a given star and measure the flux/magnitude difference between the preferred aperture size (I use 3 pixels) and some larger aperture (e.g. 20 pixels). One then adds an additional correction factor measured from that larger aperture to infinity using the known Encircled Energy Fractions (EEF) for the instrument of choice[^3]. Theoretically, this should estimate all of the light one expects to miss for an ideal star within a given *HST* observation, and this correction term can be applied to all remaining stars to get a better estimate of their total fluxes. 
 
-A good 'ideal star' is one with a magnitude that increases up until about 3 pixels, and then flattens off (see {numref}`fig-ap-example`). `RunPhots()` will continue prompting the user for input until the number of ideal stars selected equals the input `num_stars` (the default is 20). If you find that the same stars are being cycled through, this probably means there aren't enough acceptable stars to meet the input criterion, and you should lower `num_stars` and try again. Once the criterion is met, `RunPhots()` will calculate and return the aperture correction and standard deviation. It may be a good idea to run the aperture correction a few times to make sure you're minimizing the standard deviation, or you may not end up with an appropriate aperture correction. You can run just the aperture correction part of the code by calling `AutoPhots.CorrectAp()`.
+A good 'ideal star' is one with a magnitude that increases up until about 3 pixels, and then flattens off (see {numref}`fig-ap-example`). `RunPhots()` will continue prompting the user for input until the number of ideal stars selected equals the input `num_stars` (the default is 20). As you add stars to the list of ideal stars, you will see their radial profiles plotted in grey,  against which you can compare the radial profiles of the next randomly selected star. If you find that the same stars are being cycled through (as indicated by the star number in the title of the plot), this probably means there aren't enough acceptable stars to meet the input criterion, and you should lower `num_stars` and try again. Once the criterion is met, `RunPhots()` will calculate and return the aperture correction and standard deviation. It may be a good idea to run the aperture correction a few times to make sure you're minimizing the standard deviation, or you may not end up with an appropriate aperture correction. You can run just the aperture correction part of the code by calling `AutoPhots.CorrectAp()`.
+
+As of version 1.5.0, `RunPhots()` and `CorrectAp()` will also calculate the aperture correction for extended source given the aperture radius provided by the `extended_rad` parameter. By default, this value is 10 pixels, but one should select an aperture radius that best suits the compact clusters within the image of interest since farther galaxies will likely have clusters with smaller angular sizes. `RunPhots()` will then print `*_extended.ecsv` files from which the aperture photometry of clusters can be pulled.  
 
 
 ```{figure} ../images/aperture_example.png
@@ -68,9 +69,14 @@ A good 'ideal star' is one with a magnitude that increases up until about 3 pixe
 The radial profile of an `ideal' star, showing the total flux (converted to magnitudes) within an aperture of a given radius. The integrated flux of stars in *HST* images will generally max out by 3 pixels and should be flat at increasing radius. If there are wiggles/spikes in the flux, this suggests the star is non well-isolated (light from a nearby star is interfering with the measurement), and that star should not be used for the aperture correction.
 ```
 
-## Identifying Point Sources with `DAOStarFinder`
+## Manual Source Identification and Photometry (w/o `RunPhots()`)
 
-For those who prefer to run their own point source identification, whether because `RunPhots()` did not produce acceptable results or because you value the skill, you can extract sources using `photutils` instead, which should already be included in your `python` installation. The main function used to find stars in a `FITS` file is the `DAOStarFinder`[^4] function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.
+For those who prefer to run their own point source identification, whether because `RunPhots()` did not produce acceptable results or because you value the skill, you can extract sources using `photutils` instead, which should already be included in your `python` installation. The following instructions walk you through one means of manually identifying point sources in your *HST* images, extracting their photometry, and estimating an aperture correction for each image/filter, which you can use *instead of* `RunPhots()`. There almost certainly are other methods that you could use as well, but those will not be discussed here.
+
+
+### Identifying Point Sources with `DAOStarFinder`
+
+The main function used to find stars in a `FITS` file is the `DAOStarFinder`[^4] function. This requires an estimate of the FWHM of stars on the image and some threshold amplitude above which a detection is found.
 
 Open the `FITS` file in your imaging software of choice and use the analytics of that software to determine some reasonable measurement of the background noise in a dark area of the image, and the FWHM of a few average stars. For `DS9`, you can use the instructions in {ref}`sec:runphots` to find the FWHM. An important thing to note is that `DAOStarFinder` requires the FWHM in pixels, but `DS9` gives it in arcseconds. The pixel scale for is 0.05 arcsec per pixel for ACS/WFC and 0.03962 for WFC3/UVIS. This is usually stored under the `FITS` `HDU` header `D001SCAL`.
 
@@ -95,7 +101,7 @@ objects = daofind(data)
 
 `DAOStarFind` will return a table containing the coordinates of all identified sources, which can be used to make a region file that will plot in `DS9` and `CARTA` (this can be done easily using my custom function `WriteScript.WriteReg()`). For reasons I don't understand, the region file that comes from these coordinates often doesn't align very well with the image itself, even though I believe the photometry that comes from these coordinates is accurate. When creating a region file, it may be a good idea to do a minor coordinate shift, just so that the regions align with the image and don't cause confusion during the aperture correction step. Also, you'll want to check the region file to make sure `DAOStarFind` isn't missing any obvious sources. If it is, you'll need to adjust your parameters (such as the FWHM) and run it again.
 
-## Extracting Photometry with `aperture_photometry`
+### Extracting Photometry with `aperture_photometry`
 
 `RunPhots()` will conduct the aperture photometry for you with a default minimum radius of 3 pixels, but you can also run the aperture photometry yourself with `photutils.aperture_photometry`. The inputs for `aperture_photometry` are fairly simple: all you need is the `FITS` data (background subtracted) and a list of aperture radii at the positions of your sources of interest, built with `photutils.aperture.CircularAperture()`. Using the resulting `objects` table obtained from `DAOStarFinder` above: 
 
@@ -144,7 +150,7 @@ phot_full.write("<filename>.ecsv")
 
 The resulting `.ecsv` file will contain the coordinates of each source and the integrated flux within each aperture radius (in this case, 1--30 pixels). For normal stars, I generally use the flux within a 3-pixel aperture to represent a single star, as this radius is usually large enough to collect most of the stellar light but small enough for the flux not to be influenced by contamination from a neighboring star. However, any defined aperture is sure to miss some of the light of the chosen star, which is why an aperture correction is also needed to fully represent the stellar flux of a star of interest.
 
-## Estimating Aperture Corrections
+### Estimating Aperture Corrections
 
 `RunPhots()` will automatically conduct the aperture corrections using a second custom function, `CorrectAp()`. The philosophy behind aperture corrections is described in detailed above in {ref}`sec:runphots` or, in a more official capacity, here: https://www.stsci.edu/hst/instrumentation/acs/data-analysis/aperture-corrections
 

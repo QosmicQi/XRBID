@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -184,11 +184,16 @@
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Getting Started</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="hst-data.html">Retrieving Optical Images from the HLA</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="astrodrizzle.html">Creating Mosaics with <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="photometry.html"><em>HST</em> Source Identification and Photometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="astrometry.html">Astrometric Corrections</a></li>
-<li class="toctree-l1"><a class="reference internal" href="selection.html">Selecting Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="selection.html">Identifying Optical Counterparts to X-ray Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourceids.html">Classifying Optical Counterparts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmds.html">Estimating XRB Masses with CMDs and CCDs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="final.html">Final Thoughts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">Errors and How to Fix Them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Examples of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> Functions</a></li>
 </ul>
 
     </div>
@@ -398,7 +403,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="retrieving-x-ray-data-from-the-csc">
 <span id="chap-csc-data"></span><h1>Retrieving X-ray Data from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code><a class="headerlink" href="#retrieving-x-ray-data-from-the-csc" title="Link to this heading">#</a></h1>
-<p>For my work, the most important information that I need from <em>CXO</em> is the coordinates of the X-ray sources (used to locate their optical counterparts on an <em>HST</em> image), their X-ray luminosities (calculated from the <code class="docutils literal notranslate"><span class="pre">CSC</span></code>-provided flux), their hardness ratios (used to determine whether or not they may be a supernova remnant in a later section), the off-axis angle, and the total X-ray counts (the last two of which are used to calculate the uncertainty radii in <a class="reference internal" href="astrometry.html#chap-astrometry"><span class="std std-ref">Astrometric Corrections</span></a>). This information can be pulled directly from <code class="docutils literal notranslate"><span class="pre">CSCView.jar</span></code>.</p>
+<p>For my work, the most important information that I need from <em>CXO</em> is the coordinates of the X-ray sources (used to locate their optical counterparts on an <em>HST</em> image), their X-ray luminosities (calculated from the CSC-provided flux), their hardness ratios (used to determine whether or not they may be a supernova remnant in a later section), the off-axis angle, and the total X-ray counts (the last two of which are used to calculate the uncertainty radii in <a class="reference internal" href="astrometry.html#chap-astrometry"><span class="std std-ref">Astrometric Corrections</span></a>). This information can be pulled directly from <code class="docutils literal notranslate"><span class="pre">CSCView.jar</span></code>.</p>
 <p>Open the program by clicking the icon or typing into the command line (where it is saved):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">cscview</span><span class="o">.</span><span class="n">jar</span> <span class="o">&amp;</span>
 </pre></div>
@@ -406,15 +411,16 @@ document.write(`
 <p>(The optional <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> allows you to continue using the terminal for other processes while <code class="docutils literal notranslate"><span class="pre">cscview.jar</span></code> is running)</p>
 <p>This will open the program GUI, which will look something like:</p>
 <img alt="../_images/cscview.png" id="fig-cscview" src="../_images/cscview.png" />
-<p>Select the most recent data release. Under <code class="docutils literal notranslate"><span class="pre">Source</span> <span class="pre">Properties</span></code>, search for hardness ratio or <code class="docutils literal notranslate"><span class="pre">hard_hs</span></code> and add it to the Result Set with the <code class="docutils literal notranslate"><span class="pre">+</span></code> button. Do the same for off-axis angle (<code class="docutils literal notranslate"><span class="pre">theta</span></code> or <code class="docutils literal notranslate"><span class="pre">theta_mean</span></code>) and total X-ray counts (<span id="id1">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span> appears to use <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_b</span></code>, <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_lolim_b</span></code>, and <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_hilim_b</span></code>).
-All other results can be left as is, or you may remove the properties that you won’t need to save memory. You can save the query for future use by clicking the <code class="docutils literal notranslate"><span class="pre">Save</span></code> button at the top of the window. By default, it is saved with the suffix <code class="docutils literal notranslate"><span class="pre">.prop</span></code>.</p>
+<p>Select the most recent data release and press the <code class="docutils literal notranslate"><span class="pre">Search</span></code> button at the top left to be brought from the <code class="docutils literal notranslate"><span class="pre">Catalog</span></code> tab to the <code class="docutils literal notranslate"><span class="pre">Query</span></code> tab.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">Query</span></code> tab under <code class="docutils literal notranslate"><span class="pre">Source</span> <span class="pre">Properties</span></code>, search for hardness ratio (<code class="docutils literal notranslate"><span class="pre">hard_hs</span></code>) and add it to the <code class="docutils literal notranslate"><span class="pre">Result</span> <span class="pre">Set</span></code> with the <code class="docutils literal notranslate"><span class="pre">+</span></code> button. Do the same for off-axis angle (<code class="docutils literal notranslate"><span class="pre">theta</span></code> or <code class="docutils literal notranslate"><span class="pre">theta_mean</span></code>) and total X-ray counts (I choose to use <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_b</span></code>, <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_lolim_b</span></code>, and <code class="docutils literal notranslate"><span class="pre">src_cnts_aper_hilim_b</span></code>, which appears to be what is used in <span id="id1">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span>).
+All other results can be left as is, or you may remove the properties that you won’t need to save memory. You can save the query settings for future use by clicking the <code class="docutils literal notranslate"><span class="pre">Save</span></code> button at the top of the window. By default, it is saved with the suffix <code class="docutils literal notranslate"><span class="pre">.prop</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>There may be additional data needed in order to clean up the X-ray source catalog such that only good data are included in your analysis. Since I focused mainly on X-ray sources identified in <span id="id2">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span>, which did this step for me, I never had to deal with this. However, it’s something that will need to be kept in mind for future products. See <span id="id3">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span> for more information on data selection from <code class="docutils literal notranslate"><span class="pre">CSC</span></code>.</p>
+<p>There may be additional data needed in order to clean up the X-ray source catalog such that only good data are included in your analysis. Since I focused mainly on X-ray sources identified in <span id="id2">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span>, which did this step for me, I never had to deal with this. However, it’s something that will need to be kept in mind for future projects. See <span id="id3">[<a class="reference internal" href="title.html#id10" title="Bret D. Lehmer, Rafael T. Eufrasio, Panayiotis Tzanavaris, Antara Basu-Zych, Tassos Fragos, Andrea Prestwich, Mihoko Yukita, Andreas Zezas, Ann E. Hornschemeier, and Andrew Ptak. X-Ray Binary Luminosity Function Scaling Relations for Local Galaxies Based on Subgalactic Modeling. \apjs , 243(1):3, Jul 2019. arXiv:1905.05197, doi:10.3847/1538-4365/ab22a8.">LehmerEufrasioTzanavaris+19</a>]</span> for more information on data selection from <code class="docutils literal notranslate"><span class="pre">CSC</span></code>.</p>
 </div>
 <p>To search for the <em>CXO</em>  X-ray sources associated with your galaxy of interest, select <code class="docutils literal notranslate"><span class="pre">Cone</span></code> under <code class="docutils literal notranslate"><span class="pre">Position</span> <span class="pre">Search</span></code> at the bottom of the window and search for the galaxy of interest by name or coordinates. In the example above, I am looking for X-ray sources in M101, which has a linear diameter of roughly 30 arcminutes. I set the search parameters accordingly and hit the <code class="docutils literal notranslate"><span class="pre">Search</span></code> button at the top left of the window. This automatically brings you from the <code class="docutils literal notranslate"><span class="pre">Query</span></code> tab to the <code class="docutils literal notranslate"><span class="pre">Results</span></code> tab, from which you can select all the X-ray sources and save them to a <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
 <p>You will need to press the <code class="docutils literal notranslate"><span class="pre">Search</span></code> button every time you make a change in the <code class="docutils literal notranslate"><span class="pre">Query</span></code> tab. Otherwise, your search results may not be updated!</p>
 </div>
 <p>To view the <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file, open <code class="docutils literal notranslate"><span class="pre">TopCat</span></code>:</p>
@@ -431,31 +437,20 @@ All other results can be left as is, or you may remove the properties that you w
 <p>In the GUI above, navigate to the <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file via the <code class="docutils literal notranslate"><span class="pre">Filestore</span> <span class="pre">Browser</span></code> or <code class="docutils literal notranslate"><span class="pre">System</span> <span class="pre">Browser</span></code> interface. This will pull up the file information under <code class="docutils literal notranslate"><span class="pre">Current</span> <span class="pre">Table</span> <span class="pre">Properties</span></code>. The 4th icon at the top of the window (looks like a spreadsheet) will open the <code class="docutils literal notranslate"><span class="pre">Table</span> <span class="pre">Browser</span></code>, which allows you to view the table as a spreadsheet.</p>
 <section id="converting-from-votable-to-pandas-dataframe">
 <span id="sec-csc-dataframe"></span><h2>Converting from <code class="docutils literal notranslate"><span class="pre">VOTable</span></code> to Pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code><a class="headerlink" href="#converting-from-votable-to-pandas-dataframe" title="Link to this heading">#</a></h2>
-<p>In the repository for this guide, I’ve included custom code that I use to convert <code class="docutils literal notranslate"><span class="pre">.vot</span></code> files into Pandas <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> in <code class="docutils literal notranslate"><span class="pre">python</span></code>, a function called <code class="docutils literal notranslate"><span class="pre">NewSources()</span></code> from the <code class="docutils literal notranslate"><span class="pre">Sources.py</span></code> script. To use this function, you simply need to open run something like this in an iPython notebook:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> package contains a specialized function for converting <code class="docutils literal notranslate"><span class="pre">.vot</span></code> files from the CSC into Pandas <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> in <code class="docutils literal notranslate"><span class="pre">python</span></code>: <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.NewSources()</span></code>. To use this function, you simply need to run something like this in <code class="docutils literal notranslate"><span class="pre">python</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># When running python from a notebook, it&#39;s good to import a function</span>
-<span class="c1"># that will allow you to navigate your directories</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="n">cd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span>
-<span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">NewSources</span>
 
-<span class="c1"># On my computer, I saved these functions to a directory called &#39;pyfiles&#39;. </span>
-<span class="c1"># Navigating to that folder first.</span>
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../pyfiles&#39;</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">Sources</span> <span class="kn">import</span> <span class="n">NewSources</span>
-<span class="o">%</span><span class="k">run</span> Sources.py   # run commands are only needed in an ipynb
-
-<span class="n">cd</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span> <span class="c1"># Navigating back to the original directory</span>
-
-<span class="n">NewSources</span><span class="p">(</span><span class="s2">&quot;testdata/cscresults_M101.vot&quot;</span><span class="p">)</span> <span class="c1"># I saved my .vot to a directory called &#39;testdata&#39;</span>
-
-<span class="c1">### This can also be done in the command line terminal, but without the %run command. ###</span>
+<span class="c1"># Note: I saved my .vot to a directory called &#39;testdata&#39;, </span>
+<span class="c1">#       so that&#39;s included in my filename path below</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">NewSources</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101.vot&quot;</span><span class="p">)</span> 
+<span class="n">display</span><span class="p">(</span><span class="n">TempSources</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in table from testdata/cscresults_M101.vot
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in table from ../testdata/cscresults_M101.vot
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DONE
@@ -772,17 +767,378 @@ All other results can be left as is, or you may remove the properties that you w
 <p>3492 rows × 28 columns</p>
 </div></div></div>
 </div>
-<p>This will read in the table exactly as written. Keep in mind, the code will need to point towards where <code class="docutils literal notranslate"><span class="pre">Sources.py</span></code> and your <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file(s) are saved on your computer! If you want to rename the headers or save the <code class="docutils literal notranslate"><span class="pre">Dataframe</span></code> to a file, you can do so using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NewSources</span><span class="p">(</span><span class="s2">&quot;testdata/cscresults_M101.vot&quot;</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
-           <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;testdata/cscresults_M101.frame&quot;</span><span class="p">)</span>
+<p>Keep in mind, the code will need to point towards where your <code class="docutils literal notranslate"><span class="pre">.vot</span></code> file(s) are saved on your computer! If you would like to save this to a file, you can do so in one of two ways: either save it using functions native to Pandas, or use the <code class="docutils literal notranslate"><span class="pre">outfile</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">NewSources()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Saving the file using Pandas</span>
+<span class="n">TempSources</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101.frame&quot;</span><span class="p">)</span> <span class="c1"># Pandas version of saving the df</span>
+
+<span class="c1"># Alternatively, saving file using NewSources</span>
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">NewSources</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscresults_M101.vot&quot;</span><span class="p">,</span> 
+                         <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscresults_M101.frame&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in table from ../testdata/cscresults_M101.vot
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/cscresults_M101.frame...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DONE
+</pre></div>
+</div>
+</div>
+</div>
+<p>As you can see, the calls to <code class="docutils literal notranslate"><span class="pre">NewSources</span></code> above will read in the table exactly as written. If you want to rename the headers, you can do so manually in the <code class="docutils literal notranslate"><span class="pre">.frame</span></code> file created above or by setting the <code class="docutils literal notranslate"><span class="pre">rename</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The code below will prompt you to rename each of the headers within the <code class="docutils literal notranslate"><span class="pre">.vot</span></code> table, then save the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as a comma-separated value (CSV):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NewSources</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscresults_M101.vot&quot;</span><span class="p">,</span> <span class="n">rename</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+           <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscresults_M101_renamed.frame&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <figure class="align-center">
 <a class="reference internal image-reference" href="../_images/newsources_output.png"><img alt="../_images/newsources_output.png" src="../_images/newsources_output.png" style="width: 500px;" />
 </a>
 </figure>
-<p>The code above will prompt you to rename each of the headers within the <code class="docutils literal notranslate"><span class="pre">.vot</span></code> Table, then save the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> as a comma-separated value that is easily read in by <code class="docutils literal notranslate"><span class="pre">pd.read_csv()</span></code> or, better yet, my custom function <code class="docutils literal notranslate"><span class="pre">Sources.LoadSources()</span></code>. The latter is a little slower, but it will automatically remove the index column of the <code class="docutils literal notranslate"><span class="pre">CSV</span></code> file and convert applicable values from strings into actual numbers as the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is being built. This is usually very helpful during the analysis stage, so I recommend using <code class="docutils literal notranslate"><span class="pre">LoadSources()</span></code> as long as it’s working properly.</p>
-<p>You should also save these sources as a region file that can be loaded into <code class="docutils literal notranslate"><span class="pre">DS9</span></code> or <code class="docutils literal notranslate"><span class="pre">CARTA</span></code> to overlay onto an <em>HST</em> <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file. This can be done fairly simply with <code class="docutils literal notranslate"><span class="pre">WriteScript.WriteReg()</span></code>.</p>
+<p>The CSV output file created above (<code class="docutils literal notranslate"><span class="pre">cscresults_M101.frame</span></code>) is easily read in by <code class="docutils literal notranslate"><span class="pre">pd.read_csv()</span></code> or <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.LoadSources()</span></code>. The latter is a little slower, but it will automatically remove the index column of the <code class="docutils literal notranslate"><span class="pre">CSV</span></code> file and convert applicable values from strings into actual numbers as the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is being built. This is usually very helpful during the analysis stage, so I recommend using <code class="docutils literal notranslate"><span class="pre">LoadSources()</span></code> when you can.</p>
+<p>You should also save these sources as a region file that can be loaded into <code class="docutils literal notranslate"><span class="pre">DS9</span></code> or <code class="docutils literal notranslate"><span class="pre">CARTA</span></code> to overlay onto an <em>HST</em> <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file. This can be done fairly simply with <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteReg()</span></code> – for example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.WriteScript</span> <span class="kn">import</span> <span class="n">WriteReg</span>
+<span class="kn">from</span> <span class="nn">XRBID.Sources</span> <span class="kn">import</span> <span class="n">LoadSources</span>
+
+<span class="n">TempSources</span> <span class="o">=</span> <span class="n">LoadSources</span><span class="p">(</span><span class="s2">&quot;../testdata/cscresults_M101_renamed.frame&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">TempSources</span><span class="p">)</span>
+
+<span class="c1"># Writing to a DS9-compatible region file</span>
+<span class="n">WriteReg</span><span class="p">(</span><span class="n">TempSources</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;../testdata/cscsources_M101.reg&quot;</span><span class="p">,</span> <span class="n">idname</span><span class="o">=</span><span class="s2">&quot;CSC ID&quot;</span><span class="p">,</span> 
+        <span class="n">radius</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;hotpink&quot;</span><span class="p">,</span> <span class="n">showlabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading in sources from ../testdata/cscresults_M101_renamed.frame...
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Separation</th>
+      <th>CSC ID</th>
+      <th>RA</th>
+      <th>Dec</th>
+      <th>ExpTime</th>
+      <th>Theta</th>
+      <th>Err Ellipse Major</th>
+      <th>Err Ellipse Minor</th>
+      <th>Err Ellipse Angle</th>
+      <th>Significance</th>
+      <th>...</th>
+      <th>HS Ratio hilim</th>
+      <th>HM Ratio</th>
+      <th>HM Ratio lolim</th>
+      <th>HM Ratio hilim</th>
+      <th>MS Ratio</th>
+      <th>MS Ratio lolim</th>
+      <th>MS Ratio hilim</th>
+      <th>Counts</th>
+      <th>Counts lolim</th>
+      <th>Counts hilim</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>192658.710333</td>
+      <td>2.687974</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>170.006026</td>
+      <td>155.698239</td>
+      <td>184.313814</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>142729.493705</td>
+      <td>2.727056</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>254.489381</td>
+      <td>233.532285</td>
+      <td>274.136658</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>141298.623812</td>
+      <td>2.783596</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>442.576953</td>
+      <td>419.112035</td>
+      <td>464.477543</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>132129.439441</td>
+      <td>2.690653</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>131.798703</td>
+      <td>118.539780</td>
+      <td>144.321019</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.835778</td>
+      <td>2CXO J140312.5+542056</td>
+      <td>210.802227</td>
+      <td>54.348952</td>
+      <td>130186.649966</td>
+      <td>2.749161</td>
+      <td>0.296164</td>
+      <td>0.295254</td>
+      <td>89.606978</td>
+      <td>22.302136</td>
+      <td>...</td>
+      <td>-0.454091</td>
+      <td>0.028732</td>
+      <td>-0.100562</td>
+      <td>0.156777</td>
+      <td>-0.553404</td>
+      <td>-0.61649</td>
+      <td>-0.485322</td>
+      <td>649.590529</td>
+      <td>616.129127</td>
+      <td>683.051932</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>3487</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>120993.038017</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>59.364933</td>
+    </tr>
+    <tr>
+      <th>3488</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>88598.047743</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>14.952548</td>
+    </tr>
+    <tr>
+      <th>3489</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>81021.851289</td>
+      <td>13.486809</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>53.481053</td>
+      <td>29.414579</td>
+      <td>77.547526</td>
+    </tr>
+    <tr>
+      <th>3490</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>52087.100775</td>
+      <td>NaN</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>34.780341</td>
+    </tr>
+    <tr>
+      <th>3491</th>
+      <td>892.520732</td>
+      <td>2CXO J140447.2+542633</td>
+      <td>211.196627</td>
+      <td>54.442543</td>
+      <td>14276.493764</td>
+      <td>3.416463</td>
+      <td>1.612100</td>
+      <td>0.795238</td>
+      <td>86.007749</td>
+      <td>2.650000</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>7.591890</td>
+      <td>4.313574</td>
+      <td>10.870206</td>
+    </tr>
+  </tbody>
+</table>
+<p>3492 rows × 28 columns</p>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Saving ../testdata/cscsources_M101.reg
+</pre></div>
+</div>
+</div>
+</div>
+<p>The code above takes every source in <code class="docutils literal notranslate"><span class="pre">TempSources</span></code> (i.e. every row in the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>) and writes the coordinates to a <code class="docutils literal notranslate"><span class="pre">DS9</span></code>-compatible region file called <code class="docutils literal notranslate"><span class="pre">cscsources_M101.reg</span></code>. The default coordinate system here is galactic coordinates (or fk5 in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>), since the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> only contains RA and Dec coordinates. By setting <code class="docutils literal notranslate"><span class="pre">showlabel</span> <span class="pre">=</span> <span class="pre">True</span></code> and <code class="docutils literal notranslate"><span class="pre">idname</span> <span class="pre">=</span> <span class="pre">&quot;CSC</span> <span class="pre">ID&quot;</span></code>, each circular region (representing the X-ray sources from CSC) will be labeled with the source ID taken from CSC and stored under the header “CSC ID”.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information on additional parameters taken in by <code class="docutils literal notranslate"><span class="pre">WriteReg()</span></code>, one can run <code class="docutils literal notranslate"><span class="pre">help(WriteReg)</span></code> in <code class="docutils literal notranslate"><span class="pre">python</span></code>. This can be done with any <code class="docutils literal notranslate"><span class="pre">python</span></code> function.</p>
+</div>
 </section>
 </section>
 
@@ -795,16 +1151,16 @@ All other results can be left as is, or you may remove the properties that you w
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "jupyterbook"
         },
         kernelOptions: {
-            name: "python3",
+            name: "jupyterbook",
             path: "./chapters"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'jupyterbook'</script>
 
                 </article>
               
@@ -875,7 +1231,7 @@ By Qiana Hunt
 
   <p class="copyright">
     
-      © Copyright 2023.
+      © Copyright 2025.
       <br/>
     
   </p>
