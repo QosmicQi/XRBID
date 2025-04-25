@@ -365,7 +365,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -381,6 +383,14 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runphots">RunPhots()</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -397,6 +407,30 @@ document.write(`
 <p class="admonition-title">Important</p>
 <p>This section is under construction!</p>
 </div>
+<section id="runphots">
+<h2>RunPhots()<a class="headerlink" href="#runphots" title="Link to this heading">#</a></h2>
+<p>As of version 1.5.0, RunPhots() now takes three aperture radii: <code class="docutils literal notranslate"><span class="pre">min_rad</span></code>, <code class="docutils literal notranslate"><span class="pre">max_rad</span></code>, and <code class="docutils literal notranslate"><span class="pre">extended_rad</span></code>. <code class="docutils literal notranslate"><span class="pre">min_rad</span></code> corresponds to the aperture radius used to take photometry of a point source (i.e. a star) and should usually remain at 3 pixels, unless a good argument can be made for a better aperture radius for stars in a particular galaxy. <code class="docutils literal notranslate"><span class="pre">max_rad</span></code> should always remain at 20, since the aperture correction out to infinity is taken from 20 pixels to infinity, unless you know what you’re doing with this code. The new parameter, <code class="docutils literal notranslate"><span class="pre">extended_rad</span></code>, represents the radius of extended sources. This should be set to the pixel radius of a standard cluster in your galaxy. The default is 10 pixels, as this was a good setting for clusters in M81, but you should always check your own data to see if a smaller or larger aperture radius is better suited to your particular data set.</p>
+<p>For M101, which is 2 Mpc farther than M81, I found that clusters are well-constrained by an aperture radius of 8 pixels. Thus, when running <code class="docutils literal notranslate"><span class="pre">RunPhots()</span></code> for M101, I set <code class="docutils literal notranslate"><span class="pre">extended_rad</span> <span class="pre">=</span> <span class="pre">8</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.AutoPhots</span> <span class="kn">import</span> <span class="n">RunPhots</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span> 
+
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;M101_mosaic_acs_f555w_drc_sci.fits&quot;</span><span class="p">)</span>
+
+<span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> 
+         <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+         
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;M101_mosaic_acs_f814w_drc_sci.fits&quot;</span><span class="p">)</span>
+
+<span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F814W&quot;</span><span class="p">,</span> 
+         <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;testdata/M101_mosaic_acs_f435w_drc_sci.fits&quot;</span><span class="p">)</span>
+
+<span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F435W&quot;</span><span class="p">,</span> 
+         <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -444,6 +478,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runphots">RunPhots()</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

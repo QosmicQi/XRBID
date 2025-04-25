@@ -16,11 +16,18 @@ Assuming you don't mind black boxes, the quickest way to extract and correct the
 * Find point sources with `photutils.detection.DAOStarFinder`;
 * Measure the photometry within apertures with radius ranging from 1 to 30 pixels with `photutils.aperture.CircularAperture`; 
 * Calculate the apparent magnitudes of each object at each aperture radius; 
-* Calculate an aperture correction from 3--20 pixels and 20--infinity by prompting user to identify 'ideal' stars;
-* Apply aperture corrections to the apparent magnitudes; 
+* Calculate an aperture correction from 3--20 pixels (by default) and 20--infinity by prompting user to identify 'ideal' stars; these ideal stars are also used to calculate aperture corrections from 10--20 (by default) and 20--infinity pixels for extended sources (i.e. clusters);
+* Apply aperture corrections to the apparent magnitudes and return the aperture correction factor and the correction error (both for point sources and extended sources as of version 1.5.0); 
 
 
-Running this code is fairly easy, but before you do, you will need to know the FWHM (full width at half maximum, the width of a Gaussian at half of its maximum height) of stars within the `FITS` file of interest. This can be measured within `DS9`[^2]. Open your `FITS` file (be sure to set the scaling to something visible) and navigate to a relatively dark area with bright, isolated stars; you may have to set your cursor to pan using `Edit > Pan` first. Once in a good location, set your cursor to create a new region by selecting `Edit > Region`. Then under the `Region` menu located in the upper menu bar, go to `Shape > Annulus`. Click and drag somewhere on the image to create the annulus region. This region will be used to make a measurement of the radial profile of stars in this image, which will be used to estimate their FWHM. 
+Running this code is fairly easy, but before you do, you will need to know the FWHM (full width at half maximum, the width of a Gaussian at half of its maximum height, as demonstrated in {numref}`fig-fwhm`) of stars within the `FITS` file of interest. This can be measured within `DS9`[^2]. Open your `FITS` file (be sure to set the scaling to something visible) and navigate to a relatively dark area with bright, isolated stars; you may have to set your cursor to pan using `Edit > Pan` first. Once in a good location, set your cursor to create a new region by selecting `Edit > Region`. Then under the `Region` menu located in the upper menu bar, go to `Shape > Annulus`. Click and drag somewhere on the image to create the annulus region. This region will be used to make a measurement of the radial profile of stars in this image, which will be used to estimate their FWHM. 
+
+```{figure} ../images/fwhm.png
+:name: fig-fwhm
+:width: 300px
+
+Example of the FWHM of a Gaussian. Compare to {numref}`fig-ds9-annuli`, which plots only half of a Gaussian and, thus, gives the HWHM.
+```
 
 To take a good radial profile of a star, you will need to update this region to include more than a single annulus. Double-click on the region to open up the Annulus properties window. You can add additional annuli by changing the inner and outer radius and increasing the annuli count. For me, I chose inner and outer radii of 1 and 31 pixels, and plotted 20 annuli. Click `Generate` followed by `Apply` to update your annulus region. You can save this region for later use under `Region > Save`. I recommend saving it using image coordinates, so that you can reuse the same region on different galaxies.
 
@@ -40,7 +47,16 @@ To measure the radial profile of a star, click and drag your region to center it
 Example radial profile of an *HST* star. In this case, half-max occurs at around 0.15 arcseconds, so the FWHM of this star would be 0.3 arcseconds. Beware: you'll want to ensure you're looking at stars and not clusters, which will have a much broader FWHM and likely a higher peak surface brightness.
 ```
 
-To run `RunPhots`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
+You will also want to determine a good aperture radius with which to extract the photometry of compact star clusters, which will be read in to `RunPhots()` as `extended_rad`. The default is 10 pixels, which was sufficient for M81 but will likely be larger and smaller for your galaxy, depending on whether it is closer or farther than M81. For M101, I created regions around a few globular clusters and found that an aperture of 5 pixels is generally sufficient. An example of what a standard globular cluster looks like is given in {numref}`fig-gc`. 
+
+```{figure} ../images/M101_XRB_candidates_CXO011.png
+:name: fig-gc
+:width: 250px
+
+Example of a standard globular cluster in M101. Notice, the globular cluster here is large enough to fill the 1-$\sigma$ radius of this XRB and is much larger than the 3 pixel aperture plotted surrounding its centroid. This demonstrates why it is necessary to set a separate aperture radius for extended sources like star clusters, compared to isolated stars (e.g. the other, smaller point sources visible in the image). 
+```
+
+To run `RunPhots()`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
 
 ```
 from XRBID.AutoPhots import RunPhots
@@ -50,14 +66,20 @@ from XRBID.AutoPhots import RunPhots
 hdu = fits.open("M101_mosaic_acs_f555w_drc_sci.fits")
 
 RunPhots(hdu, gal="M101", instrument="acs", filter="F555W", 
-         fwhm_arcs=0.3, num_stars=25)
+         fwhm_arcs=0.3, num_stars=25, reg_correction=[1,1], extended_rad=5)
+```
+
+```{note}
+I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the right direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
 ```
 
 This code may take a few minutes to run for each step, depending on the size of your `FITS` file. Then, it will prompt you to select 'ideal' stars for the aperture corrections by plotting the integrated radial profiles of randomly selected stars and requesting user approval.
 
 The idea behind an aperture correction is to ensure that all of the light from a given star is captured and reflected in its measured flux/magnitude; since an aperture of infinite radius will detect the flux of an infinite number of sources other than the one you're interested in, you need to select an aperture small enough to only measure the light from your selected star, but this aperture will undoubtedly 'miss' some of the light the star is giving off. An aperture correction is a means by which you can estimate and correct for the light that is presumably 'cut off' when you select an aperture of a given size. To do so, one should look at the radial profile of a given star and measure the flux/magnitude difference between the preferred aperture size (I use 3 pixels) and some larger aperture (e.g. 20 pixels). One then adds an additional correction factor measured from that larger aperture to infinity using the known Encircled Energy Fractions (EEF) for the instrument of choice[^3]. Theoretically, this should estimate all of the light one expects to miss for an ideal star within a given *HST* observation, and this correction term can be applied to all remaining stars to get a better estimate of their total fluxes. 
 
-A good 'ideal star' is one with a magnitude that increases up until about 3 pixels, and then flattens off (see {numref}`fig-ap-example`). `RunPhots()` will continue prompting the user for input until the number of ideal stars selected equals the input `num_stars` (the default is 20). If you find that the same stars are being cycled through, this probably means there aren't enough acceptable stars to meet the input criterion, and you should lower `num_stars` and try again. Once the criterion is met, `RunPhots()` will calculate and return the aperture correction and standard deviation. It may be a good idea to run the aperture correction a few times to make sure you're minimizing the standard deviation, or you may not end up with an appropriate aperture correction. You can run just the aperture correction part of the code by calling `AutoPhots.CorrectAp()`.
+A good 'ideal star' is one with a magnitude that increases up until about 3 pixels, and then flattens off (see {numref}`fig-ap-example`). `RunPhots()` will continue prompting the user for input until the number of ideal stars selected equals the input `num_stars` (the default is 20). As you add stars to the list of ideal stars, you will see their radial profiles plotted in grey,  against which you can compare the radial profiles of the next randomly selected star. If you find that the same stars are being cycled through (as indicated by the star number in the title of the plot), this probably means there aren't enough acceptable stars to meet the input criterion, and you should lower `num_stars` and try again. Once the criterion is met, `RunPhots()` will calculate and return the aperture correction and standard deviation. It may be a good idea to run the aperture correction a few times to make sure you're minimizing the standard deviation, or you may not end up with an appropriate aperture correction. You can run just the aperture correction part of the code by calling `AutoPhots.CorrectAp()`.
+
+As of version 1.5.0, `RunPhots()` and `CorrectAp()` will also calculate the aperture correction for extended source given the aperture radius provided by the `extended_rad` parameter. By default, this value is 10 pixels, but one should select an aperture radius that best suits the compact clusters within the image of interest since farther galaxies will likely have clusters with smaller angular sizes. `RunPhots()` will then print `*_extended.ecsv` files from which the aperture photometry of clusters can be pulled.  
 
 
 ```{figure} ../images/aperture_example.png
@@ -131,7 +153,7 @@ data_sub = data - bkg.background
 This background-subtracted data can then be used in the aperture photometry extraction (for cleaner photometry, you can also add an error calculation):
 
 ```
-from photutils import aperture_photometry
+from photutils.aperture import aperture_photometry
 
 phot_full = aperture_photometry(data_sub, apertures_full, method="center")
 
