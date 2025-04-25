@@ -566,7 +566,7 @@ def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, p
 					coordsys = "fk5"
 					try: 
 						rad_temp = float(radius)
-						radius = str(rad_temp * pixtoarcs) + "\""
+						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
 					except: pass;
 				elif "ra" in sources.columns.tolist():
 					xcoord = "ra" 

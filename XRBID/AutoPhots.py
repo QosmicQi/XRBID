@@ -213,10 +213,11 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     		print("Aperture corrections...")
     		apcorrections = CorrectAp(phot_full, radii=ap_rads, EEF=EEF, num_stars=num_stars, zmag=zeropoint, \
                               		  min_rad=min_rad, max_rad=max_rad, extended_rad=extended_rad)
-    		apcorr = apcorrections[0]
-    		aperr = apcorrections[1]
-    		apcorr_ext = apcorrections[2]
-    		aperr_ext = apcorrections[3]
+		if len(apcorrections) > 0:
+    		    apcorr = apcorrections[0]
+    		    aperr = apcorrections[1]
+    		    apcorr_ext = apcorrections[2]
+    		    aperr_ext = apcorrections[3]
 
     # Calculates magnitudes from the photometry on point sources
     # If an aperture correction is given or calculated, include that in the source photometry.
@@ -410,8 +411,8 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
                   					plt.ylabel("Magnitude")
                   					plt.title("Star No. " + str(j))
                   					plt.show()
-                  					if len(temp_select) > 0: print(temp_select)
-                  					ans = input("Keep?").lower()
+                  					if len(temp_select) > 0: print("Stars selected:",temp_select)
+                  					ans = input("Keep? (yes/[n]o/quit)").lower()
                   					if "y" in ans: temp_select.append(j) # add if not already in the list
                   					elif "q" in ans: cont = False; # allows user to quit the code
     		temp_select_inds = random.sample(range(0, len(tab)), num_stars-len(temp_select))
