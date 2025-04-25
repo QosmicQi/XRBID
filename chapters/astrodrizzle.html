@@ -583,7 +583,12 @@ For example, the galaxy M81 has over 27 unique <em>HST</em> fields, not all of w
 </pre></div>
 </div>
 <p>Check the resulting <code class="docutils literal notranslate"><span class="pre">FITS</span></code> file (here, <code class="docutils literal notranslate"><span class="pre">M101_mosaic_acs_f555w.fits</span></code>) in <code class="docutils literal notranslate"><span class="pre">DS9</span></code>. If everything looks good, repeat these steps for each of the other filters, being sure to use the same reference file for all alignments. Using the same reference file should allow <code class="docutils literal notranslate"><span class="pre">AstroDrizzle</span></code> to align all filters to the same coordinates.</p>
-<p>Once all mosaics are complete, check the full color mosaic in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> as an RGB frame, playing close attention to how the alignment of each field looks.</p>
+<p>Once all mosaics are complete, check the full color mosaic in <code class="docutils literal notranslate"><span class="pre">DS9</span></code> as an RGB frame, playing close attention to how the alignment of each field looks. Remember, you will want to fill the red, green, and blue channels with the filters most closely fitting the visible light spectrum:</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/visiblelight.png"><img alt="../_images/visiblelight.png" src="../_images/visiblelight.png" style="width: 750px;" />
+</a>
+</figure>
+<p>In my case, I use F814W as red, F555W as green, and F435W as blue. This results in the following full-color image:</p>
 <figure class="align-default" id="fig-m101-mosaic">
 <a class="reference internal image-reference" href="../_images/M101_mosaic.png"><img alt="../_images/M101_mosaic.png" src="../_images/M101_mosaic.png" style="width: 750px;" />
 </a>
