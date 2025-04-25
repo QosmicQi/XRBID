@@ -411,7 +411,9 @@ def CorrectAp(tab, radii, EEF=False, num_stars=20, return_err=True, zmag=0, min_
                   					plt.ylabel("Magnitude")
                   					plt.title("Star No. " + str(j))
                   					plt.show()
-                  					if len(temp_select) > 0: print("Stars selected:",temp_select)
+                  					if len(temp_select) > 0: 
+                  					    print("Stars selected:",temp_select)
+                  					    print(num_stars-len(temp_select),"more to go.")
                   					ans = input("Keep? (yes/[n]o/quit)").lower()
                   					if "y" in ans: temp_select.append(j) # add if not already in the list
                   					elif "q" in ans: cont = False; # allows user to quit the code

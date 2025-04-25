@@ -112,6 +112,11 @@ If you decide to install the command line version, then you will need to follow 
 mkdir bin
 ```
 
+```{note}
+If installing DS9 or other apps on a Linux, you can create a symlink to open the app from the command line by moving the downloaded application to the `/usr` directory and then creating the link with: 
+`sudo ln -s /usr/<app_name> /usr/local/bin/<app_name>`
+```
+
 If while installing `DS9` you encounter an error that states the program has an unknown developer, you will need to change the security settings of your computer to allow you to proceed anyway. If you have no issues installing `DS9` but have trouble opening it, then make sure `Darwin X11` and `XQuartz` are installed and up to date on your computer.
 
 Please note, there are some process in this guide that open `DS9` as a bash script (e.i. `XRBID.WriteScript.WriteDS9`). These scripts require you open a special terminal before running them, or you may run into errors with `Darwin X11` or `XQuartz`: 

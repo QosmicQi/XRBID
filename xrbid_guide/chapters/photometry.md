@@ -20,7 +20,14 @@ Assuming you don't mind black boxes, the quickest way to extract and correct the
 * Apply aperture corrections to the apparent magnitudes and return the aperture correction factor and the correction error (both for point sources and extended sources as of version 1.5.0); 
 
 
-Running this code is fairly easy, but before you do, you will need to know the FWHM (full width at half maximum, the width of a Gaussian at half of its maximum height) of stars within the `FITS` file of interest. This can be measured within `DS9`[^2]. Open your `FITS` file (be sure to set the scaling to something visible) and navigate to a relatively dark area with bright, isolated stars; you may have to set your cursor to pan using `Edit > Pan` first. Once in a good location, set your cursor to create a new region by selecting `Edit > Region`. Then under the `Region` menu located in the upper menu bar, go to `Shape > Annulus`. Click and drag somewhere on the image to create the annulus region. This region will be used to make a measurement of the radial profile of stars in this image, which will be used to estimate their FWHM. 
+Running this code is fairly easy, but before you do, you will need to know the FWHM (full width at half maximum, the width of a Gaussian at half of its maximum height, as demonstrated in {numref}`fig-fwhm`) of stars within the `FITS` file of interest. This can be measured within `DS9`[^2]. Open your `FITS` file (be sure to set the scaling to something visible) and navigate to a relatively dark area with bright, isolated stars; you may have to set your cursor to pan using `Edit > Pan` first. Once in a good location, set your cursor to create a new region by selecting `Edit > Region`. Then under the `Region` menu located in the upper menu bar, go to `Shape > Annulus`. Click and drag somewhere on the image to create the annulus region. This region will be used to make a measurement of the radial profile of stars in this image, which will be used to estimate their FWHM. 
+
+```{figure} ../images/fwhm.png
+:name: fig-fwhm
+:width: 450px
+
+Example of the FWHM of a Gaussian. Compare to {numref}`fig-ds9-annuli`, which plots only half of a Gaussian and, thus, gives the HWHM.
+```
 
 To take a good radial profile of a star, you will need to update this region to include more than a single annulus. Double-click on the region to open up the Annulus properties window. You can add additional annuli by changing the inner and outer radius and increasing the annuli count. For me, I chose inner and outer radii of 1 and 31 pixels, and plotted 20 annuli. Click `Generate` followed by `Apply` to update your annulus region. You can save this region for later use under `Region > Save`. I recommend saving it using image coordinates, so that you can reuse the same region on different galaxies.
 
@@ -40,7 +47,9 @@ To measure the radial profile of a star, click and drag your region to center it
 Example radial profile of an *HST* star. In this case, half-max occurs at around 0.15 arcseconds, so the FWHM of this star would be 0.3 arcseconds. Beware: you'll want to ensure you're looking at stars and not clusters, which will have a much broader FWHM and likely a higher peak surface brightness.
 ```
 
-To run `RunPhots`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
+You will also want to determine a good aperture radius with which to extract the photometry of compact star clusters, which will be read in to `RunPhots()` as `extended_rad`. The default is 10 pixels, which was sufficient for M81 but will likely be larger and smaller for your galaxy, depending on whether it is closer or farther than M101. For M101, I created regions around a few globular clusters and found that an aperture of 5 pixels is generally sufficient. 
+
+To run `RunPhots()`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
 
 ```
 from XRBID.AutoPhots import RunPhots
@@ -50,7 +59,11 @@ from XRBID.AutoPhots import RunPhots
 hdu = fits.open("M101_mosaic_acs_f555w_drc_sci.fits")
 
 RunPhots(hdu, gal="M101", instrument="acs", filter="F555W", 
-         fwhm_arcs=0.3, num_stars=25)
+         fwhm_arcs=0.3, num_stars=25, reg_correction=[1,1], extended_rad=5)
+```
+
+```{note}
+I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the right direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
 ```
 
 This code may take a few minutes to run for each step, depending on the size of your `FITS` file. Then, it will prompt you to select 'ideal' stars for the aperture corrections by plotting the integrated radial profiles of randomly selected stars and requesting user approval.
