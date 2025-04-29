@@ -70,7 +70,7 @@ RunPhots(hdu, gal="M101", instrument="acs", filter="F555W",
 ```
 
 ```{note}
-I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the right direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
+I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the y direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
 ```
 
 This code may take a few minutes to run for each step, depending on the size of your `FITS` file. Then, it will prompt you to select 'ideal' stars for the aperture corrections by plotting the integrated radial profiles of randomly selected stars and requesting user approval.
