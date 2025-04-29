@@ -193,4 +193,39 @@ While true SNR identification is a multi-wavelength process that requires a lot 
 A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See {cite:p}`hunt21` for more information.  
 ```
 
+The X-ray luminosities of X-ray sources are calculated from the X-ray flux obtained from CSC. Future versions of `XRBID` will include the following function to help with this process: 
+
+```
+def Lum(F, dist): 
+
+	"""Calculates the luminosity of a set of sources given the flux and distance to the host galaxy. 
+
+	PARAMETERS
+	----------
+	F	[list]	:	Flux of X-ray source(s), in units ergs/s/cm^2. 
+	dist	[float]	:	Distance to the galaxy in units pc or cm.
+
+	RETURNS
+	---------
+	L	[list]	:	List of luminosities in units ergs/s
+	"""
+
+	if not dist: dist = input("Galaxy distance (in pc, Mpc, or cm)? ")
+	
+	# if dist is less than 100, probably given in Mpcs. Convert to pcs.	
+	if dist < 100: 
+		dist = dist * 10**6
+	
+	# need dist in cm, since F is in ergs/s/cm2. If not given in cm, convert. 
+	if dist < 1e18: 
+		dist = dist * 3e18
+
+
+	F = np.array(F)
+	L = F*4*pi*(dist)**2	# luminosity calculation
+	L = L.tolist()
+	return L
+
+```
+
 There are several ways one can keep track of these sources, depending on your workflow. Based on the current data files I've created in these examples, I would probably use `Find()` on `M101_best` to identify SNR candidates from the X-ray properties of each source. Then for each source in `M101_xrb`, I would check to see if the source appears in the SNR `DataFrame` I just created and update the `Class` header to `(SNR)` if it does, where the parentheses indicate that these are candidate SNR rather than SNR definitively identified by some other catalog. Alternatively, I have also, in previous surveys, added a `(SNR)` column to my main working `DataFrame` and flagged them as `True` or `False` (1 or 0) based on the cuts.

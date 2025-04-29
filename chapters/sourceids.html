@@ -585,6 +585,39 @@ The appropriate scaling for the outskirts of the galaxy is usually <code class="
 <p><span class="caption-number">Fig. 18 </span><span class="caption-text">A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See <span id="id2">[<a class="reference internal" href="title.html#id6" title="Qiana Hunt, Elena Gallo, Rupali Chandar, Paula Johns Mulia, Angus Mok, Andrea Prestwich, and Shengchen Liu. Calibrating x-ray binary luminosity functions via optical reconnaissance. i. the case of m83. The Astrophysical Journal, 912(1):31, Apr 2021. URL: http://dx.doi.org/10.3847/1538-4357/abe531, doi:10.3847/1538-4357/abe531.">HGC+21</a>]</span> for more information.</span><a class="headerlink" href="#fig-snr" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>The X-ray luminosities of X-ray sources are calculated from the X-ray flux obtained from CSC. Future versions of <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> will include the following function to help with this process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Lum</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span> 
+
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Calculates the luminosity of a set of sources given the flux and distance to the host galaxy. </span>
+
+<span class="sd">	PARAMETERS</span>
+<span class="sd">	----------</span>
+<span class="sd">	F	[list]	:	Flux of X-ray source(s), in units ergs/s/cm^2. </span>
+<span class="sd">	dist	[float]	:	Distance to the galaxy in units pc or cm.</span>
+
+<span class="sd">	RETURNS</span>
+<span class="sd">	---------</span>
+<span class="sd">	L	[list]	:	List of luminosities in units ergs/s</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">dist</span><span class="p">:</span> <span class="n">dist</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Galaxy distance (in pc, Mpc, or cm)? &quot;</span><span class="p">)</span>
+	
+	<span class="c1"># if dist is less than 100, probably given in Mpcs. Convert to pcs.	</span>
+	<span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span> 
+		<span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+	
+	<span class="c1"># need dist in cm, since F is in ergs/s/cm2. If not given in cm, convert. </span>
+	<span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="mf">1e18</span><span class="p">:</span> 
+		<span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">*</span> <span class="mf">3e18</span>
+
+
+	<span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+	<span class="n">L</span> <span class="o">=</span> <span class="n">F</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>	<span class="c1"># luminosity calculation</span>
+	<span class="n">L</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">L</span>
+
+</pre></div>
+</div>
 <p>There are several ways one can keep track of these sources, depending on your workflow. Based on the current data files I’ve created in these examples, I would probably use <code class="docutils literal notranslate"><span class="pre">Find()</span></code> on <code class="docutils literal notranslate"><span class="pre">M101_best</span></code> to identify SNR candidates from the X-ray properties of each source. Then for each source in <code class="docutils literal notranslate"><span class="pre">M101_xrb</span></code>, I would check to see if the source appears in the SNR <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> I just created and update the <code class="docutils literal notranslate"><span class="pre">Class</span></code> header to <code class="docutils literal notranslate"><span class="pre">(SNR)</span></code> if it does, where the parentheses indicate that these are candidate SNR rather than SNR definitively identified by some other catalog. Alternatively, I have also, in previous surveys, added a <code class="docutils literal notranslate"><span class="pre">(SNR)</span></code> column to my main working <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> and flagged them as <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> (1 or 0) based on the cuts.</p>
 </section>
 </section>
