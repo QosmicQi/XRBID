@@ -553,7 +553,9 @@ The appropriate scaling for the outskirts of the galaxy is usually <code class="
 <section id="classifying-sources-by-eye">
 <h2>Classifying sources by eye<a class="headerlink" href="#classifying-sources-by-eye" title="Link to this heading">#</a></h2>
 <p>With the images complete, one should be able to visually inspect and flag any source that looks like a background galaxy (extended, red, and usually disk-like or blobby) or a foreground star (with diffraction spikes).  I recommend creating a file in which you can keep track of the classification of each X-ray source. There are some tools within <code class="docutils literal notranslate"><span class="pre">XRBID</span></code> that can help (such as <code class="docutils literal notranslate"><span class="pre">XRBID.Sources.SourceList()</span></code> or <code class="docutils literal notranslate"><span class="pre">XRBID.DataFrameMod.BuildFrame()</span></code>, depending on how you prefer to work). For M101, I chose to create a <code class="docutils literal notranslate"><span class="pre">.txt</span></code> file that I will use to classify contaminants and keep track of the XRB donor star mass categories in <a class="reference internal" href="cmds.html#chap-cmds"><span class="std std-ref">Estimating XRB Masses with CMDs and CCDs</span></a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a DataFrame of good XRBs only</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">XRBID.DataFrameMod</span> <span class="kn">import</span> <span class="n">Find</span><span class="p">,</span> <span class="n">BuildFrame</span>
+
+<span class="c1"># Creating a DataFrame of good XRBs only</span>
 <span class="n">M101_xrbs</span> <span class="o">=</span> <span class="n">Find</span><span class="p">(</span><span class="n">M101_best</span><span class="p">,</span> <span class="s2">&quot;Bounds = In&quot;</span><span class="p">)</span>
 
 <span class="c1"># Adding empty columns that I&#39;ll use later</span>

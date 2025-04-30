@@ -160,6 +160,8 @@ for i in range(len(M101_best)):
 With the images complete, one should be able to visually inspect and flag any source that looks like a background galaxy (extended, red, and usually disk-like or blobby) or a foreground star (with diffraction spikes).  I recommend creating a file in which you can keep track of the classification of each X-ray source. There are some tools within `XRBID` that can help (such as `XRBID.Sources.SourceList()` or `XRBID.DataFrameMod.BuildFrame()`, depending on how you prefer to work). For M101, I chose to create a `.txt` file that I will use to classify contaminants and keep track of the XRB donor star mass categories in {ref}`chap:cmds`. 
 
 ```
+from XRBID.DataFrameMod import Find, BuildFrame
+
 # Creating a DataFrame of good XRBs only
 M101_xrbs = Find(M101_best, "Bounds = In")
 
