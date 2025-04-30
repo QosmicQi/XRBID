@@ -454,6 +454,10 @@ For example, the galaxy M81 has over 27 unique <em>HST</em> fields, not all of w
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MAST also contains what are called ‘HAP-MVM’ files, where MVM refers to multi-visit mosaics as opposed to SVM, single-visit mosaics. According to STScI, these are susceptible to photometric and alignment errors, so they are likely not appropriate for our purposes.</p>
+</div>
 <p>Finally, clean up the downloaded directories by pulling the appropriate files and moving them to the main working directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">glob</span>

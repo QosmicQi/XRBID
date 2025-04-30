@@ -95,6 +95,8 @@ If you don't create a scalings file as we have just done, `WriteDS9()` will assu
 `WriteDS9()` takes as parameters the `DataFrame` containing the sources you want to image, a list of the `FITS` files to be read into the RGB frame (`colorfiles`), a list of any region files you want to include in the images (`regions`), and the name of the scaling file created by `WriteScalings()` (`scales`, with `unique_scales = True`). You'll also want to select one of the filters to use as the base over which the regions are printed (in my case, I use green for F555W), `imgnames` if you want to define a naming convention for the images, and the name of the output `.sh` file. You can also define the `zoom` scale of `DS9`, which is especially useful for sources with a large 2-$\sigma$ radius. 
 
 ```
+from XRBID.WriteScript import WriteDS9
+
 WriteDS9(M101_best, galaxy="M101", zoom=4, 
          unique_scale=True, scales="../testdata/M101_XRB_scalings.txt",
          regions=["../testdata/M101_XRB_candidates.reg",
@@ -193,7 +195,7 @@ While true SNR identification is a multi-wavelength process that requires a lot 
 A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See {cite:p}`hunt21` for more information.  
 ```
 
-The X-ray luminosities of X-ray sources are calculated from the X-ray flux obtained from CSC. Future versions of `XRBID` will include the following function to help with this process: 
+The X-ray luminosities of X-ray sources are calculated from the X-ray flux obtained from CSC. Future versions of `XRBID` will include a new module called `XRTools.py`, within which will be the following function to help with this process: 
 
 ```
 def Lum(F, dist): 
