@@ -1,7 +1,8 @@
 ###########################################################################################
 ##########	For writing scripts, such as bash scripts and region files	########### 
-##########	                Last Update: Feb 11, 2025               	########### 
-##########	(Standardized parameters, added descriptions, cleaned up code)  ########### 
+##########	                Last Update: May 09, 2025               	########### 
+##########	(Major overhaul of WriteReg, deleted unneeded functions, and	########### 
+##########	added new function, CombineReg. Added descriptions to others.)	###########
 ###########################################################################################
 
 import math
@@ -24,20 +25,51 @@ RA = "RA"
 Dec = "Dec" 
 ID = "ID"
 
-pixtoarcs = 0.5/12.626263
-arcstodeg = 0.000277778  # 1 arcs = 0.000277778 deg
-pixtodeg = arcstodeg * pixtoarcs
-
-#print("Load test")
-
 ###-----------------------------------------------------------------------------------------------------
 
-def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, idheader="ID", filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None, tile=False): 
+def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, idheader="ID", filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None, tile=False): 
 
-	"""Arguments: (DataFrame, Galaxy name, Galaxy color .fits files in RGB order, Region files, Desired color scales, Output image name (number will be appended to the image), Output file name).
+	"""
+	Generates a bash script that will write a program for taking thumbnails/snapshots in DS9 of sources in a given DataFrame. 
+	Will take in one or more region files to open over the given galaxy file, and different scales to use to adjust the RGB colors of the image. 
+	Scales should be input with the format ["scale name", redscale, greenscale, bluescale], or, if unique_scale is True, the name of the file 
+	with the unique scalings should be used. If zscale is being used, only ["zscale"] is needed (**** SETTING TO ZSCALE IS CURRENTLY BROKEN. 
+	INSTEAD, ALWAYS USE A UNIQUE SCALES***). Parameter basefilter can be used to set which filter the region file should be aligned to, if not 
+	the default green (Ex. red used as the base filter in M81). The very first basefilter should be the main filter used for imaging, even if 
+	the region files are aligned to different filters. Filters should be called in the order they're intended to be used (default [red, green, blue]). 
+	If a different order is used, the order should be declared using the 'filterorder' parameter. 
 
- Generates a bash script that will write a program for taking thumbnails/snapshots in DS9 of sources in a given DataFrame. Will take in one or more region files to open over the given galaxy file, and different scales to use to adjust the RGB colors of the image. Scales should be input with the format ["scale name", redscale, greenscale, bluescale], or, if unique_scale is True, the name of the file with the unique scalings should be used. If zscale is being used, only ["zscale"] is needed (**** SETTING TO ZSCALE IS CURRENTLY BROKEN. INSTEAD, ALWAYS USE A UNIQUE SCALES***). Parameter basefilter can be used to set which filter the region file should be aligned to, if not the default green (Ex. red used as the base filter in M81). The very first basefilter should be the main filter used for imaging, even if the region files are aligned to different filters. Filters should be called in the order they're intended to be used (default [red, green, blue]. If a different order is used, the order should be declared using the 'filterorder' parameter. """
+	PARAMETERS: 
+	-----------
+	df		[pd.DataFrame]	:	DataFrame containing the sources to image.
+	galaxy		[str]		:	Name of the galaxy containing the images. This is used to name certain files. 
+	colorfiles	[list]		:	List of the FITS files used to create color images, in RGB order. Currently requires
+						all 3 channels to be filled. If an alternate order is used, it should be defined by the 'filterorder' parameter.
+	regions		[list]		: 	List of region files to include in DS9 images. 
+	scales		[list, str]	: 	Either a list of scaling parameters for each filter (e.g. ["scale name", redscale, greenscale, bluescale])
+						or, if unique_scale is set to True, the name of the file with the unique scalings output by WriteScalings. 
+	imgnames	[list, str]	:	Either a list containing the unique names of each image to be saved, or the prefix to append to each 
+						image name. If a single string is given, the images will be differentiated by image number.
+	imgsize		[list]		:	Integer dimensions of saved images. The DS9 window will be rescaled to this size. 
+	outfile		[str]		:	Name of the bash script to save. 
+	unique_scale	[bool]		:	If True, looks for unique scale parameters for each source. These should be read in as a txt file in 'scales' parameter. 
+	coords		[list]		:	Instead of reading in a DataFrame, can instead read in a list of coordinates. Assumes the coodinate system is 'image'
+						unless otherwise given in 'coordsys'. 
+	ids		[list]		:	List of source IDs. Only needed if only coordinates are provided (to build new DataFrame). 
+	idheader	[str]		:	Header of the ID column in the DataFrame. Defaults to "ID". 
+	filetype	[str]		: 	File format of the images to be saved. Defaults to "jpeg" to save memory, but "png" may also be used. 
+	basefilter	[str]		:	The filter/channel whose coordinates are to be used when opening region files. This is useful when there are slight coordinate
+						differences between the filters and/or the region files were created using a specific base filter. Default is "red". 
+	filterorder	[list]		:	Order in which the filters were input. The default is ["red","green","blue"]. 
+	zoom		[int]		:	DS9 zoom setting, for the closest zoom. Default is 8. 
+	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the environment around each source. Default is 2. 
+	coordsys	[str]		:	Coordinate system of the source coordinates (image or fk5 preferred). 
+	tile		[bool]		:	Determines whether to save a tiled image, in which each of the color channels are tiled side-by-side instead of opening a 
+						full color image. Default is False. 
+						
+	"""
 	
+	frame = df.copy()
 
 	if ".txt" in scales: unique_scale = True
 
@@ -82,10 +114,6 @@ def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zs
 		if len(basefilter) == 1 and regions: basefilter = [basefilter[0]]*len(regions)
 		base = filterorder[0]
 
-		#if imgnames == None: # Names of the output images (not required)
-		#	imgnames = raw_input("Image (thumbnail) names?: ")
-		#	if len(imgnames) == 0: imgnames = galaxy
-
 		if outfile == None: # Name of output script file
 			outfile = input("Output (script) file name?: ")
 			if len(outfile) == 0: outfile = galaxy+".sh" # if no name is given, just use the galaxy name
@@ -94,9 +122,9 @@ def WriteDS9(frame=None, galaxy="M81", colorfiles=None, regions=None, scales="zs
 
 		### If using unique scales for each source ###
 		if unique_scale == True: 
-			print("This part of the code is not complete yet.")
-			### Insert way of reading in the file that contains all of the unique scalings per source and output a DS9 bash file that'll scale accordingly
-			### Currently, this looks at the unique scalings file and finds all sources in there in the DataFrame. It might be more useful to look for the scaling for each DataFrame source read in. To do that, may want to convert the scalings to a DataFrame and perform as search on it. (4/6/20: STILL TO DO)
+			# Currently, this looks at the unique scalings file and finds all sources in there in the DataFrame. 
+			# It might be more useful to look for the scaling for each DataFrame source read in. 
+			# To do that, may want to convert the scalings to a DataFrame and perform as search on it.
 			scalings = None
 			try: 
 				try: scalings  = np.genfromtxt(galaxy+"_scalings.txt", dtype=str).tolist() 
@@ -375,657 +403,242 @@ def WriteDS9_tile(frame=None, galaxy="M81", colorfiles=None, regions=None, scale
 
 ###-----------------------------------------------------------------------------------------------------
 
-### UNDER CONSTRUCTION ###
-# Need to figure out how I want to implement different variations on region files. 
-def WriteReg(sources, outfile, coordsys=False, coordnames=False, idname=False, props=None, label=False, color="#FFC107", radius=3, radunit="pixel", showlabel=False, width=1, fontsize=10, bold=False, addshift=[0,0], savecoords=None, marker=None): 
-	
-	"""
-	Writes a region file for all sources within the given DataFrame. Input (DataFrame, desired filename, coordinate system (image, fk5, etc), 
-	region properties (region radius [including \" for arcsec], text, etc.) Arguments xcoord and ycoord refer to the header name of the 
-	coordinates in the DataFrame.
-	
-	PARAMETERS
-	----------
-	sources     [DataFrame or list] :   Sources for which to plot the regions. Can be provided as either a 
-	                                    DataFrame containing the headers [x,y] or [RA, Dec], or a list of 
-	                                    coordinates in [[xcoords], [ycoords]] format. User can define the header 
-	                                    of the coordinates with xcoord and ycoord.
-	outfile     [str]               :   Name of the file to save to.
-	coordsys    [str]               :   Defines the coordinate system to use in DS9 (e.g. image, fk5, etc.).
-	coordnames  [list]              :   Name of the headers containing the x and y coordinates of each source, 
-	                                    read in as a list in [xcoordname, ycoordname] format.
-	idname      [str]               :   Name of the header containing the ID of each source. By default, checks 
-	                                    whether the DataFrame contains a header called 'ID'. If not, it's assumed
-	                                    no IDs are given for each source. 
-	
-	
-	"""
+def WriteReg(sources, outfile, coordsys=False, coordheads=False, coordnames=False, idheader=False, color="#FFC107", radius=False, radunit=False, label=False, width=1, fontsize=10, bold=False, dash=False, addshift=[0,0], savecoords=None, marker=False, fill=False): 
 
-	size=width
-	
-	if width:
-		if not isinstance(width, list): width = "width=" + str(width)
-		else: width = ["width=" + str(w) for w in width]
+    """
+    Writes a DS9 region file for all sources given a DataFrame containing their coordinates or a list of the source coordinates. 
+    
+    PARAMETERS
+    ----------
+    sources     [DataFrame, list]:	Sources for which to plot the regions. Can be provided as either a 
+                                        DataFrame containing the the galactic or image coordinates, or a list of 
+                                        coordinates in [[xcoords], [ycoords]] format.
+    outfile     [str]		:	Name of the file to save the regions to.
+    coordsys    [str]		:	Defines the coordinate system to use in DS9. Options are 'image' or 'fk5'.
+					If no coordsys is given, will attempt to infer from other inputs.
+    coordheads  [list]		:	Name of the headers containing the coordinates of each source, 
+                                        read in as a list in [xcoordname, ycoordname] format. This is only needed if
+					sources is a DataFrame. If coordheads is not defined, will attempt to infer
+					the correct coordinate headers from the DataFrame or other inputs.
+    coordnames  [list]		: 	Depricated parameter, now called coordheads (as of v1.6.0).
+    idheader    [str]           :   	Name of the header containing the ID of each source. By default, checks 
+                                        whether the DataFrame contains a header called 'ID'. If not, it's assumed
+                                        no IDs are given for each source. 
+    idname 	[str] 		: 	Depricated parameter, now called idheader (as of v1.6.0)
+    color 	[str] 		: 	Color of the regions to plot. Default is '#FFC107' (yellow-orange).
+    radius 	[int] 		: 	Radius or size of the region to plot, given as a list of unique values or a 
+					single value to use on all sources. If no radius is given, all radii are set to 
+					10 pixels or 1 arcsecond, depending on radunits or the coordinate system.
+    radunit 	[str] 		: 	Unit of the region radius. If no unit is given, algorithm makes a guess at the
+					best unit to use based on the coordinate system. 
+    label 	[list] 		: 	Labels to apply to each source. This is overwritten if idheader is given.
+    width 	[int] 		: 	Width of the region outline if circular regions are used.
+    fontsize 	[int]		:	Size of the label text. 
+    bold 	[bool] 		: 	If True, sets text to boldface. Default is False.
+    dash 	[bool] 		:	If True, sets region circles to be outlined with dashed lines. Default is False.
+    addshift 	[list] 		: 	Adds a shift to the source coordinates. Shifts must be given in the same units as the coordinates!
+    savecoords 	[str] 		: 	Saves the source coordinates to a text file with the input filename. 
+    marker 	[str] 		: 	Defines a marker to use instead of circular units. For DS9, options include circle, box, diamond, 
+					cross, x, arrow, or boxcircle.
+    fill 	[bool] 		: 	If True, fills the region with the color determined by the 'color' parameter. 
+					Only circular regions can be filled. 
+    """
 
-	if bold: bold=" bold"
-	else: bold = " normal" 
-	
-	if coordnames: 
-		xcoord = coordnames[0]
-		ycoord = coordnames[1]
+    # Coordnames has been renamed coordheads to standardize parameter names across XRBID, 
+    # This code is added so that old calls of WriteReg still work without error. 
+    if coordnames: coordheads=coordnames
+
+    # xcoord and ycoord keep track of the coordinate headers if source is a DataFrame
+    xcoord = False
+    ycoord = False
+    
+    # Pulling the name of the coordinate headers for source DataFrame, if given
+    if coordheads: 
+        xcoord = coordheads[0]
+        ycoord = coordheads[1]
+
+    # Pulling source coordinates from sources, depending on the type of input
+    if isinstance(sources, list): # if sources is a list, assume they are a list of coordinates
+        if len(np.asarray(sources)) == 2: # if in the format [x_coords, y_coords]....
+            x_coords = sources[0]
+            y_coords = sources[1]
+        else: # if not, assume given as [[x1,y1], [x2,y2]...]
+            x_coords = np.array(sources).T[0]
+            y_coords = np.array(sources).T[1]
+    elif isinstance(sources, str) and len(re.split(r"\.", sources)) > 1: # if sources is a filename, use GetCoords to retrieve coordinates
+        x_coords, y_coords = GetCoords(infile=sources)
+    elif isinstance(sources, pd.DataFrame): # If df read in, try to decide on coordinate system, if not given
+        if not coordheads:
+            # The header name can be inferred from the coordinate system
+            # Assumes image coordinates have headers [X,Y] or [x,y] and 
+            # fk5 coordinates have headers [RA,Dec] or [ra,dec]
+            if not coordsys or coordsys.lower() == "fk5": 
+                if "RA" in sources.columns.tolist():
+                    xcoord = "RA"
+                elif "ra" in sources.columns.tolist(): 
+                    xcoord = "ra" 
+                else: pass;
+                if "Dec" in sources.columns.tolist(): 
+                    ycoord = "Dec" 
+                elif "dec" in sources.columns.tolist(): 
+                    ycoord = "dec"
+                else: pass;
+            if not coordsys or "im" in coordsys.lower(): 
+                if "X" in sources.columns.tolist(): 
+                    xcoord = "X" 
+                elif "x" in sources.columns.tolist(): 
+                    xcoord = "x" 
+                else: pass; 
+                if "Y" in sources.columns.tolist(): 
+                    ycoord = "Y" 
+                elif "y" in sources.columns.tolist():
+                    ycoord = "y" 
+                else: pass;                
+        # Whether or not coordheads is given, we should have a valid xcoord and ycoord by now
+        # If not, this code will pass an error, and the user will be asked to provide the header names. 
+        try: 
+            x_coords = sources[xcoord].values.tolist()
+            y_coords = sources[ycoord].values.tolist()
+        except: 
+            coordheads = input("Coordinate headers not found. Please enter headers (separated by comma, no space):")
+            xcoord,ycoord = coordheads.split(",")
+            # If this still fails, then user has erred and program will end in error. 
+            x_coords = sources[xcoord].values.tolist()
+            y_coords = sources[ycoord].values.tolist()
+
+    # At this point, WriteReg should now have the x and y coordinates of each region to plot. 
+    # We also need to make sure coordsys, radius, and radunits are known, if not given. 
+
+    # Sorting out coordsys options
+    if coordsys: 
+        coordsys = coordsys.lower()
+        if "im" in coordsys: coordsys = "image" # allows user to input img instead of image and still get same results
+    if not coordsys: 
+        # If any values are beyond the acceptable range of fk5, this must be in image coordinates
+        if max(x_coords) > 360 or max(abs(y_coords)) > 90 or xcoord in ["X","x"]: coordsys = "image"
+        else: coordsys="fk5"
+
+    # Setting up the units to add to the radii
+    if (radunit and 'arcs' in radunit) or (not radunit and coordsys=="fk5"): radmark='\"' # add arcsec
+    elif (radunit and 'arcm' in radunit): radmark='\'' # add arcmin
+    elif (radunit and 'deg' in radunit): radmark='d'   # add degree marker
+    else: radmark=''  # if pixels or marker is given, no unit marker needed
         
-	### THIS NEEDS TO BE CLEANED
-	if marker: # If a marker is defined
-		if label: showlabel=True
-		
-		# Different forms of input needs to be treated differently.
-		# Checking whether sources is a DataFrame or a list of coordinates
-		
-		if isinstance(sources, pd.DataFrame):
-			# Setting up the possible coordinate systems based on inputs, or lack thereof.		
-			sources = sources.copy()
-			
-			# Attempting to define the coordinate system and coordinate names, if they are
-			# not well-defined by the user. This assumes the coordsys is either fk5 or image.
-			if not coordsys and not coordnames: 
-				if "RA" in sources.columns.tolist():
-					xcoord = "RA" 
-					ycoord = "Dec"
-					coordsys = "fk5"
-					try: 
-						rad_temp = float(radius)
-						# Setting up radius to include arcsec mark
-						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
-					except: pass;
-				elif "ra" in sources.columns.tolist():
-					xcoord = "ra" 
-					ycoord = "dec"
-					coordsys = "fk5"
-					try: 
-						rad_temp = float(radius)
-						# Setting up radius to include arcsec mark
-						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
-					except: pass;
-				elif 'X' in sources.columns.tolist(): 
-					xcoord = "X" 
-					ycoord = "Y" 
-					coordsys = "image"
-				else: 
-					xcoord = "x" 
-					ycoord = "y" 
-					coordsys = "image"	
-			elif coordsys == "fk5" and not coordnames: 
-				if "RA" in sources.columns.tolist():
-					xcoord = "RA" 
-					ycoord = "Dec"
-				elif "ra" in sources.columns.tolist():
-					xcoord = "ra" 
-					ycoord = "dec"
-				try: 
-					rad_temp = float(radius)
-					if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
-				except: pass;
-			elif "im" in coordsys and not coordnames: 
-				xcoord = "x" 
-				ycoord = "y" 	
-
-			x_coords = sources[xcoord].values
-			y_coords = sources[ycoord].values
-			
-			# if the label is given, use them as the ids
-			if label: ids = label
-			elif not label and showlabel: # If not and if showlabel is set to true, determine a good label
-			    if not idname: # if no idname is given, search for values
-			        try: ids = sources["ID"].values
-			        except: ids = np.arange(0, len(x_coords))   # If no header found, number sources
-			    else:   # if idname is defined, search for this header
-			        try: ids = sources[idname].values
-			        except: # if this header is not found, do not label
-			            print("No header called", idname, "found. Sources will not be ID'd.")
-			            ids = ""
-			    
-		elif isinstance(sources, list): 
-			if len(np.asarray(sources)) == 2: 
-				x_coords = sources[0]
-				y_coords = sources[1]
-			else: 
-				x_coords = np.array(sources).T[0]
-				y_coords = np.array(sources).T[1]
-		elif len(re.split(r"\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
-			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
-
-		if not coordsys: # if coordsys not given, use simple check to assign
-			if max(x_coords) > 500 or max(y_coords) > 500: coordsys = "image"
-			else: coordsys= "fk5"
-
-		
-		# Making sure outfile has a proper file extension (default = .reg)
-		temp = re.split(r"\.", outfile)
-		if len(temp) == 1: outfile = temp[0] + ".reg"
-
-		if not isinstance(radius, list): radius = [radius]
-		if not isinstance(radunit, list): radunit = [radunit]*len(radius)
-
-		for i in range(len(radius)): 
-			if "arcs" in radunit[i]: radius[i] = str(radius[i]) + "\""
-			if "arcm" in radunit[i]: radius[i] = str(radius[i]) + "\'"
-			else: pass;
-
-
-		if len(radius) == 1: radius = radius*len(x_coords) 
-
-		### Attempting to add the props argument. More thought needed.
-		#label = []
-		#if props: 
-		#	temp = re.split(",| ", props)
-		#	if len(temp) < 2: temp = re.split(",", props)
-		#	for i in temp:
-
-		### UNDER CONSTRUCTION ###
-		# props should contain different properties of the region file, such as color? 
-
-
-		print("Saving " + outfile)
-		with open(outfile, 'w') as f: 
-			f.write("# Region file format: DS9 version 4.1\nglobal color=" + str(color) + " dashlist=8 3 width=1 font=\"helvetica 10 normal roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1\n"+str(coordsys)+"\n")
-			for i in range(len(radius)):	# In case each source in original region file has more than one radius, here we want to convert to only one radius.  
-				x_coords[i] = float(x_coords[i]) + addshift[0]
-				y_coords[i] = float(y_coords[i]) + addshift[1]
-
-				# In case widths aren't the same for all sources
-				if isinstance(width, list): w = width[i]
-				else: w = width
-
-				if showlabel == True and str(x_coords[i]) != "nan" and str(y_coords[i]) != "nan": 
-					try:
-						#if frame["ID"][i] != frame["ID"][i-1]: 
-						#f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", 0.2\") #text={"+str(ids[i])+"}\n")
-						f.write("point("+str(x_coords[i])+", "+str(y_coords[i])+") #text={"+str(ids[i])+"} font=\"helvetica " + str(fontsize) + bold + "\" "+width+"\n")
-						#else: pass;
-					except: 
-						#f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", 0.2\")\n")
-						f.write("point("+str(x_coords[i])+", "+str(y_coords[i])+") # point="+marker+" "+str(size)+"\n")
-				elif showlabel == False and str(x_coords[i]) != "nan" and str(y_coords[i]) != "nan": 
-					f.write("point("+str(x_coords[i])+", "+str(y_coords[i])+") # point="+marker+" "+str(size)+"\n")
-
-		if savecoords: 
-			with open(savecoords, "w") as f: 
-				np.savetxt(f, np.column_stack([x_coords, y_coords]))
-			print("Saved " + savecoords)
-	else: # If a marker is not defined
-		if label: showlabel=True
-		
-		# Different forms of input needs to be treated differently.
-		# Not all coordinates will be inserted as a DataFrame
-		if isinstance(sources, pd.DataFrame):
-			# Setting up the possible coordinate systems based on inputs, or lack thereof.
-			if not coordsys: 
-				if "RA" in sources.columns.tolist():
-					xcoord = "RA" 
-					ycoord = "Dec"
-					coordsys = "fk5"
-					try: 
-						rad_temp = float(radius)
-						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
-					except: pass;
-				elif "ra" in sources.columns.tolist():
-					xcoord = "ra" 
-					ycoord = "dec"
-					coordsys = "fk5"
-					try: 
-						rad_temp = float(radius)
-						# Setting up radius to include arcsec mark
-						if "p" in radunit: radius = str(rad_temp * pixtoarcs) + "\""
-					except: pass;
-				elif 'X' in sources.columns.tolist(): 
-					xcoord = "X" 
-					ycoord = "Y" 
-					coordsys = "image"
-				else: 
-					xcoord = "x" 
-					ycoord = "y" 
-					coordsys = "image"	
-			elif coordsys == "fk5": 
-				if "RA" in sources.columns.tolist():
-					xcoord = "RA" 
-					ycoord = "Dec"
-				elif "ra" in sources.columns.tolist():
-					xcoord = "ra" 
-					ycoord = "dec"
-				try: 
-					rad_temp = float(radius)
-					radius = str(rad_temp * pixtoarcs) + "\""
-				except: pass;
-			elif coordsys == "image" and not coordnames: 
-				xcoord = "x" 
-				ycoord = "y" 	
-
-			x_coords = sources[xcoord].values
-			y_coords = sources[ycoord].values
-			
-			# if the label is given, use them as the ids
-			if label: ids = label
-			elif not label and showlabel: # If not and if showlabel is set to true, determine a good label
-			    if not idname: # if no idname is given, search for values
-			        try: ids = sources["ID"].values
-			        except: ids = np.arange(0, len(x_coords))   # If no header found, number sources
-			    else:   # if idname is defined, search for this header
-			        try: ids = sources[idname].values
-			        except: # if this header is not found, do not label
-			            print("No header called", idname, "found. Sources will not be ID'd.")
-			            ids = ""
-			            
-		elif isinstance(sources, list): 
-			if len(np.asarray(sources)) == 2: 
-				x_coords = sources[0]
-				y_coords = sources[1]
-			else: 
-				x_coords = np.array(sources).T[0]
-				y_coords = np.array(sources).T[1]
-				
-			if label: ids = label
-			elif not label and showlabel: ids = np.arange(0, len(x_coords))
-			
-		elif len(re.split(r"\.", sources)) > 1: # if the sources are given as a filename, use GetCoords
-			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
-
-		if not coordsys: # if coordsys not given, use simple check to assign
-			if max(x_coords) > 500 or max(y_coords) > 500: coordsys = "image"
-			else: coordsys= "fk5"
-
-		###--- BEGIN SAVING OUTPUT FILE ---###
-		if not outfile: outfile = input("Output filename?: ")
-
-		# Making sure outfile has a proper file extension (default = .reg)
-		temp = re.split(r"\.", outfile)
-		if len(temp) == 1: outfile = temp[0] + ".reg"
-
-		if not isinstance(radius, list): radius = [radius]
-		if not isinstance(radunit, list): radunit = [radunit]*len(radius)
-
-		for i in range(len(radius)): 
-			if "arcs" in radunit[i]: radius[i] = str(radius[i]) + "\""
-			if "arcm" in radunit[i]: radius[i] = str(radius[i]) + "\'"
-			else: pass;
-
-
-		if len(radius) == 1: radius = radius*len(x_coords) 
-
-		### Attempting to add the props argument. More thought needed.
-		#label = []
-		#if props: 
-		#	temp = re.split(",| ", props)
-		#	if len(temp) < 2: temp = re.split(",", props)
-		#	for i in temp:
-
-		### UNDER CONSTRUCTION ###
-		# props should contain different properties of the region file, such as color? 
-
-		print("Saving " + outfile)
-		with open(outfile, 'w') as f: 
-			f.write("# Region file format: DS9 version 4.1\nglobal color=" + str(color) + " dashlist=8 3 width=1 font=\"helvetica 10 "+bold+" roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1\n"+str(coordsys)+"\n")
-			for i in range(len(radius)):	# In case each source in original region file has more than one radius, here we want to convert to only one radius.  
-				x_coords[i] = float(x_coords[i]) + addshift[0]
-				y_coords[i] = float(y_coords[i]) + addshift[1]
-
-				# In case widths aren't the same for all sources
-				if isinstance(width, list): w = width[i]
-				else: w = width
-
-				if showlabel == True and str(x_coords[i]) != "nan" and str(y_coords[i]) != "nan": 
-					try:
-						#if frame["ID"][i] != frame["ID"][i-1]: 
-						#f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", 0.2\") #text={"+str(ids[i])+"}\n")
-						f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", " + str(radius[i]) + ") #text={"+str(ids[i])+"} font=\"helvetica " + str(fontsize) + bold + "\" "+width+"\n")
-						#else: paøss;
-					except: 
-						#f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", 0.2\")\n")
-						f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", " + str(radius[i]) + ") # "+w+"\n")
-				elif showlabel == False and str(x_coords[i]) != "nan" and str(y_coords[i]) != "nan": 
-					f.write("circle("+str(x_coords[i])+", "+str(y_coords[i])+", " + str(radius[i]) + ") # "+w+"\n")
-
-		if savecoords: 
-			with open(savecoords, "w") as f: 
-				np.savetxt(f, np.column_stack([x_coords, y_coords]))
-			print("Saved " + savecoords)
-
-
-###-----------------------------------------------------------------------------------------------------
-
-def WriteFilledReg(sources=None, coords=None, outfile=None, filename=None, coordsys="fk5", xcoord=None, ycoord=None, props=None, label=None, color="#FFC107", radius=3.0, radunit="pixel", showlabel=False, width=None, inner_width=1, outer_width=1, fontsize=10, bold=False, addshift=[0,0], savecoords=None, marker="circle", fill="#FFC107", outline="#FFC107", vertices=None, angle=0, size=None, inner_size=None, outer_size=None): 
-	
-	"""Writes a region file of filled markers for all sources within the given DataFrame. Input (DataFrame, desired filename, coordinate system (image, fk5, etc), region properties (region radius [including \" for arcsec], text, etc.). This can probably be combined with WriteReg above, with enough effort."""
-
-
-	# The default marker type is a circle with some given radius
-	# Also possible choices: triangle, square, diamond, 
-	# Need to come up with some mathematical expression for each type of object. 
-	# Use width as the outline width
-
-	# Square markers are called box is DS9
-	# Marker may be either circle, box, diamond, cross, x, arrow, or boxcircle
-	if  marker == "square": marker = "box"
-	elif marker == "+": marker = "cross"
-
-	if bold: bold=" bold"
-	else: bold = " normal" 
-
-	# If a singular width is given, overwide the inner and outer widths
-	# Outer width is defaulted to twice the inner width
-	if width: 
-		inner_width = width
-		outer_width = width*2
-	# Setting up the proper coordinate system and
-	# converting radius into the proper units
-
-	if coordsys == "fk5": 
-		xcoord = "RA"
-		ycoord = "Dec"
-		try: 
-			rad_temp = float(radius)
-			radius = str(rad_temp * pixtoarcs) + "\""
-		except: pass;
-	elif coordsys == "image" and xcoord==None: 
-		xcoord = "x" 
-		ycoord = "y" 	
-
-	# Different forms of input needs to be treated differently.
-	# Not all coordinates will be inserted as a DataFrame
-	if sources is not None:
-		if isinstance(sources, pd.DataFrame):
-			# Reading in the Dataframe and pulling coordinates
-			sources = sources.copy()
-			if not coords: 
-				x_coords = sources[xcoord].values
-				y_coords = sources[ycoord].values
-			# If IDs are in DataFrame, pull
-			try: 
-				ids = sources["ID"].values
-				for i in len(range(ids)): ids[i] = "text={"+ids[i]+"} font=\"helvetica " + str(fontsize) + bold + "\" "
-			except: ids = ""
-		# If sources is a list of coordinates, set coords
-		elif isinstance(sources, list): 
-			if len(np.asarray(sources)) == 2: 
-				x_coords = sources[0]
-				y_coords = sources[1]
-			else: 
-				x_coords = np.array(sources).T[0]
-				y_coords = np.array(sources).T[1]
-		# If the sources is a filename, use GetCoords
-		elif len(re.split(r"\.", sources)) > 1: 
-			x_coords, y_coords = GetCoords(infile=sources) # retrieves coords from the file
-
-	# if coordinates are given separately, read them in
-	if coords: 
-		x_coords = coords[0]
-		y_coords = coords[1]
-
-
-	# If a label is given, set show label to true and ids to label
-	# NOTE: this will override the automatic labeling set by the IDs in the Dataframe
-	if label: 
-		showlabel=True
-		ids = []
-		for i in label: 
-			ids.append("text={" + i + "} font=\"helvetica " + str(fontsize) + bold + "\" ") 
-
-	# We don't want anything in ids if showlabel=False
-	if not showlabel: 
-		ids = [""]*len(x_coords)
-	else: pass; 
-
-	# Setting up widths and marker sizes
-	if not isinstance(width, list): width = [width]*len(x_coords)
-	
-	# Setting up the sizes. Inner and outer sizes can be independently controlled. 
-	# If not given as size or inner/outer, check if given as radius, set that size.
-	if not size: 
-		if not inner_size and not outer_size: 
-			try: 
-				inner_size=int(radius)
-				outer_size=int(radius)
-			except:
-				inner_size = width
-				outer_size = width
-	elif size: 
-		inner_size = size
-		outer_size = size
-
-	# Width may sometimes be a list, so we will set size to always be a list
-	if not isinstance(inner_size, list):
-		inner_size = [inner_size]*len(x_coords) 
-		outer_size = [outer_size]*len(x_coords) 
-
-	###--- BEGIN SAVING OUTPUT FILE ---###
-	if not outfile: outfile = input("Output filename?: ")
-
-	# Making sure outfile has a proper file extension (default = .reg)
-	temp = re.split(r"\.", outfile)
-	if len(temp) == 1: outfile = temp[0] + ".reg"
-
-	if not isinstance(radius, list): radius = [radius]*len(x_coords) 
-	if not isinstance(radunit, list): radunit = [radunit]*len(radius)
-
-	# radunits tells the units of the radius. This helps set the formatting 
-	# of the radius as we add it to the list
-	for i in range(len(radius)): 
-		if "arcs" in radunit[i]: radius[i] = str(radius[i]) + "\""
-		if "arcm" in radunit[i]: radius[i] = str(radius[i]) + "\'"
-		else: pass;
-
-
-	### --- WRITING THE FILE --- ###
-	print("Saving " + outfile)
-	with open(outfile, 'w') as f: 
-		f.write("# Region file format: DS9 version 4.1\nglobal color=" + str(color) + " dashlist=8 3 width=1 font=\"helvetica 10 "+bold+" roman\" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1\n"+str(coordsys)+"\n")
-
-		for i in range(len(radius)):	# In case each source in original region file has more than one radius, here we want to convert to only one radius.  
-
-			# If a shift is given, add it
-			x_coords[i] = float(x_coords[i]) + addshift[0]
-			y_coords[i] = float(y_coords[i]) + addshift[1]
-
-			# In case widths aren't the same for all sources
-			if isinstance(inner_width, list): 
-				iw = inner_width[i]
-				ow = outer_width[i]
-			else: 
-				iw = inner_width
-				ow = outer_width
-			f.write("point("+str(x_coords[i])+", "+str(y_coords[i])+") #point="+marker+" "+ str(inner_size[i]) + " width=" + str(iw) + " color="+fill+ " " +ids[i]+ " \n")
-			f.write("point("+str(x_coords[i])+", "+str(y_coords[i])+") #point="+marker+" "+ str(outer_size[i]) + " width=" + str(ow) + " color="+outline+ " " +ids[i]+ " \n")
-
-	if savecoords: 
-		with open(savecoords, "w") as f: 
-			np.savetxt(f, np.column_stack([x_coords, y_coords]))
-		print("Saved " + savecoords)
-
-###-----------------------------------------------------------------------------------------------------
-
-def WriteDonor(frame, galaxy=None, colorfiles=None, regions=None, scales=None, unique_scale=True, outfile=None, sourcecoords=None, donorcoords=None): #, imgnames=None, outfile=None): 
-
-	"""Writes the bash script for imaging each of the given donor stars. These thumbnails will be useful for verifying donor star for each source.\nArguments: ()"""
-
-	if galaxy == None: galaxy = input("Name of galaxy: ") # Name of the galaxy needed
-
-	good = False
-
-	frame = frame.copy()
-
-	# Coordinates for the sources and the donors should be different. 
-	# If not given, just use the coords from the DataFrame.
-	# Not ideal, but it works
-	if isinstance(sourcecoords, pd.DataFrame): 
-		tempcoords = sourcecoords.copy()
-		sourcecoords = []
-		try: 
-			for i in range(len(frame)): 
-				temp = FindUnique(tempcoords, "ID = " + frame[ID][i])
-				sourcecoords.append([temp[X][0], temp[Y][0]])
-		except: 
-			for i in range(len(frame)): 
-				temp = FindUnique(tempcoords, "ID = " + frame[ID][i])
-				sourcecoords.append([temp[RA][0], temp[Dec][0]])
-	elif sourcecoords == None: 
-		sourcecoords = []
-		try: 
-			for i in range(len(frame)): sourcecoords.append([frame[X][i], frame[Y][i]])
-		except: 
-			for i in range(len(frame)): sourcecoords.append([frame[RA][i], frame[Dec][i]])
-	
-	if isinstance(donorcoords, pd.DataFrame): 
-		tempcoords = donorcoords.copy()
-		donorcoords = []
-		try: 
-			for i in range(len(tempcoords)): donorcoords.append([tempcoords[X][i], tempcoords[Y][i]])
-		except: 
-			for i in range(len(tempcoords)): donorcoords.append([tempcoords[RA][i], tempcoords[Dec][i]])
-	elif donorcoords == None: 
-		donorcoords = []
-		try: 
-			for i in range(len(frame)): donorcoords.append([frame[X][i], frame[Y][i]])
-		except: 
-			for i in range(len(frame)): donorcoords.append([frame[RA][i], frame[Dec][i]])
-
-	if colorfiles == None: # Name of the files for RGB frames needed
-		while not good: 
-			colorfiles = input("Names of .fits files for galaxy color map (red, green, blue; separate by commas): ")
-			colorfiles = colorfiles.split(",")
-			if len(colorfiles) == 3: good = True
-			else: print("Not enough color files provided."); colorfiles = None; 
-	
-	# To draw region circles: -regions command circle x y rad # color=[color] dash=1
-	if regions == None: #I n case region files were forgotten, ask user for input. 
-		regions = input("Region files? (separate by commas, or Enter if none):") 
-		regions = regions.split(",")
-	if not isinstance(regions, list): regions = [regions]  # region files should be lists
-
-	#if imgnames == None: # Names of the output images (not required)
-	#	imgnames = nput("Image (thumbnail) names?: ")
-	#	if len(imgnames) == 0: imgnames = galaxy
-
-	if outfile == None: # Name of output script file
-		#outfile = input("Output (script) file name?: ")
-		outfile = galay + "_donors.sh"
-		if len(outfile) == 0: outfile = galaxy+".sh" # if no name is given, just use the galaxy name
-		if len(outfile.split(".")) < 2: outfile = outfile+".sh" # if .sh is not included in the name, add it
-	
-	### If using unique scales for each source ###
-	if unique_scale == True: 
-		# Reading in scalings from file. This will be an array that contains source IDs and scales.
-		try: 
-			try: scalings  = np.genfromtxt(galaxy+"_scalings.txt", dtype=None) 
-			except: scalings = np.genfromtxt(raw_input("Unique scalings file?: "), dtype=None)
-		except: print("\nUnique scalings file not found.")
-		try: 
-			print("Writing " + outfile + "...")
-			with open(outfile, 'w') as f: 
-				f.write("#! /bin/bash\necho \"Creating images of " + galaxy + " donors. Please wait...\"\n")
-				tempid = "None"			
-				donortemp = 0	
-				for k in range(len(frame)): # For each of the objects in the frame
-					if tempid == frame[ID][k]: donortemp = donortemp + 1
-					else: donortemp = 0
-					# code for opening color image of galaxies
-					f.write("ds9 -height 200 -width 200 -colorbar no \\\n-rgb -red -zscale " + colorfiles[0])
-					f.write(" \\\n-green -zscale " + colorfiles[1])
-					f.write(" \\\n-blue -zscale " + colorfiles[2] + " \\\n") 
-					tempscales = np.where(scalings.T[0] == frame[ID][k])[0][0]  # source scale
-					tempscales = [x for x in scalings[tempscales]]  # pulling proper scale
-					if tempscales[1] == "-zscale" or tempscales[1] == "zscale":
-						j = [tempscales[0], " -zscale", " -zscale", " -zscale"]
-					else: j = [tempscales[0], " -scale limits 0 " + str(tempscales[1]), " -scale limits 0 " + str(tempscales[2]), " -scale limits 0 " + str(tempscales[3])]
-					f.write("-red" + str(j[1])+ " \\\n-green" + str(j[2]) + " \\\n-blue" +  str(j[3]) + " ")
-					# code for opening region files
-					for i in regions: 
-						f.write(" \\\n-region load " + i + " ")
-					f.write(" \\\n-regions command \"circle " + str(donorcoords[k][0]) + " " + str(donorcoords[k][1]) + " 3 # color=green dash=1 width=2\" ")
-					f.write("\\\n-zoom to 4 ")
-					try:
-						temp = frame[X] 
-						f.write("\\\n-pan to " + str(sourcecoords[k][0]) + " " + str(sourcecoords[k][1]) + " image " )
-					except: f.write("\\\n-pan to " + str(sourcecoords[k][0]) + " " + str(sourcecoords[k][1]) + " fk5 ")
-					f.write("\\\n-saveimage jpeg " + frame[ID][k] + "_donor" + str(donortemp) + ".jpg ")
-					f.write("\\\n-exit \\\n\\\n")
-					tempid = frame[ID][k]
-					f.write("#! /bin/bash\n")
-				f.write("\\\necho \"Done.\"")   
-			f.close()
-			print("DONE") 
-		except: print("Error creating file.") 
-
-
-
-	### If not using unique scales for each source (default) ###
-	#else: 
-	#	if scales == None:
-	#		scales = []
-	#		temp = "none" 
-	#		while len(temp) > 0:
-	#			temp = input("Color scales? (enter one at a time. Example: \"zscale\" or [\"red\", 10, 5, 2.5]. Press Enter when finished.)")
-	#			if len(temp)>0: scales.append([x for x in temp.split()])
-	#	
-	#	if not isinstance(scales, list): scales = [scales] # Scales should be a list
-	#	print "Writing " + outfile + "..."
-	#	with open(outfile, 'w') as f: 
-	#		f.write("#! /bin/bash\necho \"Creating images of " + galaxy + " sources. Please wait...\"\n")
-	#		# code for opening color image of galaxies
-	#		f.write("ds9 -height 305 -width 305 -colorbar no \\\n-rgb -red -zscale " + colorfiles[0])
-	#		f.write(" \\\n-green -zscale " + colorfiles[1])
-	#		f.write(" \\\n-blue -zscale " + colorfiles[2] + " \\\n") 
-	#		# code for opening region files
-	#		for i in regions: 
-	#			f.write("-region load " + i + " ")
-	#		f.write("\\\n-zoom to 4 ")
-	#		for i in range(len(frame)): 
-	#			try: f.write("\\\n-pan to " + str(frame["x"][i]) + " " + str(frame["y"][i]) + " image " )
-	#			except: f.write("\\\n-pan to " + str(frame["RA"][i]) + " " + str(frame["Dec"][i]) + " fk5 ")
-	#			for j in scales: 
-	#				try: j = j.strip(",")
-	#				except: j[0] = j[0].strip(",")
-	#				if not isinstance(j, list): j = [j]
-	#				if len(j) == 1:
-	#					f.write("\\\n\\\n-red -zscale -green -zscale -blue -zscale ")
-	#					f.write("\\\n-saveimage png " + imgnames+"%03i"%(i)+"_zscale.png ")
-	#					pass;
-	#				elif len(j) > 3: 
-	#					f.write("\\\n\\\n-red -scale limits 0 "+str(j[1])+" -green -scale limits 0 "+str(j[2])+" -blue -scale limits 0 "+str(j[3])+" ")
-	#					f.write("\\\n-saveimage png "+imgnames+"%03i"%(i)+"_"+j[0]+".png ")
-	#					pass;
-	#		f.write("\\\n-exit\necho \"Done.\"")               
-	#	f.close()
-	#	print "DONE" 
-				
-			
-
-#### EXAMPLE CODE TO COPY FOR BASH SCRIPT WRITING ####
-#print "Writing Long_shifted.sh"
-#with open("Long_shifted.sh", 'w') as f: 
-#    f.write("#! /bin/bash\necho \"Creating images of Long X-ray sources. Please wait...\"\n")
-#    f.write("ds9 -height 305 -width 305 -colorbar no \\\n-rgb -red -zscale m83_red.fits "+ \
-#            "\\\n-green -zscale m83_green.fits \\\n-blue -zscale m83_blue.fits \\\n"+ \
-#            "-region load Long_cleaned.reg -region load Long_shifted.reg " +\
-#            "-region load M83_sig1_raw.reg "+\
-#            "-region load Long_CSC.reg \\\n-zoom to 2 ")
-#    for i in range(len(Long_CSC_unique_in)):
-#        try: 
-#            f.write("\\\n-pan to " + str(Long_CSC_unique_in[X][i]) + " " + \
-#                    str(Long_CSC_unique_in[Y][i]) + " image \\\n-saveimage png " + \
-#                    "LongCSC"+"%03i"%(i)+"_zscale.png ")
-#            f.write("\\\n\\\n-red -scale limits 0 20 -green -scale limits 0 10 -blue -scale limits 0 5 ")
-#            f.write("\\\n-saveimage png LongCSC"+"%03i"%(i) + "_dark.png ")
-#            f.write("\\\n\\\n-red -scale limits 0 4 -green -scale limits 0 2 -blue -scale limits 0 1 ")
-#            f.write("\\\n-saveimage png LongCSC"+"%03i"%(i) + "_bright.png ")
-#            f.write("\\\n\\\n-red -zscale -green -zscale -blue -zscale ")
-#        except: pass;
-#    f.write("\\\n-exit\necho \"Done.\"")               
-#f.close()
-
-#print "DONE"
+    # Setting default radius, if not given
+    if isinstance(radius, list): radius = [str(r)+radmark for r in radius] # converting radii to strings with unit markers added
+    elif not radius: # defaults to 3 pixels or 0.5 arcsec, depending on coordinate system and marker type
+        if coordsys == "image" or marker: radius = ['10']*len(x_coords) # pixels
+        else: radius = ['1'+radmark]*len(x_coords) # will add unit arcsecond soon
+    elif not isinstance(radius, list): radius = [str(radius)+radmark]*len(x_coords) # making radius a list of strings, if single value given 
+
+    # If only one width is given, use it as the default in the header
+    # otherwise, unique widths will be added to each region, and the header width will be set to the first in list
+    if not isinstance(width, list): 
+        uniquewidth = False
+        defaultwidth=width
+    else:
+        uniquewidth = True
+        defaultwidth = width[0]
+        
+    # Now have radii as a list of strings with the unit markers included, 
+    # coordinates of each region to plot, and the coordinate system 
+    # Can start to put together the strings to write to file.
+    
+    #### PARAMETERS FOR PLOTTING #####        
+    # Setting text to bold or normal based on user input
+    if bold: bold = " bold"
+    else: bold = " normal" 
+    # Setting up the header of the region file based on parameters read in
+    f_head = "# Region file format: DS9 version 4.1\nglobal color=" +str(color)+" dashlist=8 3 width="+str(defaultwidth)+\
+            " font=\"helvetica "+str(fontsize)+bold+" roman\" select=1 highlite=1 dash="+str(int(dash))+\
+            " fill="+str(int(fill))+" fixed=0 edit=1 move=0 delete=1 include=1 source=1\n"+coordsys+"\n" 
+    # NOTE, each source can theoretically have a different width, but if not, we'll want to set the width in the header of the .reg
+
+    # SETTING UP REGION OF EACH SOURCE
+    # reg determines the type of region (circle or point), preceeding the coordinates of each point
+    # reg_props determines the properties (label, color, etc) of each point following the coordindates of each point
+    if marker: # If it is a marker, radius is the markersize and added to reg_props after the parenthesis        
+        reg = "point("  
+        reg_props = [") # point="+marker+" "+r for r in radius] 
+    else: # If the region is a circle, the radius is added within the parenthesis
+        reg = "circle("
+        reg_props = [", "+r+") # " for r in radius]
+
+    # If list of labels or idheader given, add them to the end of reg_props
+    if idheader: label = sources[idheader].values.tolist()
+    if label: reg_props = [r+" text={"+str(label[i])+"}" for i,r in enumerate(reg_props)]
+    # If each source has a unique width, add them to reg_props
+    if uniquewidth: reg_props = [r+" width="+str(width[i]) for i,r in enumerate(reg_props)]
+
+    # Finally, adding endline character to end of reg_props to place each region on a new line in the .reg file
+    reg_props = [r+"\n" for r in reg_props] 
+    
+    # Putting together the full region line using the coordinates of each source
+    f_reg = [reg+str(x_coords[i])+", "+str(y_coords[i])+r for i,r in enumerate(reg_props)]
+
+    #### WRITING THE REGION FILE ####
+    print("Saving", outfile)
+    with open(outfile, 'w') as f:
+        f.write(f_head)
+        for r in f_reg: # for each source in the list, print the 
+            f.write(r)
+    print(outfile,"saved!")
+
+    if savecoords: 
+        with open(savecoords, "w") as f: 
+            np.savetxt(f, np.column_stack([x_coords, y_coords]))
+        print(savecoords, "saved!")
 
 ###---------------------------------------------
 
-def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_scalings=["zscale","zscale","zscale"], regions=None, savescalings="autoscalings.txt", coords_header=['X','Y'], idheader="ID"): 
+def CombineReg(regions, outfile): 
+    """
+    Combines multiple region files, assuming all files are written in the same coordinate system. 
+
+    PARAMETERS
+    -----------
+    regions [list] : List of region file names to combine. 
+    Only region files with the same coordinate system as the first file will be added to the file. 
+    outfile [str] : Name of the combined region file. 
+    """
+
+    # First, read in the region file and find the coordinate system. 
+    # If the coordinate system of the region file matches the first file, add to the combined file.  
+    # Otherwise, reject the region file and do not add to the combined region file. 
+
+    # Reading in the first region file and pulling the coordinate system and header information
+    # The new region file will use the header information of the first region file
+    basereg = regions[0]
+    
+    f = open(basereg, "r")
+    basetext = f.read()
+    basetext = basetext.split("\n") # splitting the text into lines
+    basecoord = basetext[2] # base coordinate system. 
+    f.close()
+
+    newtext = basetext
+    
+    for reg in regions[1::]: 
+        f = open(reg, "r")
+        text = f.read()
+        text = text.split("\n")
+
+        # If the coordinate system is the same, add it to the text. Otherwise, skip. 
+        if text[2] == basecoord: newtext = newtext + text[3::]
+        else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
+        f.close()
+
+    
+    #### WRITING THE REGION FILE ####
+    print("Saving", outfile)
+    with open(outfile, 'w') as f:
+        for line in newtext: # for each source in the list, print the 
+            f.write(line+"\n")
+    print(outfile,"saved!")
+
+###---------------------------------------------
+
+def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_scalings=["zscale","zscale","zscale"], regions=None, savescalings="autoscalings.txt", coordheads=False, coords_header=['X','Y'], idheader="ID"): 
 	"""Script for automatically writing a default unique scaling for each source in the input DataFrame based on the image coordinates 
 	and input square regions. It is assumed that the regions get brighter closer to the center of the image and that regions are read in 
 	going from the outer regions moving inward. The regions are read in as rectangles in the form [[xmin, xmax], [ymin, ymax]] in image 
@@ -1042,7 +655,28 @@ def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_s
 	(3) Run WriteDS9 using unique_scale=True and the new unique scaling file as the 'scales' argument. Use the resulting 
 	    .sh file to get scaled images of each source. 
 
+	PARAMETERS:
+	----------
+	sources		[DataFrame]	:	DataFrame containing the sources to image. 
+	outfile		[str]		:	Name of the file to save the source scalings to. Defaults to "scalings.txt".
+	scalings	[list, str]	:	Name of the file containing the manually-determined scale parameters of nested 
+						rectangular regions, or a list containing these scalings in the format
+						[[red, green, blue], ...]. If the scalings are read in 
+						as a list, will save them to a file named by the parameter 'savescalings'. 
+	default_scalings [list]		:	Default scalings for any source falling outside of the nested rectangular regions
+						in scalings, in RGB order. Defaults to ['zscale','zscale','zscale'].
+	regions		[list]		:	If scalings is given as a list of scale parameters rather than a file containing the scalings, 
+						then the nested regions can be defined here in the format [[[xmin, xmax], [ymin, ymax]], ...]
+	savescalings	[str]		:	If scalings is a list of scale parameters instead of a file, then save the scalings to a file
+						using this filename. 
+	coordheads	[list]		:	Headers under which the coordinates are stored in the sources DataFrame.
+	coords_header	[list]		:	Depricated parameter name, now called coordheads (as of v1.6.0).
+	idheader	[str]		:	Header under which source IDs are stored. These will be used to save the appropriate scale 
+						parameter of each source, which will then be called by WriteDS9. 
+					
 	"""
+
+	if coordheads: coords_header = coordheads
 
 	sourcex = sources[coords_header[0]].values.tolist()
 	sourcey = sources[coords_header[1]].values.tolist()
@@ -1097,9 +731,15 @@ def WriteScalings(sources=None, outfile="scalings.txt", scalings=None, default_s
 
 ###-----------------------------------------------------------------------------------------------------
 
-def WriteFig(images, outfile=None, dimensions=(8,5), folder=None): #, imgnames=None, outfile=None): 
+def WriteFig(images, outfile=None, dimensions=(8,5), dir=""): #, imgnames=None, outfile=None): 
 
-	"""For writing LaTex code for figure containing thumbnails. Dimensions are given as rows x columns"""
+	"""For writing LaTex code for figure containing thumbnails. Dimensions are given as rows x columns
+
+	images		[list]	:	List of image names to add to the figure. 
+	outfile		[str]	:	Name of the file to save the LaTex code to. 
+	dimensions	[tuple]	:	Size of the figure, given as (rows, columns).
+	dir		[str]	:	Name of the directory containing the images (including the trailing \)
+	"""
 
 	images = images.copy()
 
@@ -1109,7 +749,7 @@ def WriteFig(images, outfile=None, dimensions=(8,5), folder=None): #, imgnames=N
 	img = 0 	# keeping track of which image is being added to the table
 
 	try: 
-		for i in images: images[i] = folder+"/"+images[i]
+		for i in images: images[i] = dir+images[i]
 	except: pass;
 
 	print("Writing " + outfile + "...\n")
@@ -1137,11 +777,19 @@ def WriteFig(images, outfile=None, dimensions=(8,5), folder=None): #, imgnames=N
 
 ###-----------------------------------------------------------------------------------------------------
 
-def WriteTable(frame, outfile=None, headers=None, dimensions=None): 
+def WriteTable(df, outfile=None, headers=None, dimensions=None): 
 
-	"""For writing LaTex code for tables containing data properties, etc."""
+	"""
+	For writing LaTex code for tables containing data properties, etc.
 
-	frame = frame.copy()
+	df		[DataFrame]	:	DataFrame containing the sources in table. 
+	outfile		[str]		:	Name of file to save LaTex code to. 
+	headers		[list]		:	List of headers to add to the table. 
+	dimensions	[tuple]		:	Number of rows/columns to include in a single table. This allows the table to be broken up into smaller 
+						tables that continue across multiple pages. 
+	"""
+
+	frame = df.copy()
 
 	# If no dimensions are given, use full df.
 	if dimensions == None: dimensions = [frame.shape[0], frame.shape[1]]

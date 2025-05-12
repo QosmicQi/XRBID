@@ -296,13 +296,13 @@ def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, savereg=False)
     PARAMETERS
     ----------
     data		[HDUImage] 	: HDU data extracted from a FITS file.
-    			    	  Should use the original file, not the background subtraction.
+    			    	  	  Should use the original file, not the background subtraction.
     fwhm		[float]	 	: Estimated FWHM of stars in image, in units arcseconds.
-    pixtoarcs 	[float]		: Pixel to arcsecond conversion.
+    pixtoarcs 		[float]		: Pixel to arcsecond conversion.
     sigma
     threshold
-    savefile 	[str] (False)	: If sources should be saved to a region file, input should be the 
-    				              name of the region file to be saved.
+    savefile 		[str] (False)	: If sources should be saved to a region file, input should be the 
+    				          name of the region file to be saved.
     
 
     RETURN

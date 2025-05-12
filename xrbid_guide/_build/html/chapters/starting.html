@@ -520,6 +520,11 @@ document.write(`
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="nb">bin</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If installing DS9 or other apps on a Linux, you can create a symlink to open the app from the command line by moving the downloaded application to the <code class="docutils literal notranslate"><span class="pre">/usr</span></code> directory and then creating the link with:
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">/usr/&lt;app_name&gt;</span> <span class="pre">/usr/local/bin/&lt;app_name&gt;</span></code></p>
+</div>
 <p>If while installing <code class="docutils literal notranslate"><span class="pre">DS9</span></code> you encounter an error that states the program has an unknown developer, you will need to change the security settings of your computer to allow you to proceed anyway. If you have no issues installing <code class="docutils literal notranslate"><span class="pre">DS9</span></code> but have trouble opening it, then make sure <code class="docutils literal notranslate"><span class="pre">Darwin</span> <span class="pre">X11</span></code> and <code class="docutils literal notranslate"><span class="pre">XQuartz</span></code> are installed and up to date on your computer.</p>
 <p>Please note, there are some process in this guide that open <code class="docutils literal notranslate"><span class="pre">DS9</span></code> as a bash script (e.i. <code class="docutils literal notranslate"><span class="pre">XRBID.WriteScript.WriteDS9</span></code>). These scripts require you open a special terminal before running them, or you may run into errors with <code class="docutils literal notranslate"><span class="pre">Darwin</span> <span class="pre">X11</span></code> or <code class="docutils literal notranslate"><span class="pre">XQuartz</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xterm</span> <span class="o">&amp;</span>

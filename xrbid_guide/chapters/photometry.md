@@ -24,7 +24,7 @@ Running this code is fairly easy, but before you do, you will need to know the F
 
 ```{figure} ../images/fwhm.png
 :name: fig-fwhm
-:width: 450px
+:width: 300px
 
 Example of the FWHM of a Gaussian. Compare to {numref}`fig-ds9-annuli`, which plots only half of a Gaussian and, thus, gives the HWHM.
 ```
@@ -47,7 +47,14 @@ To measure the radial profile of a star, click and drag your region to center it
 Example radial profile of an *HST* star. In this case, half-max occurs at around 0.15 arcseconds, so the FWHM of this star would be 0.3 arcseconds. Beware: you'll want to ensure you're looking at stars and not clusters, which will have a much broader FWHM and likely a higher peak surface brightness.
 ```
 
-You will also want to determine a good aperture radius with which to extract the photometry of compact star clusters, which will be read in to `RunPhots()` as `extended_rad`. The default is 10 pixels, which was sufficient for M81 but will likely be larger and smaller for your galaxy, depending on whether it is closer or farther than M101. For M101, I created regions around a few globular clusters and found that an aperture of 5 pixels is generally sufficient. 
+You will also want to determine a good aperture radius with which to extract the photometry of compact star clusters, which will be read in to `RunPhots()` as `extended_rad`. The default is 10 pixels, which was sufficient for M81 but will likely be larger and smaller for your galaxy, depending on whether it is closer or farther than M81. For M101, I created regions around a few globular clusters and found that an aperture of 5 pixels is generally sufficient. An example of what a standard globular cluster looks like is given in {numref}`fig-gc`. 
+
+```{figure} ../images/M101_XRB_candidates_CXO011.png
+:name: fig-gc
+:width: 250px
+
+Example of a standard globular cluster in M101. Notice, the globular cluster here is large enough to fill the 1-$\sigma$ radius of this XRB and is much larger than the 3 pixel aperture plotted surrounding its centroid. This demonstrates why it is necessary to set a separate aperture radius for extended sources like star clusters, compared to isolated stars (e.g. the other, smaller point sources visible in the image). 
+```
 
 To run `RunPhots()`, you will simply need to read in the `FITS` `HDU`, the galaxy name, the instrument (ACS/WFC or WFC3/UVIS), and the filter, though you pre-define additional parameters as well: 
 
@@ -63,7 +70,7 @@ RunPhots(hdu, gal="M101", instrument="acs", filter="F555W",
 ```
 
 ```{note}
-I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the right direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
+I choose to apply an additional pixel correction to the region files that result from `RunPhots()` by setting `reg_correction = [1,1]`, which shifts all circular regions by 1 pixel in the x direction and 1 pixel in the y direction. This is because I noticed a small offset in the region files created from the coordinates of the point sources obtained by `photutils` aperture photometry. I don't know what causes this disconnect, but since I intend to align the `Chandra` source coordinates to the `HST` region file coordinates, I use `reg_correction` to make sure the `HST` region file is properly aligned to the `HST` image. 
 ```
 
 This code may take a few minutes to run for each step, depending on the size of your `FITS` file. Then, it will prompt you to select 'ideal' stars for the aperture corrections by plotting the integrated radial profiles of randomly selected stars and requesting user approval.

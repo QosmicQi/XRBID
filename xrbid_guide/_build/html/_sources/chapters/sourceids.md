@@ -95,6 +95,8 @@ If you don't create a scalings file as we have just done, `WriteDS9()` will assu
 `WriteDS9()` takes as parameters the `DataFrame` containing the sources you want to image, a list of the `FITS` files to be read into the RGB frame (`colorfiles`), a list of any region files you want to include in the images (`regions`), and the name of the scaling file created by `WriteScalings()` (`scales`, with `unique_scales = True`). You'll also want to select one of the filters to use as the base over which the regions are printed (in my case, I use green for F555W), `imgnames` if you want to define a naming convention for the images, and the name of the output `.sh` file. You can also define the `zoom` scale of `DS9`, which is especially useful for sources with a large 2-$\sigma$ radius. 
 
 ```
+from XRBID.WriteScript import WriteDS9
+
 WriteDS9(M101_best, galaxy="M101", zoom=4, 
          unique_scale=True, scales="../testdata/M101_XRB_scalings.txt",
          regions=["../testdata/M101_XRB_candidates.reg",
@@ -158,6 +160,8 @@ for i in range(len(M101_best)):
 With the images complete, one should be able to visually inspect and flag any source that looks like a background galaxy (extended, red, and usually disk-like or blobby) or a foreground star (with diffraction spikes).  I recommend creating a file in which you can keep track of the classification of each X-ray source. There are some tools within `XRBID` that can help (such as `XRBID.Sources.SourceList()` or `XRBID.DataFrameMod.BuildFrame()`, depending on how you prefer to work). For M101, I chose to create a `.txt` file that I will use to classify contaminants and keep track of the XRB donor star mass categories in {ref}`chap:cmds`. 
 
 ```
+from XRBID.DataFrameMod import Find, BuildFrame
+
 # Creating a DataFrame of good XRBs only
 M101_xrbs = Find(M101_best, "Bounds = In")
 
@@ -191,6 +195,41 @@ While true SNR identification is a multi-wavelength process that requires a lot 
 :width: 350px
 
 A visual representation of the SNR selection criteria applied to pre-classified X-ray sources in M83. See {cite:p}`hunt21` for more information.  
+```
+
+The X-ray luminosities of X-ray sources are calculated from the X-ray flux obtained from CSC. Future versions of `XRBID` will include a new module called `XRTools.py`, within which will be the following function to help with this process: 
+
+```
+def Lum(F, dist): 
+
+	"""Calculates the luminosity of a set of sources given the flux and distance to the host galaxy. 
+
+	PARAMETERS
+	----------
+	F	[list]	:	Flux of X-ray source(s), in units ergs/s/cm^2. 
+	dist	[float]	:	Distance to the galaxy in units pc or cm.
+
+	RETURNS
+	---------
+	L	[list]	:	List of luminosities in units ergs/s
+	"""
+
+	if not dist: dist = input("Galaxy distance (in pc, Mpc, or cm)? ")
+	
+	# if dist is less than 100, probably given in Mpcs. Convert to pcs.	
+	if dist < 100: 
+		dist = dist * 10**6
+	
+	# need dist in cm, since F is in ergs/s/cm2. If not given in cm, convert. 
+	if dist < 1e18: 
+		dist = dist * 3e18
+
+
+	F = np.array(F)
+	L = F*4*pi*(dist)**2	# luminosity calculation
+	L = L.tolist()
+	return L
+
 ```
 
 There are several ways one can keep track of these sources, depending on your workflow. Based on the current data files I've created in these examples, I would probably use `Find()` on `M101_best` to identify SNR candidates from the X-ray properties of each source. Then for each source in `M101_xrb`, I would check to see if the source appears in the SNR `DataFrame` I just created and update the `Class` header to `(SNR)` if it does, where the parentheses indicate that these are candidate SNR rather than SNR definitively identified by some other catalog. Alternatively, I have also, in previous surveys, added a `(SNR)` column to my main working `DataFrame` and flagged them as `True` or `False` (1 or 0) based on the cuts.

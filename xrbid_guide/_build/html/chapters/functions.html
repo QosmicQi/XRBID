@@ -418,6 +418,16 @@ document.write(`
 
 <span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F555W&quot;</span><span class="p">,</span> 
          <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+         
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;M101_mosaic_acs_f814w_drc_sci.fits&quot;</span><span class="p">)</span>
+
+<span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F814W&quot;</span><span class="p">,</span> 
+         <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;testdata/M101_mosaic_acs_f435w_drc_sci.fits&quot;</span><span class="p">)</span>
+
+<span class="n">RunPhots</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">gal</span><span class="o">=</span><span class="s2">&quot;M101&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;acs&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;F435W&quot;</span><span class="p">,</span> 
+         <span class="n">fwhm_arcs</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">num_stars</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">extended_rad</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
