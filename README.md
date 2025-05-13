@@ -54,6 +54,16 @@ As this module is under active development, you should update it from time to ti
 pip install --upgrade git+https://github.com/QosmicQi/XRBID.git
 ```
 
+If this doesn't work, you can remove the original `XRBID` directory and rerun the installation:
+ 
+```
+# from the terminal where XRBID is saved 
+rm -rf XRBID
+git clone https://github.com/QosmicQi/XRBID
+cd XRBID
+pip install -e .
+```
+
 If you're using Google Colab, then you will need to delete the current cloned repository and reinstall it as before. 
 
 ```
@@ -71,5 +81,5 @@ If that doesn't work, you can always uninstall XRBID and start from scratch usin
 If you happen to use this code for research that results in a paper, please add it to the Software section and/or cite it as follows: 
 
 ```
-Hunt, Q. (2025). XRBID: A Python package for X-ray binary identification (v1.0) [Software]. GitHub. https://github.com/QosmicQi/XRBID
+Hunt, Q. (2025). XRBID: A Python package for X-ray binary identification (v1.6.0) [Software]. GitHub. https://github.com/QosmicQi/XRBID
 ```

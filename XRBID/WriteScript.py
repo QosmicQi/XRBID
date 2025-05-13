@@ -592,49 +592,50 @@ def WriteReg(sources, outfile, coordsys=False, coordheads=False, coordnames=Fals
 ###---------------------------------------------
 
 def CombineReg(regions, outfile): 
-    """
-    Combines multiple region files, assuming all files are written in the same coordinate system. 
+	"""
+	Combines multiple region files, assuming all files are written in the same coordinate system. 
+	NEXT UPDATE: add parameters from the header of each region file to the reg_param after each line. 
 
-    PARAMETERS
-    -----------
-    regions [list] : List of region file names to combine. 
-    Only region files with the same coordinate system as the first file will be added to the file. 
-    outfile [str] : Name of the combined region file. 
-    """
+	PARAMETERS
+	-----------
+	regions [list] : List of region file names to combine. 
+	Only region files with the same coordinate system as the first file will be added to the file. 
+	outfile [str] : Name of the combined region file. 
+	"""
 
-    # First, read in the region file and find the coordinate system. 
-    # If the coordinate system of the region file matches the first file, add to the combined file.  
-    # Otherwise, reject the region file and do not add to the combined region file. 
+	# First, read in the region file and find the coordinate system. 
+	# If the coordinate system of the region file matches the first file, add to the combined file.  
+	# Otherwise, reject the region file and do not add to the combined region file. 
 
-    # Reading in the first region file and pulling the coordinate system and header information
-    # The new region file will use the header information of the first region file
-    basereg = regions[0]
+	# Reading in the first region file and pulling the coordinate system and header information
+	# The new region file will use the header information of the first region file
+	basereg = regions[0]
     
-    f = open(basereg, "r")
-    basetext = f.read()
-    basetext = basetext.split("\n") # splitting the text into lines
-    basecoord = basetext[2] # base coordinate system. 
-    f.close()
+	f = open(basereg, "r")
+	basetext = f.read()
+	basetext = basetext.split("\n") # splitting the text into lines
+	basecoord = basetext[2] # base coordinate system. 
+	f.close()
 
-    newtext = basetext
+	newtext = basetext
     
-    for reg in regions[1::]: 
-        f = open(reg, "r")
-        text = f.read()
-        text = text.split("\n")
+	for reg in regions[1::]: 
+		f = open(reg, "r")
+		text = f.read()
+		text = text.split("\n")
 
-        # If the coordinate system is the same, add it to the text. Otherwise, skip. 
-        if text[2] == basecoord: newtext = newtext + text[3::]
-        else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
-        f.close()
+		# If the coordinate system is the same, add it to the text. Otherwise, skip. 
+		if text[2] == basecoord: newtext = newtext + text[3::]
+		else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
+		f.close()
 
     
-    #### WRITING THE REGION FILE ####
-    print("Saving", outfile)
-    with open(outfile, 'w') as f:
-        for line in newtext: # for each source in the list, print the 
-            f.write(line+"\n")
-    print(outfile,"saved!")
+	#### WRITING THE REGION FILE ####
+	print("Saving", outfile)
+	with open(outfile, 'w') as f:
+		for line in newtext: # for each source in the list, print the 
+			f.write(line+"\n")
+	print(outfile,"saved!")
 
 ###---------------------------------------------
 
@@ -738,7 +739,7 @@ def WriteFig(images, outfile=None, dimensions=(8,5), dir=""): #, imgnames=None, 
 	images		[list]	:	List of image names to add to the figure. 
 	outfile		[str]	:	Name of the file to save the LaTex code to. 
 	dimensions	[tuple]	:	Size of the figure, given as (rows, columns).
-	dir		[str]	:	Name of the directory containing the images (including the trailing \)
+	dir		[str]	:	Name of the directory containing the images (including the trailing backslash)
 	"""
 
 	images = images.copy()
