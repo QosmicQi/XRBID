@@ -161,7 +161,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     		 
     wcs = WCS(hdu['PRIMARY'].header)
     xcoords_fk5, ycoords_fk5 = wcs.wcs_pix2world(xcoord_img, ycoord_img, 1)
-    WriteReg(sources=[xcoords_fk5, ycoords_fk5], coordsys="fk5", showlabel=True, \
+    WriteReg(sources=[xcoords_fk5, ycoords_fk5], coordsys="fk5", \
              outfile=gal+"_daofind_"+filter.lower()+"_"+instrument.lower()+suffix+"_fk5.reg", \
              radius=0.15, radunit="arcsec", label=objects["id"].tolist())
              
