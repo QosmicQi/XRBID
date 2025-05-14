@@ -46,7 +46,7 @@ WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
 
 ###-----------------------------------------------------------------------------------------------------
 
-def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
+def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, sharplo=0.2, sharphi=1.0, roundlo=-1.0, roundhi=1.0, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
 
     """
     Generates the initial photometric files needed for the aperture currection and photometric analyses.
@@ -68,7 +68,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     instrument 		[str]	: 	Name of the instrument (ACS or WFC3)
     filter 		[str]	: 	Name of the hdu filter
     fwhm_arcs 		[float]	: 	FWHM of stars in the hdu image
-    pixtoarcs   	[float] :   Pixel to arcsecond conversion. Defaults to 0.05 for ACS and 0.03962 for WFC3.
+    pixtoarcs   	[float] :   	Pixel to arcsecond conversion. Defaults to 0.05 for ACS and 0.03962 for WFC3.
     zeropoint 		[float]	: 	Vega zeropoint magnitude, for converting photometry into Vega magnitudes. 
     				        Defaults to obtaining with Zeropoint() if none is given.
     EEF 		[float]	: 	The Encircled Energy Fraction at the maximum aperture pixel 
@@ -76,6 +76,10 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     			  	        If none is given, will pull the ~20 pix EEF for the instrument given. 
     sigma       	[float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
     threshold 		[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
+    sharplo		[float]	(.2):	Lower limit for object sharpness read in by DAOStarFinder. 
+    sharphi		[float]	(1) :	Upper limit for object sharpness read in by DAOStarFinder. 
+    roundlo		[float] (-1):	Lower limit for object roundness read in by DAOStarFinder.
+    roundhi		[float)	(1) :	Upper limit for object roundness read in by DAOStarFinder. 
     apcorr		[float] (0) :	In the event that aperture_correction is set to false, 
     				            user can input a manual aperture correction to the photometry, 
     			            	which will be saved in the photometry files.
@@ -140,7 +144,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     # Identifying point sources with DaoFind
     print("Running DaoFind. This may take a while...")
     objects = DaoFindObjects(data,sigma=sigma,threshold=threshold, fwhm=fwhm_arcs, pixtoarcs=pixtoarcs, \
-    			 savereg=False)
+    			 savereg=False, sharplo=sharplo, sharphi=sharphi, roundlo=roundlo, roundhi=roundhi)
     			 
     # Saving region files
     # If given, this adds a pixel shift to the region file coordinates, because the region files appear shifted 
@@ -151,7 +155,7 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
         xcoord_img = objects['xcentroid'].tolist()
         ycoord_img = objects['ycentroid'].tolist()
     else: 
-        print("\nAdding",reg_correction,"pixel correction to x & y coordinates.\nPlease double-check accuracy of region file.")
+        print("\nAdding",reg_correction,"pixel correction to x & y coordinates.\nPlease double-check accuracy of region file!")
         xcoord_img = [x+reg_correction[0] for x in objects['xcentroid'].tolist()]
         ycoord_img = [y+reg_correction[1] for y in objects['ycentroid'].tolist()]
 
@@ -289,20 +293,22 @@ def SubtractBKG(data, sigma=3.0):
     
 ###-----------------------------------------------------------------------------------------------------
 
-def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, savereg=False):
+def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, sharplo=0.2, sharphi=1, roundlo=-1, roundhi=1, savereg=False):
     
     """ Using DaoFind from photutils, generates a list of objects
 
     PARAMETERS
     ----------
-    data		[HDUImage] 	: HDU data extracted from a FITS file.
-    			    	  	  Should use the original file, not the background subtraction.
+    data		[HDUImage] 	: HDU data extracted from a FITS file. Should use the original file, not the background subtraction.
     fwhm		[float]	 	: Estimated FWHM of stars in image, in units arcseconds.
     pixtoarcs 		[float]		: Pixel to arcsecond conversion.
-    sigma
-    threshold
-    savefile 		[str] (False)	: If sources should be saved to a region file, input should be the 
-    				          name of the region file to be saved.
+    sigma		[float] (5)	: Desired sigma for the sigma clipping of the data.
+    threshold		[float] (5)	: Absolute image value above which sources are detected.
+    sharplo		[float]	(.2)	: Lower limit for object sharpness read in by DAOStarFinder. 
+    sharphi		[float]	(1) 	: Upper limit for object sharpness read in by DAOStarFinder. 
+    roundlo		[float] (-1)	: Lower limit for object roundness read in by DAOStarFinder.
+    roundhi		[float)	(1) 	: Upper limit for object roundness read in by DAOStarFinder. 
+    savefile 		[str] (False)	: If sources should be saved to a region file, input should be the name of the region file to be saved.
     
 
     RETURN
@@ -312,7 +318,7 @@ def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, savereg=False)
     """
 
     dat_mean, dat_med, dat_std = sigma_clipped_stats(data, sigma=sigma)
-    daofind = DaoFind(fwhm=fwhm/pixtoarcs, threshold=threshold*dat_std)
+    daofind = DaoFind(fwhm=fwhm/pixtoarcs, threshold=threshold*dat_std, sharplo=sharplo, sharphi=sharphi, roundlo=roundlo, roundhi=roundhi)
     objects = daofind(data)
 
     for col in objects.colnames:
