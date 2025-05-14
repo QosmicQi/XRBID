@@ -515,7 +515,7 @@ def WriteReg(sources, outfile, coordsys=False, coordheads=False, coordnames=Fals
         if "im" in coordsys: coordsys = "image" # allows user to input img instead of image and still get same results
     if not coordsys: 
         # If any values are beyond the acceptable range of fk5, this must be in image coordinates
-        if max(x_coords) > 360 or max(abs(y_coords)) > 90 or xcoord in ["X","x"]: coordsys = "image"
+        if max(x_coords) > 360 or max(np.abs(y_coords)) > 90 or xcoord in ["X","x"]: coordsys = "image"
         else: coordsys="fk5"
 
     # Setting up the units to add to the radii
