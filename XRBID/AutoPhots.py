@@ -222,6 +222,11 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
         		aperr = apcorrections[1]
         		apcorr_ext = apcorrections[2]
         		aperr_ext = apcorrections[3]
+    else: 
+        apcorr = 0
+        aperr = 0
+        apcorr_ext = 0
+        aperr_ext = 0
 
     # Calculates magnitudes from the photometry on point sources
     # If an aperture correction is given or calculated, include that in the source photometry.
