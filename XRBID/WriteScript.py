@@ -631,7 +631,8 @@ def CombineReg(regions, outfile):
 			dash = text[1].split("dash=")[1][0]
 			width = text[1].split("width=")[1][0]
 			color = text[1].split("color=")[1].split(" ")[0]
-			newtext = newtext + " font=\""+font+"\" dash="+str(dash)+" width="+str(width)+" color="+color
+			for i,line in enumerate(newtext):
+				newtext[i] = line + " font=\""+font+"\" dash="+str(dash)+" width="+str(width)+" color="+color
 		else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
 		f.close()
 
