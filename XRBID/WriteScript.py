@@ -627,10 +627,10 @@ def CombineReg(regions, outfile):
 		# If the coordinate system is the same, add it to the text. Otherwise, skip. 
 		if text[2] == basecoord: 
 			newtext = newtext + text[3::]
-			font = text[2].split("font=")[1].split("\"")[1]
-			dash = text[2].split("dash=")[1][0]
-			width = text[2].split("width=")[1][0]
-			color = text[2].split("color=")[1].split(" ")[0]
+			font = text[1].split("font=")[1].split("\"")[1]
+			dash = text[1].split("dash=")[1][0]
+			width = text[1].split("width=")[1][0]
+			color = text[1].split("color=")[1].split(" ")[0]
 			newtext = newtext + " font=\""+font+"\" dash="+str(dash)+" width="+str(width)+" color="+color
 		else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
 		f.close()
