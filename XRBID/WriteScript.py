@@ -622,7 +622,7 @@ def CombineReg(regions, outfile):
 	for reg in regions[1::]: 
 		f = open(reg, "r")
 		text = f.read()		# Text from the other region files (besides the base file)
-		text = text.split("\n")
+		text = text.split("\n") 
 
 		# If the coordinate system is the same, add it to the text. Otherwise, skip. 
 		if text[2] == basecoord: 
@@ -633,10 +633,10 @@ def CombineReg(regions, outfile):
 			dash = text[1].split("dash=")[1][0]
 			width = text[1].split("width=")[1][0]
 			color = text[1].split("color=")[1].split(" ")[0]
-			for i,line in enumerate(text[3::]):
+			for i,line in enumerate(text[3:-1]):
 				text[i+3] = line + " font=\""+font+"\" dash="+str(dash)+" width="+str(width)+" color="+color
 			# Adding the text from current region file to the full text saved to newtext 
-			newtext = newtext + text[3::]
+			newtext = newtext + text[3:-1]
 		else: print(reg, "is in wrong coordinate system. Regions will not be added to",outfile)
 		f.close()
 
