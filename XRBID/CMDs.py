@@ -587,32 +587,58 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 	# Plotting clusters from input dataframe
 	if isinstance(clusters, pd.DataFrame): 
 		clusters = clusters.copy()
-		plt.scatter(clusters[xcolor[0]] - clusters[xcolor[1]]+Ex_clust, 
-		    	    clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust, 
-			    s=size, color=color)
+
+		if isinstance(xcolor, list): xvals = clusters[xcolor[0]] - clusters[xcolor[1]]+Ex_clust
+		else: xvales = clusters[xcolor] + Ex_clust
+
+		if isinstance(ycolor, list): yvals = clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust
+		else: yvals = clusters[ycolor] + Ey_clust
+
+		plt.scatter(xvals, yvals, s=size, color=color)
 
 	# Pulling x and y colors from the model based on the input DataFrame
+	# These should be colors, but this code allows user to input a magnitude, in case it's more useful for special cases
 	for head in BC03.columns.values.tolist(): 
-		if xcolor[0] in head: x0 = head
-		if xcolor[1] in head: x1 = head
-		if ycolor[0] in head: y0 = head
-		if ycolor[1] in head: y1 = head
-	
+		if isinstance(xcolor, list):
+			if xcolor[0] in head: x0 = head
+			if xcolor[1] in head: x1 = head
+		if isinstance(xcolor, str): 
+			if xcolor in head: x0 = head
+		if isinstance(ycolor, list): 
+			if ycolor[0] in head: y0 = head
+			if ycolor[1] in head: y1 = head
+		if isinstance(ycolor, str): 
+			if ycolor in head: y0 = head
+
 	# Headers in BC03 are in V-<filter> format, so they must be subtracted backwards
-	xmodel = BC03[x1]-BC03[x0]
-	ymodel = BC03[y1]-BC03[y0]
+	try: xmodel = BC03[x1]-BC03[x0]
+	except: xmodel = BC03["Vmag"] - BC03[x0]
+	try: ymodel = BC03[y1]-BC03[y0]
+	except: ymodel = BC03["Vmag"]-BC03[y0]
 
 	# Plotting the Solar model
 	plt.plot(xmodel, ymodel, color="black", label="Solar", alpha=0.7)
 
 	# Plotting the models for young and globular clusters
 	TempAge = Find(BC03, "log Age = 7") # 10 Myrs
-	plt.scatter(TempAge[x1]-TempAge[x0], TempAge[y1]-TempAge[y0], marker="v", color="black", s=75, zorder=5)
-	plt.annotate("10 Myrs", (TempAge[x1]-TempAge[x0] + 0.1, TempAge[y1]-TempAge[y0]))
+
+	if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+	else: TempAge[x0]
+	if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+	else: yage = TempAge[y0]
+
+	plt.scatter(xage,yage, marker="v", color="black", s=75, zorder=5)
+	plt.annotate("10 Myrs", (xage + 0.1, yage))
 
 	TempAge = Find(BC03, "log Age = 8.606543") # ~400 Myr
-	plt.scatter(TempAge[x1]-TempAge[x0], TempAge[y1]-TempAge[y0], marker="v", color="black", s=75, zorder=5)
-	plt.annotate("~400 Myrs", (TempAge[x1]-TempAge[x0]- 0.55, TempAge[y1]-TempAge[y0]+0.03))
+
+	if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+	else: TempAge[x0]
+	if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+	else: yage = TempAge[y0]
+
+	plt.scatter(xage, yage, marker="v", color="black", s=75, zorder=5)
+	plt.annotate("~400 Myrs", (xage- 0.55, yage+0.03))
 
 	# Plotting the reddening arrow
 	print("Plotting reddening arrow for", colors[0], "vs.", colors[1])
@@ -620,7 +646,10 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 
 	plt.xlim(-0.5,1.6)
 	plt.ylim(1.3,-.5)
-	plt.xlabel(xcolor[0] + " - " + xcolor[1],fontsize=20)
-	plt.ylabel(ycolor[0] + " - " + ycolor[1],fontsize=20)
+	if isinstance(xcolor, list): plt.xlabel(xcolor[0] + " - " + xcolor[1],fontsize=20)
+	else: plt.xlabel(xcolor,fontsize=20)
+	if isinstance(ycolor, list): plt.ylabel(ycolor[0] + " - " + ycolor[1],fontsize=20)
+	else:plt.ylabel(ycolor,fontsize=20)
+
 	plt.title(title)
 	return plt
