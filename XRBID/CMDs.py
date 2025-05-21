@@ -82,7 +82,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 	label 		[str] (None):		The legend label to assign to the input points from sources. 
 	save 		[bool] (False): 	Sets whether to automatically same the CMD image. 
 	savefile 	[str] (None): 		The name to assigned the saved CMD image. 
-	title 		[str)] (None): 		Title of the figure, to be placed near, but not at, the top of the figure.
+	title 		[str] (None): 		Title of the figure.
 	subimg 		[str] (None): 		Filename of an image to include in the corner of the CMD. 
 						This is to allow a subplot of the XRB plotted to be shown within the CMD. 
 	annotation 	[str] (None): 		Additional annotation to add to the bottom corner of the CMD (usually XRB ID)
@@ -256,7 +256,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 
 	if not annotation_size: annotation_size = titlesize
 
-	if title: ax.annotate(title, xy=(xlim[1]-0.35*abs(xlim[1]), ylim[1]+0.2*abs(ylim[1])), size=annotation_size)
+	if title: ax.set_title(title, fontsize=titlesize)
 
 	# If an annotation is given, add it to the bottom of the figure
 	if annotation: ax.annotate(annotation, xy=(xlim[1]-0.05*abs(xlim[1]), ylim[0]-0.1*abs(ylim[1])), size=annotation_size, horizontalalignment="right")
