@@ -438,7 +438,7 @@ For example, the galaxy M81 has over 27 unique <em>HST</em> fields, not all of w
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You don’t strictly need to know the proposal ID for <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> to find <em>HST</em> images, but it helps to narrow down the download to the correct images. Here, I used the information I gathered when selecting the images I wanted with <code class="docutils literal notranslate"><span class="pre">pyVO</span></code> (which is saved under the header <code class="docutils literal notranslate"><span class="pre">ObsID</span></code>).</p>
+<p>You don’t strictly need to know the proposal ID for <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> to find <em>HST</em> images, but it can help narrow down the download to specific images. Here, I used the information I gathered when selecting the images I wanted with <code class="docutils literal notranslate"><span class="pre">pyVO</span></code> (which is saved under the header <code class="docutils literal notranslate"><span class="pre">ObsID</span></code>). Alternatively, if you leave <code class="docutils literal notranslate"><span class="pre">proposal_id</span></code> blank, then <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> will pull all available data, which one may find either beneficial or detrimental depending on individual needs.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The parameters <code class="docutils literal notranslate"><span class="pre">filters</span></code>, <code class="docutils literal notranslate"><span class="pre">proposal_id</span></code>, and <code class="docutils literal notranslate"><span class="pre">instrument_name</span></code> in the code above can be taken directly from the HLA under the headers <code class="docutils literal notranslate"><span class="pre">Spectral_Elt</span></code>, <code class="docutils literal notranslate"><span class="pre">PropID</span></code>, and <code class="docutils literal notranslate"><span class="pre">Detector</span></code>, respectively. It’s a really good idea to visit the HLA or MAST database prior to running the code above to find this information for the images you want to use, if you want to narrow the query results down to just those you know are useful to you!</p>
@@ -457,6 +457,10 @@ For example, the galaxy M81 has over 27 unique <em>HST</em> fields, not all of w
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>MAST also contains what are called ‘HAP-MVM’ files, where MVM refers to multi-visit mosaics as opposed to SVM, single-visit mosaics. According to STScI, these are susceptible to photometric and alignment errors, so they are likely not appropriate for our purposes.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Alternatively, if you’re worried about <code class="docutils literal notranslate"><span class="pre">astroquery</span></code> finding and downloading too many files that you don’t need, you can select and download the <code class="docutils literal notranslate"><span class="pre">FLC</span></code> files from MAST directly. After selecting and adding the fields you want to your cart, open the <code class="docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Manager</span></code> and under <code class="docutils literal notranslate"><span class="pre">Filters</span></code>, deselect “Minimum Recommended Products”, select “SCIENCE”, and select <code class="docutils literal notranslate"><span class="pre">FLC</span></code>. These can then be downloaded as normal.</p>
 </div>
 <p>Finally, clean up the downloaded directories by pulling the appropriate files and moving them to the main working directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">shutil</span>
@@ -541,6 +545,7 @@ For example, the galaxy M81 has over 27 unique <em>HST</em> fields, not all of w
 <span class="n">objects</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;mosaic_catalog.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This will save a file in which the coordinates of each identified source will be saved in image (pixel) units in columns 1-2. In this case, you will use the file from which the catalog was generated as your reference image, and read in this catalog in the <code class="docutils literal notranslate"><span class="pre">catalog</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">tweakreg</span></code>.</p>
 </section>
 <section id="downloading-catalogs-from-mast">
 <h3>Downloading catalogs from MAST<a class="headerlink" href="#downloading-catalogs-from-mast" title="Link to this heading">#</a></h3>
