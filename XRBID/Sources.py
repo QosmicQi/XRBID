@@ -386,6 +386,9 @@ def DaoClean(daosources=None, sources=None, sourceid="ID", coordsys="img", coord
 def Crossref(df=None, regions=False, catalogs=False, coords=False, sourceid="ID", search_radius=3, coordsys="img", coordheads=False, outfile="crossref_results.txt", verbose=True): 
 
 	"""
+
+	UPDATE NEEDED: Keep the other columns in the dataframe.
+
 	From input DataFrame and/or region files (in image coordinate format), finds overlaps within a given 
 	search radius of the DataFrame sources and prints all ID names to a file as a DataFrame. 
 	If the coordinates are given as [RA, Dec] instead of [X,Y], must change coordsys from "img" to "fk5" 

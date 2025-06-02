@@ -49,8 +49,10 @@ acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Ms
 	      pd.read_csv("isoACS_WFC_8Msun.frame"), pd.read_csv("isoACS_WFC_20Msun.frame")]
 
 # Calling in model for creating the cluster color-color diagrams
-BC03 = pd.read_csv("BC03_models_solar.txt")
-
+# As of version 1.7.0, no longer using BC03 models. Instead use CB07 models (Bruzual 2007, arXiv:astro-ph/0703052)
+#BC03 = pd.read_csv("BC03_models_solar.txt")
+CB07_acs = pd.read_csv("CB07_models_acs_wfc.csv")
+CB07_wfc3 = pd.read_csv("CB07_models_wfc3_uvis.csv")
 cd(curr_dir)
 
 ###-----------------------------------------------------------------------------------------------------
@@ -504,11 +506,14 @@ def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,2
 
 ###-----------------------------------------------------------------------------------------------------
 
-def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"], colors=["V-I","B-V"], correct_ext=False, E_BV=0.08, color="black", size=15, title="", model_dir=file_dir): 
+def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"], colors=["V-I","B-V"], instrument="acs", correct_ext=False, E_BV=0.08, label_ages=True, color="black", label="", model_color="gray", model_label="", size=15, title="", xlim=(-3,3), ylim=(3,-3), Z=0.02, stellar_lib="BaSeL"): 
 
 	"""
 	Creates a color-color diagram for comparing the photometric properties of input sources 
 	to the cluster color evolutionary models of Bruzual & Charlot (2003), assuming solar metallicity.
+	The ACS/WFC models contain the filters F220W, F250W, F330W, F410W, F435W, F475W, F555W, F606W, 
+	F625W, F775W, F814W. The WFC3/UVIS models contain F225W, F336W,  F438W, F547M, F555W, F606W, 
+	F625W, F656N, F658N, and F814W. These are stored in the file CB07_models_*.csv.
 	
 	PARAMETERS: 
 	-----------
@@ -524,15 +529,26 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 					This will be used to determine which extinction factor would be 
 					applied to the x and y colors and the direction/magnitude of the
 					reddening arrow. 
+	instrument [str] ('acs'):	HST instrument (acs or wfc3) with which observations were taken. Default is 'acs'.
 	correct_ext [bool]	: 	Adjust the color of clusters to correct for extinction (reddening)
 					using the Milky Way extinction law and E_BV.
 	E_BV	[float]	(0.08)	:	Galactic reddening towards the galaxy or source of interest.
 					Used to adjust the extinction arrow vector.
+	label_ages [bool]	: 	If true, plots markers to indicate cluster ages of 10 Myr and 400 Myr. Defaults to True.
 	color	[str]	(black)	:	Color of the cluster markers. 
+	label	[str]		:	Legend label of the cluster points. 
+	model_color [str] (gray):	Color of the model line.
+	model_label [str]	:	Legend label of the model. 
 	size	[int]	(15)	:	Cluster marker size. 
 	title	[str]		: 	Title of the figure. 
-	model_dir [str]		:	Allows user to define the location of the B&C model.
-
+	xlim	[tuple] (-3,3) 	:	Limits on the x-axis of the figure. 
+	ylim 	[tuple] (3,-3) 	:	Limits on the y-axis of the figure.  
+	Z	[float]	(0.02)	:	Stellar metallicity to compare to models. Defaults to approximately solar (Z=0.02). 
+					Other options are: 0.0001, 0.0004, 0.004, 0.008, 0.05, 0.10.
+	stellar_lib [str]	:	The name of the stellar libary to use, available in CB07 (from https://www.bruzual.org/). 
+					Defaults to "BaSel" (Lastennet et al. 2001). Other options are "xmiless" 
+					(MILES, Falcón-Barroso et al. 2011) or "stelib" (Le Borgne et al. 2003). 
+	
 	RETURNS: 
 	----------- 
 
@@ -541,6 +557,11 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 	Returns plt figure.
 
 	"""
+
+	if instrument.lower() == "acs": model = CB07_acs.copy()
+	elif instrument.lower() == "wfc3": model = CB07_wfc3.copy()
+
+	model = Find(model, ["Z = " + str(Z), "Library = " + stellar_lib])
 
 	# Calculating reddening factors from the MW reddening law
 	Rv = 3.19  # from MW extinction law
@@ -584,6 +605,60 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 	plt.figure(figsize=(4.5,4.5))
 	plt.tick_params(direction="in", width=1.4, length=7)
 
+
+	# Pulling x and y colors from the model based on the input DataFrame
+	# These should be colors, but this code allows user to input a magnitude, in case it's more useful for special cases
+	for head in model.columns.values.tolist(): 
+		if isinstance(xcolor, list):
+			if xcolor[0] in head: x0 = head
+			if xcolor[1] in head: x1 = head
+		if isinstance(xcolor, str): 
+			print("WARNING: Single magnitude detected for xcolor. It is advised to only use colors for these models!")
+			if xcolor in head: x0 = head
+		if isinstance(ycolor, list): 
+			if ycolor[0] in head: y0 = head
+			if ycolor[1] in head: y1 = head
+		if isinstance(ycolor, str): 
+			print("WARNING: Single magnitude detected for ycolor. It is advised to only use colors for these models!")
+			if ycolor in head: y0 = head
+
+
+	# Headers in the models are in V-<filter> format, so they must be subtracted backwards
+	try: xmodel = model[x1]-model[x0]
+	except: xmodel = model["Vmag"] - model[x0]
+	try: ymodel = model[y1]-model[y0]
+	except: ymodel = model["Vmag"]-model[y0]
+
+	# Plotting the cluster evolutionary model
+	plt.plot(xmodel, ymodel, color=model_color, label=model_label, alpha=0.5)
+
+	if label_ages:
+		# Plotting the models for young and globular clusters
+		TempAge = Find(model, "log-age-yr = 7") # 10 Myrs
+
+		if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+		else: TempAge[x0]
+		if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+		else: yage = TempAge[y0]
+
+		plt.scatter(xage,yage, marker="v", color=model_color, s=75, zorder=5)
+		plt.annotate("10 Myrs", (xage, yage), zorder=999)
+
+		TempAge = Find(model, "log-age-yr = 8.606543") # ~400 Myr
+
+		if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+		else: TempAge[x0]
+		if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+		else: yage = TempAge[y0]
+
+		plt.scatter(xage, yage, marker="v", color=model_color, s=75, zorder=5)
+		plt.annotate("400 Myrs", (xage, yage), zorder=999)
+
+	# Plotting the reddening arrow
+	print("Plotting reddening arrow for", colors[0], "vs.", colors[1])
+	plt.arrow(x=xlim[1]*0.75,y=ylim[1]*0.75, dx=Ex, dy=Ey, head_width=.05, color="black")
+
+
 	# Plotting clusters from input dataframe
 	if isinstance(clusters, pd.DataFrame): 
 		clusters = clusters.copy()
@@ -594,58 +669,10 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 		if isinstance(ycolor, list): yvals = clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust
 		else: yvals = clusters[ycolor] + Ey_clust
 
-		plt.scatter(xvals, yvals, s=size, color=color)
+		plt.scatter(xvals, yvals, s=size, color=color, label=label)
 
-	# Pulling x and y colors from the model based on the input DataFrame
-	# These should be colors, but this code allows user to input a magnitude, in case it's more useful for special cases
-	for head in BC03.columns.values.tolist(): 
-		if isinstance(xcolor, list):
-			if xcolor[0] in head: x0 = head
-			if xcolor[1] in head: x1 = head
-		if isinstance(xcolor, str): 
-			if xcolor in head: x0 = head
-		if isinstance(ycolor, list): 
-			if ycolor[0] in head: y0 = head
-			if ycolor[1] in head: y1 = head
-		if isinstance(ycolor, str): 
-			if ycolor in head: y0 = head
-
-	# Headers in BC03 are in V-<filter> format, so they must be subtracted backwards
-	try: xmodel = BC03[x1]-BC03[x0]
-	except: xmodel = BC03["Vmag"] - BC03[x0]
-	try: ymodel = BC03[y1]-BC03[y0]
-	except: ymodel = BC03["Vmag"]-BC03[y0]
-
-	# Plotting the Solar model
-	plt.plot(xmodel, ymodel, color="black", label="Solar", alpha=0.7)
-
-	# Plotting the models for young and globular clusters
-	TempAge = Find(BC03, "log Age = 7") # 10 Myrs
-
-	if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
-	else: TempAge[x0]
-	if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
-	else: yage = TempAge[y0]
-
-	plt.scatter(xage,yage, marker="v", color="black", s=75, zorder=5)
-	plt.annotate("10 Myrs", (xage + 0.1, yage))
-
-	TempAge = Find(BC03, "log Age = 8.606543") # ~400 Myr
-
-	if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
-	else: TempAge[x0]
-	if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
-	else: yage = TempAge[y0]
-
-	plt.scatter(xage, yage, marker="v", color="black", s=75, zorder=5)
-	plt.annotate("~400 Myrs", (xage- 0.55, yage+0.03))
-
-	# Plotting the reddening arrow
-	print("Plotting reddening arrow for", colors[0], "vs.", colors[1])
-	plt.arrow(x=1,y=-0.25, dx=Ex, dy=Ey, head_width=.05, color="black")
-
-	plt.xlim(-0.5,1.6)
-	plt.ylim(1.3,-.5)
+	plt.xlim(xlim)
+	plt.ylim(ylim)
 	if isinstance(xcolor, list): plt.xlabel(xcolor[0] + " - " + xcolor[1],fontsize=20)
 	else: plt.xlabel(xcolor,fontsize=20)
 	if isinstance(ycolor, list): plt.ylabel(ycolor[0] + " - " + ycolor[1],fontsize=20)
@@ -653,3 +680,172 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 
 	plt.title(title)
 	return plt
+
+###-----------------------------------------------------------------------------------------------------
+
+def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"], colors=["V-I","B-V"], instrument="acs", correct_ext=False, E_BV=0.08, label_ages=True, color="black", label="", model_color="gray", model_label="", size=15, Z=0.02, stellar_lib="BaSeL"): 
+
+	"""
+	Adds a secondary color-color diagram to one already built with MakeCCD. User must read in the object returned by MakeCCD for this to plot properly.
+	
+	PARAMETERS: 
+	-----------
+	fig	[plt object]	:	plt returned from MakeCCD.
+	clusters [pd.DataFrame]	:	DataFrame containing the magnitude of each cluster in each filter
+					denoted by xcolor and ycolor. 
+	xcolor	[list]		:	List containing the filters used to calculate the x-axis colors.
+					By default, set to ["F555W","F814W"], which equates to a V-I 
+					color on the x-axis.
+	ycolor	[list]		:	List containing the filters used to calculate the y-axis colors.
+					By default, set to ["F435W","F555W"], which equates to a B-V 
+					color on the y-axis.
+	colors	[list]		: 	List containing the short-hand for the color in the x and y axes. 
+					This will be used to determine which extinction factor would be 
+					applied to the x and y colors and the direction/magnitude of the
+					reddening arrow. 
+	correct_ext [bool]	: 	Adjust the color of clusters to correct for extinction (reddening)
+					using the Milky Way extinction law and E_BV.
+	E_BV	[float]	(0.08)	:	Galactic reddening towards the galaxy or source of interest.
+					Used to adjust the extinction arrow vector.
+	label_ages [bool]	: 	If true, plots markers to indicate cluster ages of 10 Myr and 400 Myr. Defaults to True.
+	color	[str]	(black)	:	Color of the cluster markers. 
+	size	[int]	(15)	:	Cluster marker size. 
+	label	[str]		:	Legend label of the cluster points. 
+	model_color [str] (gray):	Color of the model line.
+	model_label [str]	:	Legend label of the model. 
+	instrument [str] ('acs'):	HST instrument (acs or wfc3) with which observations were taken. Default is 'acs'. 
+	Z	[float]	(0.02)	:	Stellar metallicity to compare to models. Defaults to approximately solar (Z=0.02). 
+					Other options are [0.0001, 0.0004, 0.004, 0.008, 0.05, 0.10].
+	stellar_lib [str]	:	The name of the stellar libary to use, available in CB07 (from https://www.bruzual.org/). 
+					Defaults to "BaSel" (Lastennet et al. 2001). Other options are "xmiless" (MILES, Falcón-Barroso et al. 2011)
+					or "stelib" (Le Borgne et al. 2003). 
+	
+	RETURNS: 
+	----------- 
+
+	Plots input clusters against the cluster color evolution models, including an arrow pointing in the direction of reddening. 
+
+	Returns plt figure.
+
+	"""
+
+	if instrument.lower() == "acs": model = CB07_acs.copy()
+	elif instrument.lower() == "wfc3": model = CB07_wfc3.copy()
+
+	model = Find(model, ["Z = " + str(Z), "Library = " + stellar_lib])
+
+	# Calculating reddening factors from the MW reddening law
+	Rv = 3.19  # from MW extinction law
+	Av = Rv * E_BV
+
+	# From other relations: 
+	Au = 1.586 * Av     # 5.06
+	Ab = (1 + Rv)*E_BV  # 4.19
+	Ai = 0.536 * Av     # 1.71
+
+	E_UB = Au - Ab
+	E_UV = Au - Av
+	E_UI = Au - Ai
+	E_VI = Av - Ai
+	E_BI = Ab - Ai
+	E_BV = Ab - Av
+
+	# Finding the appropriate reddening factor based on the input x and y colors
+	if colors[0] == "U-B": Ex = E_UB
+	elif colors[0] == "U-V": Ex = E_UV
+	elif colors[0] == "U-I": Ex = E_UI
+	elif colors[0] == "V-I": Ex = E_VI
+	elif colors[0] == "B-I": Ex = E_BI
+	elif colors[0] == "B-V": Ex = E_BV
+
+	if colors[1] == "U-B": Ey = E_UB
+	elif colors[1] == "U-V": Ey = E_UV
+	elif colors[1] == "U-I": Ey = E_UI
+	elif colors[1] == "V-I": Ey = E_VI
+	elif colors[1] == "B-I": Ey = E_BI
+	elif colors[1] == "B-V": Ey = E_BV
+
+	# If user wishes to apply extinction correction, set the extinction factor
+	if correct_ext: 
+		Ex_clust = Ex
+		Ey_clust = Ey
+	else: 
+		Ex_clust = 0
+		Ey_clust = 0
+
+
+	# Pulling x and y colors from the model based on the input DataFrame
+	# These should be colors, but this code allows user to input a magnitude, in case it's more useful for special cases
+	for head in model.columns.values.tolist(): 
+		if isinstance(xcolor, list):
+			if xcolor[0] in head: x0 = head
+			if xcolor[1] in head: x1 = head
+		if isinstance(xcolor, str): 
+			print("WARNING: Single magnitude detected for xcolor. It is advised to only use colors for these models!")
+			if xcolor in head: x0 = head
+		if isinstance(ycolor, list): 
+			if ycolor[0] in head: y0 = head
+			if ycolor[1] in head: y1 = head
+		if isinstance(ycolor, str): 
+			print("WARNING: Single magnitude detected for ycolor. It is advised to only use colors for these models!")
+			if ycolor in head: y0 = head
+
+	# Headers in the models are in V-<filter> format, so they must be subtracted backwards
+	try: xmodel = model[x1]-model[x0]
+	except: xmodel = model["Vmag"] - model[x0]
+	try: ymodel = model[y1]-model[y0]
+	except: ymodel = model["Vmag"]-model[y0]
+
+	# Plotting the Solar model
+	fig.plot(xmodel, ymodel, color=model_color, label=model_label, alpha=0.5)
+
+	if label_ages:
+		# Plotting the models for young and globular clusters
+		TempAge = Find(model, "log-age-yr = 7") # 10 Myrs
+
+		if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+		else: TempAge[x0]
+		if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+		else: yage = TempAge[y0]
+
+		plt.scatter(xage,yage, marker="v", color=model_color, s=75, zorder=5)
+		plt.annotate("10 Myrs", (xage, yage), zorder=999)
+
+		TempAge = Find(model, "log-age-yr = 8.606543") # ~400 Myr
+
+		if isinstance(xcolor, list): xage = TempAge[x1]-TempAge[x0]
+		else: TempAge[x0]
+		if isinstance(ycolor, list): yage = TempAge[y1]-TempAge[y0]
+		else: yage = TempAge[y0]
+
+		plt.scatter(xage, yage, marker="v", color=model_color, s=75, zorder=5)
+		plt.annotate("400 Myrs", (xage, yage), zorder=999)
+
+	# Plotting clusters from input dataframe
+	if isinstance(clusters, pd.DataFrame): 
+		clusters = clusters.copy()
+
+		if isinstance(xcolor, list): xvals = clusters[xcolor[0]] - clusters[xcolor[1]]+Ex_clust
+		else: xvales = clusters[xcolor] + Ex_clust
+
+		if isinstance(ycolor, list): yvals = clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust
+		else: yvals = clusters[ycolor] + Ey_clust
+
+		fig.scatter(xvals, yvals, s=size, color=color, label=label)
+
+	return fig
+
+###-----------------------------------------------------------------------------------------------------
+# PLANNED FUNCTIONS, UPDATE TBD
+#
+#def FitCCD(): 
+#	"""
+#	Function for finding the best fit cluster model from CB07 models. Coming soon!
+#	"""
+#
+###-----------------------------------------------------------------------------------------------------
+#
+#def FitSED(): 
+#	"""
+#	Function for finding the best fit stellar SED (see ULX code). Coming soon!
+#	"""

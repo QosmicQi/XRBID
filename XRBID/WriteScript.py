@@ -27,7 +27,7 @@ ID = "ID"
 
 ###-----------------------------------------------------------------------------------------------------
 
-def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, idheader="ID", filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None, tile=False): 
+def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zscale", imgnames=None, imgsize=[305,305], outfile=None, unique_scale=False, coords=None, ids=None, idheader="ID", filetype="jpeg", basefilter=["red"], filterorder=["red", "green", "blue"], zoom=8, env_zoom=2, coordsys=None): 
 
 	"""
 	Generates a bash script that will write a program for taking thumbnails/snapshots in DS9 of sources in a given DataFrame. 
@@ -58,25 +58,20 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 	ids		[list]		:	List of source IDs. Only needed if only coordinates are provided (to build new DataFrame). 
 	idheader	[str]		:	Header of the ID column in the DataFrame. Defaults to "ID". 
 	filetype	[str]		: 	File format of the images to be saved. Defaults to "jpeg" to save memory, but "png" may also be used. 
-	basefilter	[str]		:	The filter/channel whose coordinates are to be used when opening region files. This is useful when there are slight coordinate
-						differences between the filters and/or the region files were created using a specific base filter. Default is "red". 
+	basefilter	[str]		:	The filter/channel whose coordinates are to be used when opening region files. This is useful when there are slight 
+						coordinate differences between the filters and/or the region files were created using a specific base filter. 
+						Default is "red". 
 	filterorder	[list]		:	Order in which the filters were input. The default is ["red","green","blue"]. 
 	zoom		[int]		:	DS9 zoom setting, for the closest zoom. Default is 8. 
-	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the environment around each source. Default is 2. 
+	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the environment around each source. 
+						Default is 2. 
 	coordsys	[str]		:	Coordinate system of the source coordinates (image or fk5 preferred). 
-	tile		[bool]		:	Determines whether to save a tiled image, in which each of the color channels are tiled side-by-side instead of opening a 
-						full color image. Default is False. 
 						
 	"""
 	
 	frame = df.copy()
 
 	if ".txt" in scales: unique_scale = True
-
-	if tile: # If tiling is set to True, need to run this enitrely differently
-		WriteDS9_tile(frame=frame, galaxy=galaxy, colorfiles=colorfiles, regions=regions, scales=scales, \
-			      imgnames=imgnames, imgsize=imgsize, outfile=outfile, unique_scale=unique_scale, \
-		              coords=coords, filetype=filetype, zoom=zoom, env_zoom=env_zoom, coordsys=coordsys,ids=ids)
 
 	# If tiling is not set to true, continue...
 	else: 
@@ -416,7 +411,7 @@ def WriteReg(sources, outfile, coordsys=False, coordheads=False, coordnames=Fals
     reg_props = [r+"\n" for r in reg_props] 
     
     # Putting together the full region line using the coordinates of each source
-    f_reg = [reg+str(x_coords[i])+", "+str(y_coords[i])+r for i,r in enumerate(reg_props)]
+    f_reg = [reg+str(x_coords[i]+addshift[0])+", "+str(y_coords[i]+addshift[1])+r for i,r in enumerate(reg_props)]
 
     #### WRITING THE REGION FILE ####
     print("Saving", outfile)
