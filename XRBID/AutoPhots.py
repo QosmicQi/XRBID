@@ -163,7 +163,9 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     	     outfile=gal+"_daofind_"+filter.lower()+"_"+instrument.lower()+suffix+"_img.reg", \
     	     label=objects["id"].tolist())
     		 
-    wcs = WCS(hdu['PRIMARY'].header)
+    try: wcs = WCS(hdu['SCI',1].header)
+    except: wcs = WCS(hdu['PRIMARY',1].header)
+
     xcoords_fk5, ycoords_fk5 = wcs.wcs_pix2world(xcoord_img, ycoord_img, 1)
     WriteReg(sources=[xcoords_fk5, ycoords_fk5], coordsys="fk5", \
              outfile=gal+"_daofind_"+filter.lower()+"_"+instrument.lower()+suffix+"_fk5.reg", \
