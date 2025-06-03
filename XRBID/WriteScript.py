@@ -1,8 +1,7 @@
 ###########################################################################################
 ##########	For writing scripts, such as bash scripts and region files	########### 
-##########	                Last Update: May 09, 2025               	########### 
-##########	(Major overhaul of WriteReg, deleted unneeded functions, and	########### 
-##########	added new function, CombineReg. Added descriptions to others.)	###########
+##########	                Last Update: Jun 03, 2025               	########### 
+##########	Streamlined some I/O code, made minor changes to WriteDS9.	########### 
 ###########################################################################################
 
 import math
@@ -93,13 +92,13 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 		if colorfiles == None: # Name of the files for RGB frames needed
 			while not good: 
 				colorfiles = input("Names of .fits files for galaxy color map (red, green, blue; separate by commas): ")
-				colorfiles = colorfiles.split(",")
+				colorfiles = [c.strip() for c in colorfiles.split(",")] # breaks up filters and removes trailing/leading whitespace
 				if len(colorfiles) == 3: good = True
 				else: print("Not enough color files provided."); colorfiles = None; 
 		
 		if regions == None: # In case region files were forgotten, ask user for input. 
 			regions = input("Region files? (separate by commas, or Enter if none):") 
-			regions = regions.split(",")
+			regions = [r.strip() for r in regions.split(",")]
 		if not isinstance(regions, list): regions = [regions]  # region files should be lists
 
 		# basefilter should be indicated for every region
@@ -129,17 +128,17 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 					else: scalings = np.genfromtxt(raw_input("Unique scalings file?: "), dtype=None).tolist()
 			except: print("\nUnique scalings file not found.")
 			#try: 
-			print("Writing " + outfile + "...")
+			print(r"Writing {outfile}...")
 			with open(outfile, 'w') as f: 
-				f.write("#! /bin/bash\necho \"Creating images of " + galaxy + " sources. Please wait...\"\n")
+				f.write(f"#! /bin/bash\necho \"Creating images of {galaxy} sources. Please wait...\"\n")
 				# code for opening color image of galaxies
-				f.write("ds9 -height "+str(imgsize[0])+" -width "+str(imgsize[1])+" -colorbar no \\\n-rgb -" + filterorder[0] + " -zscale " + colorfiles[0])	# green needs to be opened first, for alignment reasons
-				f.write(" \\\n-" + filterorder[1] + " -zscale " + colorfiles[1])
-				f.write(" \\\n-" + filterorder[2] + " -zscale " + colorfiles[2] + " \\\n") 
+				f.write(f"ds9 -height {imgsize[0]}" -width {imgsize[1]} -colorbar no \\\n-rgb -{filterorder[0]} -zscale {colorfiles[0]"})	# green needs to be opened first, for alignment reasons
+				f.write(f" \\\n-{filterorder[1]} -zscale {colorfiles[1]}")
+				f.write(f" \\\n-{filterorder[2]} -zscale {colorfiles[2]} \\\n") 
 				# code for opening region files (if applicable)
 				try: 
 					for i in range(len(regions)): 
-						f.write("-" + basefilter[i] + " -region load " + regions[i] + " ")
+						f.write(f"-{basefilter[i]} -region load {regions[i]} ")
 				except: pass;
 				# For each of the scalings, look to see if the source is in the DataFrame
  				#  Making sure the scalings is in the right form
@@ -149,28 +148,29 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 					j = scalings[k]
 					#try: 
 					if isinstance(imgnames, list): tempname = str(imgnames[k])
-					else: tempname = str(imgnames) + "_" + j[0] # if imgname is given, use it
+					else: tempname = f"{imgnames}_{j[0]}" # if imgname is given, use it
 					#except: tempname = j[0]
 
 					# Search dataframe for the scaling ID
-					temp = FindUnique(frame, idheader + " = " + j[0])
+					temp = FindUnique(frame, f"{idheader} = {j[0]}")
 					
 					# If ID is found, print pan script to .sh file
 					if len(temp) > 0:
-						f.write("\\\n-zoom to " + str(zoom) + " ")
+						f.write(f"\\\n-zoom to {zoom} ")
 						if coordsys == "img" or coordsys == "image":
-							f.write("\\\n\\\n-" + base + " -pan to " + str(temp["x"].values[0]) + " " + str(temp["y"].values[0]) + " image " )
+							try: f.write(f"\\\n\\\n-{base} -pan to {temp["x"].values[0]} {temp["y"].values[0]} image " )
+							except: f.write(f"\\\n\\\n-{base} -pan to {temp["X"].values[0]} {temp["Y"].values[0]} image " )
 						elif coordsys == "galaxy" or coordsys == "fk5":
-							f.write("\\\n-" + base + " -pan to " + str(temp["RA"].values[0]) + " " + str(temp["Dec"].values[0]) + " fk5 ")
+							f.write(f"\\\n-{base} -pan to {temp["RA"].values[0]} {temp["Dec"].values[0]} fk5 ")
 						else:
-							try: f.write("\\\n\\\n-" + base + " -pan to " + str(temp["x"].values[0]) + " " + str(temp["y"].values[0]) + " image " )
-							except: f.write("\\\n-" + base + " -pan to " + str(temp["RA"].values[0]) + " " + str(temp["Dec"].values[0]) + " fk5 ")
+							try: f.write(f"\\\n\\\n-{base} -pan to {temp["x"].values[0]} {temp["y"].values[0]} image " )
+							except: f.write(f"\\\n-{base} -pan to {temp["RA"].values[0]} {temp["Dec"].values[0]} fk5 ")
 						if j[1] == "-zscale" or j[1] == "zscale":
 							f.write("\\\n-red -zscale -green -zscale -blue -zscale ")
-						else: f.write("\\\n-red -scale limits 0 " + str(j[1]) + " -green -scale limits 0 " + str(j[2]) + " -blue -scale limits 0 " + str(j[3]) + " ")
-						f.write("\\\n-saveimage " + filetype + " " + tempname +"."+filetype+" ")
-						f.write("\\\n-zoom to " + str(env_zoom) + " ")
-						f.write("\\\n-saveimage " + filetype + " " + tempname + "_env." + filetype + " ")
+						else: f.write(f"\\\n-red -scale limits 0 {j[1]} -green -scale limits 0 {j[2]} -blue -scale limits 0 {j[3]} ")
+						f.write(f"\\\n-saveimage {filetype} {tempname}.{filetype} ")
+						f.write(f"\\\n-zoom to {env_zoom} ")
+						f.write(f"\\\n-saveimage {filetype} {tempname}_env.{filetype} ")
 					else: pass;
 				f.write("\\\n-exit\necho \"Done.\"")               
 			f.close()
@@ -189,27 +189,28 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 					if len(temp)>0: scales.append([x for x in re.split(",", temp)])
 			
 			if not isinstance(scales, list): scales = [scales] # Scales should be a list
-			print("Writing " + outfile + "...")
+			print(f"Writing {outfile}...")
 			with open(outfile, 'w') as f: 
-				f.write("#! /bin/bash\necho \"Creating images of " + galaxy + " sources. Please wait...\"\n")
+				f.write(f"#! /bin/bash\necho \"Creating images of {galaxy} sources. Please wait...\"\n")
 				# code for opening color image of galaxies
-				f.write("ds9 -height "+str(imgsize[0])+" -width "+str(imgsize[1])+" -colorbar no \\\n-rgb -" + filterorder[0] + " -zscale " + colorfiles[0])
-				f.write(" \\\n-" + filterorder[1] + " -zscale " + colorfiles[1])
-				f.write(" \\\n-" + filterorder[2] + " -zscale " + colorfiles[2] + " \\\n") 
+				f.write(f"ds9 -height {imgsize[0]} -width {imgsize[1]} -colorbar no \\\n-rgb -{filterorder[0]} -zscale {colorfiles[0]}")
+				f.write(f" \\\n-{filterorder[1]} -zscale {colorfiles[1]}")
+				f.write(f" \\\n-{filterorder[2]} -zscale {colorfiles[2]} \\\n") 
 				# code for opening region files
 				try:
 					for i in range(len(regions)): 
-						f.write("-" + basefilter[i] + " -region load " + regions[i] + " ")
+						f.write(f"-{basefilter[i]} -region load {regions[i]} ")
 				except: pass;
 				for i in range(len(frame)): 
-					f.write("\\\n-zoom to " + str(zoom) + " ")
+					f.write(f"\\\n-zoom to {zoom} ")
 					if coordsys == "img" or coordsys == "image":
-						f.write("\\\n-" + base + " -pan to " + str(frame["x"][i]) + " " + str(frame["y"][i]) + " image " )
+						try: f.write(f"\\\n-{base} -pan to {frame["x"][i]} {frame["y"][i]} image ")
+						except: f.write(f"\\\n-{base} -pan to {frame["X"][i]} {frame["Y"][i]} image ")
 					elif coordsys == "galaxy" or coordsys == "fk5":
-						f.write("\\\n-" + base + " -pan to " + str(frame["RA"][i]) + " " + str(frame["Dec"][i]) + " fk5 ")
+						f.write(f"\\\n-{base} -pan to {frame["RA"][i]} {frame["Dec"][i]} fk5 ")
 					else:
-						try: f.write("\\\n-" + base + " -pan to " + str(frame["x"][i]) + " " + str(frame["y"][i]) + " image " )
-						except: f.write("\\\n-" + base + " -pan to " + str(frame["RA"][i]) + " " + str(frame["Dec"][i]) + " fk5 ")
+						try: f.write(f"\\\n-{base} -pan to {frame["x"][i]} {frame["y"][i]} image " )
+						except: f.write(f"\\\n-{base} -pan to {frame["RA"][i]} {frame["Dec"][i]} fk5 ")
 					for j in scales: 
 						try: j = j.strip(",")
 						except: j[0] = j[0].strip(",")
@@ -225,12 +226,12 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 							f.write("\\\n\\\n-red -zscale -green -zscale -blue -zscale ")
 							pass;
 						elif len(j) > 3: 
-							f.write("\\\n\\\n-red -scale limits 0 "+str(j[1])+" -green -scale limits 0 "+str(j[2])+" -blue -scale limits 0 "+str(j[3])+" ")
+							f.write(f"\\\n\\\n-red -scale limits 0 {j[1]} -green -scale limits 0 {j[2]} -blue -scale limits 0 {j[3]} ")
 							# In the case where multiple, non-unique scales are given, append current scale to imagenames
 							if len(scales) > 1: imgtemp = [n + "_" + j[0] for n in imgtemp]
 							else: pass;
 							pass;
-						f.write("\\\n-saveimage jpeg " + imgtemp + ".jpg ")
+						f.write(f"\\\n-saveimage jpeg {imgtemp}.jpg ")
 				f.write("\\\n-exit\necho \"Done.\"")               
 			f.close()
 			print("DONE") 
