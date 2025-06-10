@@ -2,10 +2,9 @@
 ##########	For reading in, identifying, cross-referencing,		###########
 ##########	and classifying sources, particularly CSC-derived	########### 
 ##########	X-ray sources or stars ID'd w/ DaoStarFinder.		###########
-##########	Last update: June 3, 2025 				########### 
-##########	Update desc: Updated Crossref to allow the 		########### 
-##########		     original headers of DataFrame read in 	########### 
-##########		     to be maintained. 				########### 
+##########	Last update: June 9, 2025 				########### 
+##########	Update desc: Updated GetDaoPhots to allow the return	########### 
+##########		     of photometric errors.		 	########### 
 ###################################################################################
 
 import re
@@ -574,7 +573,7 @@ def Crossref(df=None, regions=False, catalogs=False, coords=False, sourceid="ID"
 
 ###-----------------------------------------------------------------------------------------------------
 
-def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=0): 
+def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=0, return_err=True, errorheader="aperture_mag_err"): 
 
 	"""
 	Retrieving the photometry for each daosource by their IDs as listed in a given DataFrame. 
@@ -596,7 +595,10 @@ def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=
 	dmod		[float]		: Distance modulus (equal to 5*np.log10(distance)-5) used to convert from apparent to absolute 
 					  magnitudes. Defaults to 0 to assume magnitudes are already converted, or to return photometry in
 					  apparent mags.
-	
+	return_err	[bool]		: If True, returns the photometric error from the photometry file and adds to the returned DataFrame.
+	errorheader	[str]		: Header under which the photometric errors are stored. If 'return_errs = True' and no errorheader is 
+					  given, assumes the header is 'aperture_mag_err'.
+
 	RETURNS
 	---------
 	df_phots	[pd.DataFrame]	: Returns df with the magnitudes and colors pulled from photfiles appended as additional headers.
@@ -611,6 +613,9 @@ def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=
 		# Defining new header for current filter
 		df_phots[f] = [np.nan]*len(df_phots) 	# defaults to np.nan if no ID is found. 
 
+		# If errors are requested, add it to the DataFrame
+		if return_err: df_phots[f"{f} Err"] = [np.nan]*len(df_phots)
+
 		print("Searching", photfiles[i])
 
 		# Reading in photometry for the current filter
@@ -621,6 +626,10 @@ def GetDaoPhots(df, photfiles, idheads, filters, magheader="aperture_mag", dmod=
 			tempph = Find(tempphots, "id = " + str(tempid))
 			try: df_phots[f][j] = tempph[magheader][0] - dmod	# pulling the photometry from the appropriate header
 			except: pass;	# if there is no ID given for this particular line in DataFrame, keep photometric value as np.nan
+
+			if return_err: 
+				try: df_phots[f"{f} Err"][j] = tempph[errorheader][0]
+				except: pass;
 		
 	return df_phots
 

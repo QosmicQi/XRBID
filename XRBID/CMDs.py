@@ -1,7 +1,8 @@
 ###################################################################################
 ##########	For plotting CMDs, along with mass tracks 		########### 
-##########	Last updated: April 2025				###########	
-##########	Added color-color diagrams for cluster aging		###########	
+##########	Last updated: June 09, 2025				###########	
+##########	Update Description: Added FitSED for direct model	###########
+##########		fitting for stellar photometric measurements	###########	
 ###################################################################################
 
 import re
@@ -47,6 +48,10 @@ wfc3_masses = [pd.read_csv("isoWFC3_1Msun.frame"), pd.read_csv("isoWFC3_3Msun.fr
 
 acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Msun.frame"), pd.read_csv("isoACS_WFC_5Msun.frame"),
 	      pd.read_csv("isoACS_WFC_8Msun.frame"), pd.read_csv("isoACS_WFC_20Msun.frame")]
+
+isoacs = pd.read_csv("isoACS_all.frame")
+isowfc3 = pd.read_csv("isoWFC3_all.frame")
+# isonircam = pd.read_csv("isoNIRCAM_all.frame") # not yet active
 
 # Calling in model for creating the cluster color-color diagrams
 # As of version 1.7.0, no longer using BC03 models. Instead use CB07 models (Bruzual 2007, arXiv:astro-ph/0703052)
@@ -344,7 +349,7 @@ def AddCMD(df=None, xcolor=False, ycolor=False, color="black", size=10, marker=N
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=["V", "B", "I"], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, ID_header="ID", coord_headers=["X", "Y"], extinction=[0,0,0,0]): 
+def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=[3,20], headers=["V", "B", "I"], instrument="ACS", filters=["F606W", "F435W", "F814W"], distance=False, savefile=None, idheader="ID", ID_header=False, coordheads=["X", "Y"], coord_headers=False, extinction=[0,0,0,0]): 
 
 	"""Calculating magnitudes with given aperture corrections. The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
 
@@ -353,6 +358,10 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 
 	if not distance: 
 		distance = float(input("Distance to galaxy (in units parsec): "))
+
+	# ID_headers and coord_headers are depricated as parameters, but still used as variables in the code below.
+	if coord_headers == False: coord_headers = coordheads
+	if ID_headers == False: ID_headers = idheader
 
 	# If U is given, add U corrections to all commands
 	if len(filters) == 4: U_true = True
@@ -445,11 +454,17 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 
 ###-----------------------------------------------------------------------------------------------------
 
-def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, ID_header="ID", coord_headers=["X", "Y"], extinction=0): 
+def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, idheader="ID", ID_header=False, coordheads=["X", "Y"], coord_headers=False, extinction=0): 
 
-	"""Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter (so that it doesn't require all filters to be given if only one measurement is needed). The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. """
+	"""Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter (so that it doesn't require all filters to be given if only one measurement is needed). The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. 
+
+	NOTE: ID_header and coord_headers have been depricated. They are now called idheader and coordheads, to match other parts of XRBID. """
 
 	if df: frame = df.copy()
+
+	# ID_headers and coord_headers are depricated as parameters, but still used as variables in the code below.
+	if coord_headers == False: coord_headers = coordheads
+	if ID_headers == False: ID_headers = idheader
 
 	curr_dir = pwd()
 	# Loading in the EEFs file
@@ -834,6 +849,116 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 		fig.scatter(xvals, yvals, s=size, color=color, label=label)
 
 	return fig
+###-----------------------------------------------------------------------------------------------------
+
+def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fittype="reduced chi2", min_models=1, input_model=False, model_header_index=13): 
+
+	"""
+	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
+	multiple filters and compares their values to those given by the Padova isochrones for theoretical stellar evolutionary models. 
+
+	PARAMETERS: 
+	-----------
+	df	[pd.DataFrame]	:	DataFrame containing the magnitudes and photometric errors of the source(s) of interest. 
+	instrument 	[str]	:	Instrument with which the measurements were taken. Currently accepts "acs" and "wfc3", but 
+					will be able to take "nircam" for JWST observations in the future. 
+	filters		[list]	:	List of filters for which the magnitudes were measured. The measured magnitudes should be stored in the 'df'
+					DataFrame under the name of the filter with which they were taken (e.g. "F814W", "F555W", etc.), matching the 
+					headers under which the modeled magnitudes from the isochrones are stored. If the header in df do not match those
+					in the isochrone DataFrames, the user should input the headers as they are stored in df as the filterheads parameter.
+					If desired, the magnitudes should be extinction-corrected beforehand using XRBID.AutoPhots.RemoveExt.
+	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err", etc.)
+	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model is associated 
+					with which source when df contains more than one source to fit.
+	filterheads	[list]	:	If the headers under which the photometry of each source is different from the list of filters (i.e. the headers 
+					under which they are stored in the isochrone model DataFrames), the user can input them here. 
+					Otherwise, user can leave 'filterheads' blank, and the code will use the values under 'filters' as the 
+					photometry headers.
+	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone (currently not necessary, as only reduced chi2
+					has been coded. In the future MCMC will also be included). 
+					"reduced chi2" (default) selects the model for which the resulting reduced chi-squared is closest to 1. 
+					"mcmc" (pending) uses an MCMC algorithm to determine the best-fit model. 
+	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be returned. If min_models >= 2, 
+					the next closest fit(s) up to min_models will be returned as well (e.g. if min_models = 3, the 2 next closest fits
+					will also be given). If several models fit equally well, all will be included in isoMatches.
+	input_model	[str]	:	If preferred, user can input the name of a file containing the preferred isochrone models from the Padova website. The code 
+					assumes the document is copied and pasted from the CMD output page, with the table headers on the 14th line (unless the file
+					is a CSV DataFrame); this can be modified using the 'model_header_index' parameter. One should be sure to change the 
+					magnitude headers to match those of their 'df', or vice versa. 
+	model_header_index [int]:	Index of the line containing the headers of the isochrone models, if a .txt file is read in as input_model. 
+					By default, this is line 13. This parameter can be ignored in input_model is the name of a CSV DataFrame.  
+
+	RETURNS: 
+	---------
+	isoMatches [pd.DataFrame] :	DataFrame containing the best-fit models for each source in 'df'. 
+	
+	"""
+
+	# If input_model is given, read in that file for the isochrone
+	# Otherwise, the instrument determines which isochrones to use
+	if input_model != False:
+		# Assumes first that the input is a CSV DataFrame. If not, the length of the header will = 1
+		isoTemp = pd.read_csv(input_model, comment="#")
+		if len(isoTemp.columns.tolist()) == 1: # the file was not a DataFrame, so treat as regular .txt file
+			# Pulls the header of the model file based on model_header_index
+			names = [n.strip("#") for n in open(input_model).readlines()[model_header_index].split()]
+			isoTemp = pd.read_csv(input_model, comment="#", delim_whitespace=True, names=names)
+		else: 
+			try: isoTemp = isoTemp.drop(columns=["Unnamed: 0"])
+			except: pass;
+	elif "acs" in instrument.lower(): isoTemp = isoacs.copy()
+	elif "wfc3" in instrument.lower(): isoTemp = isowfc3.copy()
+
+	# If filter headers is different in df than isoTemp, it should be given in filterheads: 
+	# Otherwise, we assume the filter headers are given in filters. 
+	if filterheads == False: filterheads = filters
+
+	# Keeping track of the ID of each source we will model
+	sourceids = df[idheader].values.tolist()
+	
+	# Keeping track of the photometry of each source in each filter (and errors)
+	# Each row of this list represents a single source, and each column represents the magnitude for each
+	sourcemags = [[df[f][i] for f in filterheads] for i in range(len(df))]
+	sourcemag_errs = [[df[e][i] for e in errorheads] for i in range(len(df))]
+
+	# Each best-fit model will be added to a separate DataFrame, which will be returned to the user at the end
+	isoMatches = BuildFrame(headers=isoTemp.columns.tolist())
+
+
+	# IN THE FUTURE, THIS PART WILL BE FLAGGED BY fittype
+	
+	# The fastest way to determine the best-fit model is to do so directly in the isoTemp DataFrame
+	# For each star, grab the photometry and compare to the isochrones. 
+	# Then find the isochrone for which the reduced chi-square is closest to 1, the best-fit
+	
+	isoMatches["Reduced Chi2"] = np.nan
+	isoMatches["Reduced Chi2 - 1"] = np.nan
+	isoMatches[idheader] = None
+
+	print("Finding best-fit model(s)...")
+	for star in range(len(df)): 
+		# As long as there is at least one good magnitude value associated with the star...
+		if False in [np.isnan(sourcemags[star][f]) for f in range(len(filters))]:
+			# For each filter, find the difference of the (measurements - model)^2/(errors)^2 and take the sum
+			isoTemp["Reduced Chi2"] = np.nansum([(sourcemags[star][f]-isoTemp[filters[f]].values)**2/sourcemag_errs[star][f]**2 if isinstance(sourcemags[star][f], float) else 0 for f in range(len(filters))], axis=0)
+			isoTemp["Reduced Chi2 - 1"] = np.abs(isoTemp["Reduced Chi2"] - 1)
+		
+			redchi2s = sorted(isoTemp["Reduced Chi2 - 1"].values.tolist()) # sorted list of reduced chi2 - 1
+			
+			# Searching for at least min_models number of best-fit models
+			temp = Find(isoTemp, f"Reduced Chi2 - 1 < {redchi2s[min_models]}")
+
+			# Adding the source ID to the DataFrame, to be added to isoMatches
+			temp[idheader] = sourceids[star]
+
+			# Adding the best-fit model(s) to the DataFrame to return to the user
+			isoMatches = pd.concat([isoMatches, temp], ignore_index=True)
+
+		else: pass; # if there are no good values, skip this star
+	print("DONE")
+
+	return isoMatches
+	
 
 ###-----------------------------------------------------------------------------------------------------
 # PLANNED FUNCTIONS, UPDATE TBD
@@ -845,7 +970,8 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 #
 ###-----------------------------------------------------------------------------------------------------
 #
-#def FitSED(): 
+#def PlotSED(): 
 #	"""
-#	Function for finding the best fit stellar SED (see ULX code). Coming soon!
+#	Takes in the photometric measurements of sources in a DataFrame and the best-fit isochrones from FitSED as a DataFrame and plots 
+#	them together onto a chart.
 #	"""

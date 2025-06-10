@@ -39,6 +39,13 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 	the region files are aligned to different filters. Filters should be called in the order they're intended to be used (default [red, green, blue]). 
 	If a different order is used, the order should be declared using the 'filterorder' parameter. 
 
+	PLANNED UPDATE (post v1.7.1): 
+	WriteDS9 will be updated such that the user can read in a list of zoom factors, rather than set just the 'zoom' and 'zoom_env' 
+	parameters. This update will render the 'env_zoom' parameters obsolete. WriteDS9 will check whether 'zoom' is a list and, if so,
+	will add to the image names to label them `_zoom{zoom factor}` before the user-defined suffix (if given). This will allow more 
+	than two zoom factors to be given, allowing greater flexibility for the user. 
+
+
 	PARAMETERS: 
 	-----------
 	df		[pd.DataFrame]	:	DataFrame containing the sources to image.
@@ -63,8 +70,8 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 						Default is "red". 
 	filterorder	[list]		:	Order in which the filters were input. The default is ["red","green","blue"]. 
 	zoom		[int]		:	DS9 zoom setting, for the closest zoom. Default is 8. 
-	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the environment around each source. 
-						Default is 2. 
+	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the 
+						environment around each source. Default is 2. (Will be depricated after v1.7.2).
 	coordsys	[str]		:	Coordinate system of the source coordinates (image or fk5 preferred). 
 						
 	"""
