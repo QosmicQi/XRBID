@@ -947,6 +947,8 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 		if False in [np.isnan(sourcemags[star][f]) for f in range(len(photheads))]:
 			# For each filter, find the difference of the (measurements - model)^2/(errors)^2 and take the sum
 			isoTemp["Reduced Chi2"] = np.nansum([(sourcemags[star][f]-isoTemp[photheads[f]].values)**2/sourcemag_errs[star][f]**2 if isinstance(sourcemags[star][f], float) else 0 for f in range(len(photheads))], axis=0)
+
+			# The best model is one such that reduced chi2 is close to 1. Values much higher than 1 are underfit, much lower than 1 is overfit. 
 			isoTemp["Reduced Chi2 - 1"] = np.abs(isoTemp["Reduced Chi2"] - 1)
 		
 			redchi2s = sorted(isoTemp["Reduced Chi2 - 1"].values.tolist()) # sorted list of reduced chi2 - 1
