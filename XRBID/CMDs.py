@@ -851,7 +851,7 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	return fig
 ###-----------------------------------------------------------------------------------------------------
 
-def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fittype="reduced chi2", min_models=1, input_model=False, model_header_index=13): 
+def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="reduced chi2", min_models=1, input_model=False, model_header_index=13): 
 
 	"""
 	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
@@ -862,19 +862,17 @@ def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fit
 	df	[pd.DataFrame]	:	DataFrame containing the magnitudes and photometric errors of the source(s) of interest. 
 	instrument 	[str]	:	Instrument with which the measurements were taken. Currently accepts "acs" and "wfc3", but 
 					will be able to take "nircam" for JWST observations in the future. 
-	filters		[list]	:	List of filters for which the magnitudes were measured. The measured magnitudes should be 
-					stored in the 'df' DataFrame under the name of the filter with which they were taken 
-					(e.g. "F814W", "F555W", etc.), matching the headers under which the modeled magnitudes 
-					from the isochrones are stored. If the header in df do not match those in the isochrone DataFrames, 
-					the user should input the headers as they are stored in df as the filterheads parameter.
-					If desired, the magnitudes should be extinction-corrected beforehand using XRBID.AutoPhots.RemoveExt.
-	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err")
 	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model is associated 
 					with which source when df contains more than one source to fit.
-	filterheads	[list]	:	If the headers under which the photometry of each source is different from the list of filters (i.e. the headers 
-					under which they are stored in the isochrone model DataFrames), the user can input them here. 
-					Otherwise, user can leave 'filterheads' blank, and the code will use the values under 'filters' as the 
-					photometry headers.
+	photheads	[list]	:	List of headers under which the photometric measurements per filter are stored within the 'df' DataFrame. 
+					The measured magnitudes should be stored under the name of the filter with which they were taken 
+					(e.g. "F814W", "F814Wmag", etc.), matching the headers of the isochrone models. If 'filterheads' is left blank, 
+					the code will use the filter headers found in the isochrone models as the photometry headers. In searching for 
+					the appropriate model headers, the code assumes the headers in the isochrone models begin with F and that no 
+					other header in the model table does. This is a reasonable assumption for both HST and JWST, but may need to be 
+					revisited for other models.
+	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err"). 
+					If left blank, the code will assign values based on the values in 'photheads'.
 	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone (currently not necessary, as only reduced chi2
 					has been coded. In the future MCMC will also be included). 
 					"reduced chi2" (default) selects the model for which the resulting reduced chi-squared is closest to 1. 
@@ -911,16 +909,21 @@ def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fit
 	elif "acs" in instrument.lower(): isoTemp = isoacs.copy()
 	elif "wfc3" in instrument.lower(): isoTemp = isowfc3.copy()
 
-	# If filter headers is different in df than isoTemp, it should be given in filterheads: 
-	# Otherwise, we assume the filter headers are given in filters. 
-	if filterheads == False: filterheads = filters
+
+	# Tries to find the filter headers in isoTemp, assuming they all start with "F" and no other headers do. 
+	filters = [filt for filt in isoTemp.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+	
+	# Figure out the source headers to pull the photometry from df. If not given, assume they match the model header format
+	if photheads == False: photheads = [h for h in filters if h in df.columns.tolist()]
+	if errorheads == False: errorheads = [f"{h} Err" for h in photheads]
+
 
 	# Keeping track of the ID of each source we will model
 	sourceids = df[idheader].values.tolist()
 	
 	# Keeping track of the photometry of each source in each filter (and errors)
 	# Each row of this list represents a single source, and each column represents the magnitude for each
-	sourcemags = [[df[f][i] for f in filterheads] for i in range(len(df))]
+	sourcemags = [[df[f][i] for f in photheads] for i in range(len(df))]
 	sourcemag_errs = [[df[e][i] for e in errorheads] for i in range(len(df))]
 
 	# Each best-fit model will be added to a separate DataFrame, which will be returned to the user at the end
@@ -940,9 +943,9 @@ def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fit
 	print("Finding best-fit model(s)...")
 	for star in range(len(df)): 
 		# As long as there is at least one good magnitude value associated with the star...
-		if False in [np.isnan(sourcemags[star][f]) for f in range(len(filters))]:
+		if False in [np.isnan(sourcemags[star][f]) for f in range(len(photheads))]:
 			# For each filter, find the difference of the (measurements - model)^2/(errors)^2 and take the sum
-			isoTemp["Reduced Chi2"] = np.nansum([(sourcemags[star][f]-isoTemp[filters[f]].values)**2/sourcemag_errs[star][f]**2 if isinstance(sourcemags[star][f], float) else 0 for f in range(len(filters))], axis=0)
+			isoTemp["Reduced Chi2"] = np.nansum([(sourcemags[star][f]-isoTemp[photheads[f]].values)**2/sourcemag_errs[star][f]**2 if isinstance(sourcemags[star][f], float) else 0 for f in range(len(photheads))], axis=0)
 			isoTemp["Reduced Chi2 - 1"] = np.abs(isoTemp["Reduced Chi2"] - 1)
 		
 			redchi2s = sorted(isoTemp["Reduced Chi2 - 1"].values.tolist()) # sorted list of reduced chi2 - 1
@@ -963,7 +966,7 @@ def FitSED(df, instrument, filters, errorheads, idheader, filterheads=False, fit
 	
 ###-----------------------------------------------------------------------------------------------------
 
-def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massheader="Mass", sourceheads=False, errorheads=False, modelheads=False, modelparams=["Mass", "logAge", "logL", "logTe", "Reduced Chi2 - 1"], showHR=False): 
+def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massheader="Mass", sourceheads=False, errorheads=False, modelheads=False, modelparams=["Mass", "logAge", "logL", "logTe", "Reduced Chi2 - 1"], showtable=True, showHR=False): 
 	"""
 	Takes in the photometric measurements of sources in a DataFrame and the best-fit isochrones DataFrame from FitSED and plots 
 	them together onto a chart. If more than one model is given for a single source ID (given as idheader), then the model with 
@@ -991,6 +994,7 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 	modelparams	[list]		:	List of parameters from the df_model to pull and display. These will be printed
 						as a table alongside the SED plot, sorted in order of best to worst fit. The defaults are 
 						["Mass", "logAge", "logL", "logTe", "Reduced Chi2 - 1"].
+	showtable	[bool]		:	If True, shows the table of model parameters given by 'modelparams', in order of best to worst fit.
 	showHR		[bool]		:	If True, plots the H-R diagram of the model star(s), indicating the most likely spectral type(s). 
 						(Feature coming soon!)
 
@@ -1005,6 +1009,19 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 	# Finding all unique sources from df_sources, to find their corresponding models in df_models 
 	sourceids = FindUnique(df_sources, header=idheader)[idheader].values.tolist()
 	
+	# Setting up all of the headers
+
+	# If no model headers are given, tries to find the photometry headers in df_models, assuming they all start with "F" and no other headers do. 
+	if modelheads == False: modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+	
+	# Figure out the source headers to pull the photometry from df_sources. If not given, assume they match the modelheads format
+	if sourceheads == False: sourceheads = [h for h in modelheads if h in df_sources.columns.tolist()]
+	if errorheads == False: errorheads = [f"{h} Err" for h in sourceheads]
+
+	# Setting up wavelengths of sources and models, in angstroms
+	modelwavs = [int(re.sub('\D', '', h))*10 for h in modelheads]
+	sourcewavs = [int(re.sub('\D', '', h))*10 for h in sourceheads]
+
 	# Plot each source separately
 	for s in sourceids: 
 		TempModel = Find(df_models, f"{idheader} = {s}")	# May contain multiple models, from min_models in FitSED
@@ -1015,16 +1032,11 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 
 		# Otherwise, plot the models
 		else: 
-			# If no model headers are given, tries to find the photometry headers in df_models, 
-			# assuming they all start with "F" and no other headers do. 
-			if modelheads == False: modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt]
-			#print(modelheads)
-
+			
 			# Pulls the magnitudes and wavelengths from the models
 			modelmags_all = [[TempModel[h][m] for h in modelheads] for m in range(len(TempModel))]
 			modelchis_all = TempModel[fitheader].values.tolist()
 			modelmass_all = TempModel[massheader].values.tolist()
-			modelwavs = [int(re.sub('\D', '', h))*10 for h in modelheads]
 
 			# Also keep track of parameters the user wants to print from each model
 			# The table will be sorted from best to worst fit.
@@ -1036,22 +1048,9 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 			minmassind = sorted(enumerate(modelmass_all), key=lambda i: i[1])[0][0]
 			maxmassind = sorted(enumerate(modelmass_all), key=lambda i: i[1])[-1][0]
 			
-
-			# Figure out the source headers to pull the photometry from TempSources
-			# If not given, assume they match the modelheads format
-			if sourceheads == False: sourceheads = [h for h in modelheads if h in TempSource.columns.tolist()]
-			if errorheads == False: errorheads = [f"{h} Err" for h in modelheads if h in TempSource.columns.tolist()]
-
 			# Pulling the magnitudes and wavelengths from source DataFrame
 			sourcemags = [TempSource[h][0] for h in sourceheads] # list of photometries (mags)
-			sourcewavs = [int(re.sub('\D', '', h))*10 for h in sourceheads] # list of wavelengths in angstroms
 			errormags = [TempSource[h][0] for h in errorheads] # list of photometries (mags)
-
-			# For each corresponding model in df_models, pull the photometry and plot all with low alpha
-			# Then search for the best-fit model and plot with a bold line.
-			# Then, search for the min and max mass models and indicate with different line styles. 
-			# To right of plot, add plt.table giving the Fit Rank, mass, temperature, and luminosity. 
-
 
 			# Plotting the models
 			plt.figure(figsize=(4,4))
@@ -1077,14 +1076,16 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 			plt.scatter(sourcewavs, sourcemags, marker="s", edgecolor="black", facecolor="none", s=40, linestyle='None', label="Observed", zorder=999)
 			plt.errorbar(sourcewavs, sourcemags, yerr=[np.abs(m) for m in errormags], c="black", linestyle='None', zorder=999)
 
-			# On the right or bottom of plot, plot a table of model parameters
-			# Setting table position/size, where bbox = [xmin, ymin, width, height] of table
-			bbox = [1,1-max(0.2,0.1*len(TempModel)),1+(.25*len(modelparams)),max(0.2,0.1*len(TempModel))]
+			if showtable:
+				# On the right or bottom of plot, plot a table of model parameters
+				# Setting table position/size, where bbox = [xmin, ymin, width, height] of table
+				bbox = [1,1-max(0.2,0.1*len(TempModel)),1+(.25*len(modelparams)),max(0.2,0.1*len(TempModel))]
 
-			# Plotting table
-			the_table = plt.table(cellText=modelparams_all, colLabels=modelparams, bbox=bbox)
-			the_table.auto_set_font_size(False)
-			the_table.set_fontsize(10)
+				# Plotting table
+				the_table = plt.table(cellText=modelparams_all, colLabels=modelparams, bbox=bbox)
+				the_table.auto_set_font_size(False)
+				the_table.set_fontsize(10)
+			
 			plt.title(f"Source ID: {s}")
 			plt.legend()
 			plt.show()
