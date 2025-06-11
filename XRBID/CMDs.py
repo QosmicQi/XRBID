@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as img
+from matplotlib.patches import Ellipse, Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.cbook import get_sample_data
 from scipy.interpolate import interp1d
@@ -1001,8 +1002,6 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 	RETURNS: 
 	----------
 	Plots the best-fit models against the measured magnitudes of each source. 
-	# If only one source is given (denoted by a single source ID), then the ax and plt of the plot is returned. 
-	# Otherwise, returns None. 
 
 	"""
 
@@ -1089,7 +1088,109 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 			plt.title(f"Source ID: {s}")
 			plt.legend()
 			plt.show()
-				
+
+		if showHR: PlotHR(TempModel, figsize=(4,4))
+
+###-----------------------------------------------------------------------------------------------------
+
+def PlotHR(df=False, logTeheader="logTe", logLheader="logL", idheader=False, figsize=(5,5), colormap="RdYlBu_r"):
+ 
+	"""
+	Plots a rough estimate of the HR diagram with MS, giant, and supergiant regions denoted. 
+	The values for each region come from a mixture of HR diagram images, Wikipedia, and van Belle et al. 2021. 
+	Stars can be plotted on the diagram by reading in isoMatches (or a derivative thereof) from FitSED. 
+
+	PARAMETERS:
+	-----------
+	df	[pd.DataFrame; list]	:	DataFrame containing the log effective temperature and log luminosity of each star, 
+						or a list of [logTe, logL] for each star.
+						If none is given, a blank H-R diagram will be plotted instead
+	logTeheader	[str]		:	Header under which the log effective temperature is stored in 'df'. 
+						The default is logTe (matching isoMatches).
+	logLheader	[str]		:	Header under which the log stellar luminosity is stored in 'df'. 
+						The default is logL (matching isoMatches).
+	idheader	[str, list]	:	Header under which the source ID is stored in 'df', or a list of IDs if df is a list of values. 
+	figsize		[tuple]		: 	Size of the plot to print. Default is (5,5)
+	colormap	[str]		:	Matplotlib colormap used to differentiate between spectral types. Default is "RdYlBu_r".		
+
+	"""
+
+	# Estimated HR diagram regions (mins and maxes)
+	ms_teffs = [[4.48,6],[4.0,4.48],[3.88,4.0],[3.78,3.88],[3.72,3.78],[3.57,3.72],[3.38,3.57]]
+	ms_logls = [[4.48,6],[1.4,4.48],[0.7,1.4],[.18,.7],[-.22,.18],[-1.1,-.22],[-1.1,-3]]
+
+	g_teffs = [[np.nan,np.nan],[4.,4.08],[3.84,3.98],[3.75,3.83],[3.68,3.74],[3.59,3.68],[3.36,3.58]]
+	g_logls = [[np.nan,np.nan],[np.nan,np.nan],[1,2],[1,2],[1.5,2.2],[1.8,2.4],[2,2.3]]
+
+	sg_teffs = [[4.48,6],[4.0,4.48],[3.88,4.0],[3.78,3.88],[3.72,3.78],[3.57,3.72],[3.38,3.57]]
+	sg_logls = [[5,6],[5,6],[5,6],[5,6],[5,6],[5,6],[5,6]]
+
+	startypes=["O","B","A","F","G", "K","M"]
+
+	cmap = matplotlib.cm.get_cmap(colormap)
+	colors = [cmap(i) for i in np.linspace(0,1,7)]
+
+	fig = plt.figure(figsize=figsize)
+	ax = fig.add_subplot(111)
+
+	# Plotting the colormap
+	cax = ax.scatter(10,10,c=[6], cmap=colormap)
+	cbar = fig.colorbar(cax, pad=0)
+	cbar.ax.set_yticklabels(startypes)  # vertically oriented colorbar
+
+	# for each star type, plot the regions within which we see main sequence, giant, and supergiant stars
+	for i,star in enumerate(startypes):
+		try:
+			ms_patch =  Rectangle((ms_teffs[i][0], ms_logls[i][0]), ms_teffs[i][1]-ms_teffs[i][0], ms_logls[i][1]-ms_logls[i][0], color=colors[i], alpha=0.7, lw=0)
+			ax.add_patch(ms_patch)
+		except: pass;
+		try:
+			giant_patch =  Rectangle((g_teffs[i][0], g_logls[i][0]), g_teffs[i][1]-g_teffs[i][0], g_logls[i][1]-g_logls[i][0], edgecolor=colors[i], facecolor="none", hatch="\\\\", lw=2)
+			ax.add_patch(giant_patch)
+		except: pass;
+		try:
+			sg_patch =  Rectangle((sg_teffs[i][0], sg_logls[i][0]), sg_teffs[i][1]-sg_teffs[i][0], sg_logls[i][1]-sg_logls[i][0], edgecolor=colors[i], facecolor="none", hatch="||", lw=2)
+			ax.add_patch(sg_patch)
+		except: pass;
+
+	# Extra patches for labels
+	ms_patch =  Rectangle((10,10),1,1, color="black", alpha=0.5, lw=0, label="MS")
+	giant_patch =  Rectangle((10,10),1,1, edgecolor="black", facecolor="none", hatch="\\\\", lw=2, label="Giant")
+	sg_patch =  Rectangle((10,10), 1,1,edgecolor="black", facecolor="none", hatch="||", lw=2,  label="SG")
+	ax.add_patch(ms_patch)
+	ax.add_patch(giant_patch)
+	ax.add_patch(sg_patch)
+	plt.xlim(4.6,3.4)
+	plt.ylim(-2,6)
+	plt.xlabel(r"log T$_{eff}$ [K]", size=15)
+	plt.ylabel(r"log L [L$_{\odot}$]", size=15)
+	plt.legend()
+
+	# Plot the stars in df if given
+	
+	if isinstance(df, pd.DataFrame): 
+		plt.scatter(df[logTeheader].values.tolist(), df[logLheader].values.tolist(), marker=r"$\star$", color="black", s=150)
+		
+		# Changing the x and y limits to always include the stars
+		plt.xlim(max(4.6, max(df[logTeheader])+0.1), min(3.4, min(df[logTeheader])-0.1))
+		plt.ylim(min(-2, min(df[logLheader])-0.1), max(6, max(df[logLheader])+0.1))
+		
+		if isinstance(idheader, str): 
+			for i in range(len(df)): plt.text(df[logTeheader][i], df[logLheader][i]+0.3, df[idheader][i], fontsize=12)
+
+	if isinstance(df, list): 
+		if not isinstance(df[0], list): df = [df]
+		plt.scatter(np.array(df).T[0], np.array(df).T[1], marker=r"$\star$", color="black", s=150)
+
+		# Changing the x and y limits to always include the stars
+		plt.xlim(min(np.array(df).T[0])-0.3, max(np.array(df).T[0])+0.3)
+		plt.ylim(min(np.array(df).T[1])-0.5, max(np.array(df).T[1])+0.5)
+
+		if isinstance(idheader, list): 
+			for i in range(len(df)): plt.text(df[i][0], df[i][1]+0.3, idheader[i], fontsize=12)
+
+	plt.show()
+
 ###-----------------------------------------------------------------------------------------------------
 	
 # PLANNED FUNCTIONS, UPDATE TBD
@@ -1100,24 +1201,3 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 #	"""
 #
 
-###-----------------------------------------------------------------------------------------------------
-
-#def PlotHR(df, logTeheader="logTe", logLheader="logL"):
-# 
-#	"""
-#	Plots the HR diagram of stars based on XX and XX . This can be done by reading in isoMatches (or a derivative
-#	thereof) from FitSED. 
-#
-# 	UNDER CONSTRUCTION. COMING SOON!
-#
-#	PARAMETERS:
-#	-----------
-#	df	[pd.DataFrame; list]	:	DataFrame containing the XX and XX of each star, or a list of [XX] and [XX].
-#	logTeheader	[str]		:	Header under which the log effective temperature is stored in 'df'. 
-#						The default is logTe (matching isoMatches).
-#	logLheader	[str]		:	Header under which the log stellar luminosity is stored in 'df'. 
-#						The default is logL (matching isoMatches).
-#
-#	"""
-
-	
