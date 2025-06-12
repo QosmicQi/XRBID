@@ -913,6 +913,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 
 	# Tries to find the filter headers in isoTemp, assuming they all start with "F" and no other headers do. 
 	filters = [filt for filt in isoTemp.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+	filters.sort()
 	
 	# Figure out the source headers to pull the photometry from df. If not given, assume they match the model header format
 	if photheads == False: photheads = [h for h in filters if h in df.columns.tolist()]
@@ -1013,15 +1014,21 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 	# Setting up all of the headers
 
 	# If no model headers are given, tries to find the photometry headers in df_models, assuming they all start with "F" and no other headers do. 
-	if modelheads == False: modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+	if modelheads == False: 
+		modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+		modelheads.sort()
 	
 	# Figure out the source headers to pull the photometry from df_sources. If not given, assume they match the modelheads format
 	if sourceheads == False: sourceheads = [h for h in modelheads if h in df_sources.columns.tolist()]
 	if errorheads == False: errorheads = [f"{h} Err" for h in sourceheads]
 
 	# Setting up wavelengths of sources and models, in angstroms
-	modelwavs = [int(re.sub('\D', '', h))*10 for h in modelheads]
-	sourcewavs = [int(re.sub('\D', '', h))*10 for h in sourceheads]
+	# JWST has filters containing W2, which mess up the function below. Replacing those with X
+	modelwavs = [int(re.sub('\D', '', h.replace('W2','W')))*10 for h in modelheads]
+	sourcewavs = [int(re.sub('\D', '', h.replace('W2','W')))*10 for h in sourceheads]
+
+	print(modelwavs)
+	print(sourcewavs)
 
 	# Plot each source separately
 	for s in sourceids: 
