@@ -867,11 +867,11 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					with which source when df contains more than one source to fit.
 	photheads	[list]	:	List of headers under which the photometric measurements per filter are stored within the 'df' DataFrame. 
 					The measured magnitudes should be stored under the name of the filter with which they were taken 
-					(e.g. "F814W", "F814Wmag", etc.), matching the headers of the isochrone models. If 'filterheads' is left blank, 
-					the code will use the filter headers found in the isochrone models as the photometry headers. In searching for 
-					the appropriate model headers, the code assumes the headers in the isochrone models begin with F and that no 
-					other header in the model table does. This is a reasonable assumption for both HST and JWST, but may need to be 
-					revisited for other models.
+					(e.g. "F814W", "F814Wmag", etc.). These values MUST match the headers of the isochrone models. 
+					If 'photheads' is left blank, the code will use the filter headers found in the isochrone models as the 
+					photometry headers. In searching for the appropriate model headers, the code assumes the headers in the 
+					isochrone models begin with F and that no other header in the model table does. This is a reasonable assumption
+					for both HST and JWST, but may need to be revisited for other models.
 	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err"). 
 					If left blank, the code will assign values based on the values in 'photheads'.
 	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone (currently not necessary, as only reduced chi2
