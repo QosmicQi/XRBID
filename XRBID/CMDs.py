@@ -1066,7 +1066,7 @@ def PlotSED(df_sources, df_models, idheader, fitheader="Reduced Chi2 - 1", massh
 			# On the left, plot the models and observations
 			#plt.subplot(1, 2, 1)
 			# NOTE: if reading in JWST data, the units should be in nanometers, not angstroms
-			plt.xlabel("HST Filter")
+			plt.xlabel("Instrument Filter")
 			plt.ylabel("Absolute Magnitude")
 
 			# Plotting all models with low opacity
