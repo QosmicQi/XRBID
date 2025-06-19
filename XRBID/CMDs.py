@@ -10,7 +10,6 @@ import random
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as img
 from matplotlib.patches import Ellipse, Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from matplotlib.cbook import get_sample_data
@@ -271,7 +270,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 
 	# if a subimage is given as a filename, read in. 
 	if subimg and "." in subimg: 
-		subimg = img.imread(subimg)
+		subimg = plt.imread(subimg)
 
 	# If an image is passed to overlay on plot, add 
 	if hasattr(subimg, 'shape'): # tests if subimg was fed in
