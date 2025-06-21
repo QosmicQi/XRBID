@@ -955,6 +955,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 			
 			# Searching for at least min_models number of best-fit models
 			temp = Find(isoTemp, f"Reduced Chi2 - 1 < {redchi2s[min_models]}")
+			if len(temp) == 0: temp = Find(isoTemp, f"Reduced Chi2 - 1 <= {redchi2s[min_models]}")
 
 			# Adding the source ID to the DataFrame, to be added to isoMatches
 			temp[idheader] = sourceids[star]
