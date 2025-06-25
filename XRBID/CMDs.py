@@ -876,7 +876,9 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone (currently not necessary, as only reduced chi2
 					has been coded. In the future MCMC will also be included). 
 					"chi2" (default), "min chi2", or "minimized chi2" selects the model which minimizes chi-squared, weighted by errors.
+					Values are saved to isoMatches under the header "Chi2", which should be read in as fitheader when running PlotSED. 
 					"reduced chi2" selects the model for which the resulting reduced chi-squared is closest to 1. 
+					Values are saved to isoMatches under the header "Reduced Chi2 - 1", which should be read in as fitheader when running PlotSED.
 					"mcmc" (pending) will use an MCMC algorithm to determine the best-fit model, once released. 
 	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be returned. 
 					If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
