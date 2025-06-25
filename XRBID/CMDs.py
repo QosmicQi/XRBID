@@ -941,7 +941,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	
 ###-----------------------------------------------------------------------------------------------------
 
-def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Reduced Chi2 - 1", massheader="Mass", sourceheads=False, errorheads=False, modelheads=False, modelparams=False, showtable=True, showHR=False): 
+def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2", massheader="Mass", sourceheads=False, errorheads=False, modelheads=False, modelparams=False, showtable=True, showHR=False): 
 	"""
 	Takes in the photometric measurements of sources in a DataFrame and the best-fit isochrones DataFrame from FitSED and plots 
 	them together onto a chart. If more than one model is given for a single source ID (given as idheader), then the model with 
