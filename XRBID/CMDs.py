@@ -873,8 +873,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					for both HST and JWST, but may need to be revisited for other models.
 	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err"). 
 					If left blank, the code will assign values based on the values in 'photheads'.
-	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone (currently not necessary, as only reduced chi2
-					has been coded. In the future MCMC will also be included). 
+	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone. 
 					"chi2" (default), "min chi2", or "minimized chi2" selects the model which minimizes chi-squared, weighted by errors.
 					Values are saved to isoMatches under the header "Chi2", which should be read in as fitheader when running PlotSED. 
 					"reduced chi2" selects the model for which the resulting reduced chi-squared is closest to 1. 
