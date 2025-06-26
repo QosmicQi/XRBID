@@ -851,7 +851,7 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	return fig
 ###-----------------------------------------------------------------------------------------------------
 
-def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="chi2", min_models=1, input_model=False, model_header_index=13, plotSED=True): 
+def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="chi2", min_models=1, input_model=False, model_header_index=13, plotSED=True, showHR=False): 
 
 	"""
 	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
