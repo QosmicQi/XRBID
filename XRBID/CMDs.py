@@ -851,7 +851,7 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	return fig
 ###-----------------------------------------------------------------------------------------------------
 
-def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="chi2", min_models=1, input_model=False, model_header_index=13): 
+def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="chi2", min_models=1, input_model=False, model_header_index=13, plotSED=True): 
 
 	"""
 	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
@@ -865,14 +865,14 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model 
 					is associated with which source when df contains more than one source to fit.
 	photheads	[list]	:	List of headers under which the photometric measurements per filter are stored within the 'df' 
-					DataFrame. The measured magnitudes should be stored under the name of the filter with which they were 
-					taken (e.g. "F814W", "F814Wmag", etc.). These values MUST match the headers of the isochrone models. 
-					If 'photheads' is left blank, the code will use the filter headers found in the isochrone models as the 
-					photometry headers. In searching for the appropriate model headers, the code assumes the headers in the 
-					isochrone models begin with F and that no other header in the model table does. This is a reasonable 
-					assumption for both HST and JWST, but may need to be revisited for other models.
-	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err"). 
-					If left blank, the code will assign values based on the values in 'photheads'.
+					DataFrame. The measured magnitudes should be stored under the name of the filter with which they 
+					were taken (e.g. "F814W", "F814Wmag", etc.). These values MUST match the headers of the isochrone 
+					models. If 'photheads' is left blank, the code will use the filter headers found in the isochrone 
+					models as the photometry headers. In searching for the appropriate model headers, the code assumes 
+					the headers in the isochrone models begin with F and that no other header in the model table does. 
+					This is a reasonable assumption for both HST and JWST, but may need to be revisited for other models.
+	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", 
+					"F555W Err"). If left blank, the code will assign values based on the values in 'photheads'.
 	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone. 
 					"chi2" (default), "min chi2", or "minimized chi2" selects the model which minimizes chi-squared, 
 					weighted by errors. Values are saved to isoMatches under the header "Chi2", which should be read 
@@ -883,15 +883,18 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					"mcmc" (pending) will use an MCMC algorithm to determine the best-fit model, once released. 
 	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be returned. 
 					If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
-					(e.g. if min_models = 3, the 2 next closest fits will also be given). If several models fit equally well,
-					all will be included in isoMatches.
+					(e.g. if min_models = 3, the 2 next closest fits will also be given). If several models fit equally 
+					well, all will be included in isoMatches.
 	input_model	[str]	:	If preferred, user can input the name of a file containing the preferred isochrone models from the 
-					Padova website. The code assumes the document is copied and pasted from the CMD output page, with the table
-					headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using the 
+					Padova website. The code assumes the document is copied and pasted from the CMD output page, with 
+					the table headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using the 
 					'model_header_index' parameter. One should be sure to change the magnitude headers to match those of 
 					their 'df', or vice versa. 
-	model_header_index [int]:	Index of the line containing the headers of the isochrone models, if a .txt file is read in as input_model. 
-					By default, this is line 13. This parameter can be ignored in input_model is the name of a CSV DataFrame.  
+	model_header_index [int]:	Index of the line containing the headers of the isochrone models, if a .txt file is read in as 
+					input_model. By default, this is line 13. This parameter can be ignored in input_model is the name 
+					of a CSV DataFrame.  
+	plotSED		[bool]	:	If True, shows the plot of the best-fit SED(s) using PlotSED, using default values.
+	showHR		[bool]	:	If True, shows the HR diagram from the best-fit SED(s).
 
 	RETURNS: 
 	---------
@@ -935,9 +938,14 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 
 	if fittype.lower() == "chi2" or ("min" in fittype.lower() and "chi2" in fittype.lower()): 
 		isoMatches = Chi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
+		fitheader = "Chi2"
 	elif "red" in fittype.lower() and "chi2" in fittype.lower(): 
 		isoMatches = ReducedChi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
+		fitheader = "Reduced Chi2 - 1"
 	else: print("Invalid model given as fittype. Returning empty DataFrame.")
+
+	if plotSED: PlotSED(df_sources=df, df_models=isoMatches, idheader, instrument=instrument, fitheader=fitheader)
+	if showHR: PlotHR(Find(isoMatches, f"{fitheader} = {np.nanmin(isoMatches[fitheader])}"), figsize=(4,4))
 
 	return isoMatches
 	
@@ -974,9 +982,10 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2",
 	modelparams	[list]		:	List of parameters from the df_model to pull and display. These will be printed
 						as a table alongside the SED plot, sorted in order of best to worst fit. The defaults are 
 						["Mass", "logAge", "logL", "logTe", fitheader].
-	showtable	[bool]		:	If True, shows the table of model parameters given by 'modelparams', in order of best to worst fit.
-	showHR		[bool]		:	If True, plots the H-R diagram of the model star(s), indicating the most likely spectral type(s). 
-						(Feature coming soon!)
+	showtable	[bool]		:	If True, shows the table of model parameters given by 'modelparams', in order of best to 
+						worst fit.
+	showHR		[bool]		:	If True, plots the H-R diagram of the model star(s), indicating the most likely spectral 
+						type(s).
 
 	RETURNS: 
 	----------
