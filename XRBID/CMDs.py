@@ -862,22 +862,24 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	df	[pd.DataFrame]	:	DataFrame containing the magnitudes and photometric errors of the source(s) of interest. 
 	instrument 	[str]	:	Instrument with which the measurements were taken. Currently accepts "acs" and "wfc3", but 
 					will be able to take "nircam" for JWST observations in the future. 
-	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model is associated 
-					with which source when df contains more than one source to fit.
-	photheads	[list]	:	List of headers under which the photometric measurements per filter are stored within the 'df' DataFrame. 
-					The measured magnitudes should be stored under the name of the filter with which they were taken 
-					(e.g. "F814W", "F814Wmag", etc.). These values MUST match the headers of the isochrone models. 
+	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model 
+					is associated with which source when df contains more than one source to fit.
+	photheads	[list]	:	List of headers under which the photometric measurements per filter are stored within the 'df' 
+					DataFrame. The measured magnitudes should be stored under the name of the filter with which they were 
+					taken (e.g. "F814W", "F814Wmag", etc.). These values MUST match the headers of the isochrone models. 
 					If 'photheads' is left blank, the code will use the filter headers found in the isochrone models as the 
 					photometry headers. In searching for the appropriate model headers, the code assumes the headers in the 
-					isochrone models begin with F and that no other header in the model table does. This is a reasonable assumption
-					for both HST and JWST, but may need to be revisited for other models.
+					isochrone models begin with F and that no other header in the model table does. This is a reasonable 
+					assumption for both HST and JWST, but may need to be revisited for other models.
 	errorheads 	[list]	:	List of headers under which the photometric errors for each filter are stored (e.g. "F814W Err", "F555W Err"). 
 					If left blank, the code will assign values based on the values in 'photheads'.
 	fittype		[str]	:	Defines the algorithm use to determine the best-fit isochrone. 
-					"chi2" (default), "min chi2", or "minimized chi2" selects the model which minimizes chi-squared, weighted by errors.
-					Values are saved to isoMatches under the header "Chi2", which should be read in as fitheader when running PlotSED. 
+					"chi2" (default), "min chi2", or "minimized chi2" selects the model which minimizes chi-squared, 
+					weighted by errors. Values are saved to isoMatches under the header "Chi2", which should be read 
+					in as fitheader when running PlotSED. 
 					"reduced chi2" selects the model for which the resulting reduced chi-squared is closest to 1. 
-					Values are saved to isoMatches under the header "Reduced Chi2 - 1", which should be read in as fitheader when running PlotSED.
+					Values are saved to isoMatches under the header "Reduced Chi2 - 1", which should be read in as 
+					fitheader when running PlotSED.
 					"mcmc" (pending) will use an MCMC algorithm to determine the best-fit model, once released. 
 	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be returned. 
 					If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
@@ -885,8 +887,9 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					all will be included in isoMatches.
 	input_model	[str]	:	If preferred, user can input the name of a file containing the preferred isochrone models from the 
 					Padova website. The code assumes the document is copied and pasted from the CMD output page, with the table
-					headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using the 'model_header_index' 
-					parameter. One should be sure to change the magnitude headers to match those of their 'df', or vice versa. 
+					headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using the 
+					'model_header_index' parameter. One should be sure to change the magnitude headers to match those of 
+					their 'df', or vice versa. 
 	model_header_index [int]:	Index of the line containing the headers of the isochrone models, if a .txt file is read in as input_model. 
 					By default, this is line 13. This parameter can be ignored in input_model is the name of a CSV DataFrame.  
 
@@ -929,13 +932,11 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	sourcemags = [[df[f][i] for f in photheads] for i in range(len(df))]
 	sourcemag_errs = [[df[e][i] for e in errorheads] for i in range(len(df))]
 
-	# Each best-fit model will be added to a separate DataFrame, which will be returned to the user at the end
-	isoMatches = BuildFrame(headers=isoTemp.columns.tolist())
 
 	if fittype.lower() == "chi2" or ("min" in fittype.lower() and "chi2" in fittype.lower()): 
-		isoMatches = Chi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
+		isoMatches = Chi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
 	elif "red" in fittype.lower() and "chi2" in fittype.lower(): 
-		isoMatches = ReducedChi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
+		isoMatches = ReducedChi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
 	else: print("Invalid model given as fittype. Returning empty DataFrame.")
 
 	return isoMatches
@@ -1183,7 +1184,7 @@ def PlotHR(df=False, logTeheader="logTe", logLheader="logL", idheader=False, fig
 
 ###-----------------------------------------------------------------------------------------------------
 
-def Chi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models): 
+def Chi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models): 
 	"""
 	Function for calculating Chi2, called by fitSED if fittype = 'Chi2' or 'Min Chi2'. 
 	For each star in df, checks that there are at least 1 good measurement, and then calculates the Chi2 (weighted by errors), 
@@ -1191,6 +1192,8 @@ def Chi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, source
 
 	Returned isoMatches will contain the header 'Chi2', which should be used as the fitheader when calling PlotSED.  
 	"""
+	# Each best-fit model will be added to a separate DataFrame, which will be returned to the user at the end
+	isoMatches = BuildFrame(headers=isoTemp.columns.tolist())
 
 	isoMatches["Chi2"] = np.nan
 	isoMatches[idheader] = None
@@ -1221,7 +1224,7 @@ def Chi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, source
 
 ###-----------------------------------------------------------------------------------------------------
 
-def ReducedChi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models):
+def ReducedChi2(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models):
 	"""
 	Function for calculating Reduced Chi2, called by fitSED if fittype = 'Reduced Chi2' (or equivalent). 
 	For each star in df, checks that there are at least 2 good measurements, and then calculates 'Reduced Chi2 - 1', 
@@ -1232,6 +1235,8 @@ def ReducedChi2(df, isoMatches, photheads, sourcemags, sourcemag_errs, idheader,
 	PlotSED.  
 	"""
 
+	# Each best-fit model will be added to a separate DataFrame, which will be returned to the user at the end
+	isoMatches = BuildFrame(headers=isoTemp.columns.tolist())
 	isoMatches["Reduced Chi2"] = np.nan
 	isoMatches["Reduced Chi2 - 1"] = np.nan
 	isoMatches[idheader] = None
