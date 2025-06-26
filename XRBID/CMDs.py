@@ -944,7 +944,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 		fitheader = "Reduced Chi2 - 1"
 	else: print("Invalid model given as fittype. Returning empty DataFrame.")
 
-	if plotSED: PlotSED(df_sources=df, df_models=isoMatches, idheader, instrument=instrument, fitheader=fitheader)
+	if plotSED: PlotSED(df_sources=df, df_models=isoMatches, idheader=idheader, instrument=instrument, fitheader=fitheader)
 	if showHR: PlotHR(Find(isoMatches, f"{fitheader} = {np.nanmin(isoMatches[fitheader])}"), figsize=(4,4))
 
 	return isoMatches
