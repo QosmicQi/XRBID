@@ -881,15 +881,15 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					Values are saved to isoMatches under the header "Reduced Chi2 - 1", which should be read in as 
 					fitheader when running PlotSED.
 					"mcmc" (pending) will use an MCMC algorithm to determine the best-fit model, once released. 
-	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be returned. 
-					If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
+	min_models	[int]	:	Minimum number of models to save for each source. By default, only the best-fit model will be 
+					returned. If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
 					(e.g. if min_models = 3, the 2 next closest fits will also be given). If several models fit equally 
 					well, all will be included in isoMatches.
 	input_model	[str]	:	If preferred, user can input the name of a file containing the preferred isochrone models from the 
 					Padova website. The code assumes the document is copied and pasted from the CMD output page, with 
-					the table headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using the 
-					'model_header_index' parameter. One should be sure to change the magnitude headers to match those of 
-					their 'df', or vice versa. 
+					the table headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using 
+					the 'model_header_index' parameter. One should be sure to change the magnitude headers to match 
+					those of their 'df', or vice versa. 
 	model_header_index [int]:	Index of the line containing the headers of the isochrone models, if a .txt file is read in as 
 					input_model. By default, this is line 13. This parameter can be ignored in input_model is the name 
 					of a CSV DataFrame.  
