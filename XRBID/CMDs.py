@@ -851,7 +851,7 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	return fig
 ###-----------------------------------------------------------------------------------------------------
 
-def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="wls", min_models=1, input_model=False, model_header_index=13, plotSED=True, showHR=False): 
+def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="wls", min_models=1, input_model=False, model_header_index=13, plotSED=True, showHR=False, model_ext=False): 
 
 	"""
 	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
@@ -892,6 +892,13 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					of a CSV DataFrame.  
 	plotSED		[bool]	:	If True, shows the plot of the best-fit SED(s) using PlotSED, using default values.
 	showHR		[bool]	:	If True and plotSED = True, shows the HR diagram from the best-fit SED(s) via PlotSED.
+	model_ext [bool, list]	:	Determines whether to add dust extinction as a free parameter in the model fitting. 
+					Default is False, meaning no intrinsic dust extinction is assumed. If True, creates additional isochrone
+					models with an applied extinction between 0.0 and 2.0 (see XRBID.CMDs.AddExtinction). 
+					May also define the maximum modeled Av and the number of Av values between 0.0 and Av_max to model,
+					the wavelength conversion factor to convert from the instrument wavelengths to nanometers (HST), and 
+					the index defining the dust extinction profile; e.g. model_ext=[<Av_max>, <Av_num>, <wav2nm>, <beta>] in 
+					AddExtinction().  
 
 	RETURNS: 
 	---------
@@ -933,6 +940,10 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	sourcemags = [[df[f][i] for f in photheads] for i in range(len(df))]
 	sourcemag_errs = [[df[e][i] for e in errorheads] for i in range(len(df))]
 
+	# If user wishes to model dust extinction by setting model_ext=True or model_ext as list: 
+	if isinstance(model_ext, list): isoTemp = AddExtinction(isoTemp, Av_max=model_ext[0], Av_num=model_ext[1], wav2nm=model_ext[2], beta=model_ext[3])
+	elif model_ext == True: isoTemp = AddExtinction(isoTemp)
+	else: pass;
 
 	if fittype.lower() == "wls" or ("weight" in fittype.lower() and "square" in fittype.lower()): 
 		isoMatches = WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
@@ -1231,6 +1242,59 @@ def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids,
 
 ###-----------------------------------------------------------------------------------------------------
 	
+def AddExtinction(df, Av_max=2.0, Av_num=20, wav2nm=1, beta=-0.7): 
+	"""
+	If an isochrone file does not include extinction as a free parameter (Av), the DataFrame read in as df
+	will be modified such that each model has an Av between 0 and 2 applied to its photometry using the 
+	extinction equation: Mag_ext = Mag + Av*(wavelength/550 nm)**(-0.7). 
+
+	These new isochrone models can then be used to estimate reddening on stars by finding the best-fit 
+	model between photometric measurements and the extinction-applied models.
+	
+	PARAMETERS: 
+	----------
+	df 	[pd.DataFrame]	:	DataFrame containing the isochrone models. 
+	Av_max	[float]		:	Maximum Av value to model. The default is 2.0, a physically reasonable max.
+	Av_num	[int]		:	Number of Av values to model between 0.0 and Av_max.
+	wav2nm	[int] (1)	:	Conversion factor for converting the wavelengths of the filters into
+					nanometers (default wavelength unit of HST). E.g. the conversion of 
+					JWST NIRCAM to HST wavelengths is 10, or JWST MIRI to HST = 1.
+	beta	[float]	(-0.7)	:	Index of the dust extinction function. Default is -0.7, such that
+					M_ext = M + Av*(wavelength/550 nm)**(-0.7)
+
+	RETURNS: 
+	---------
+	
+	df_ext	[pd.DataFrame]	:	DataFrame containing the original isochrones models and additional
+					models for which extinction was added. 
+	"""
+
+	# Tries to find the filter headers in isoTemp, assuming they all start with "F" and no other headers do. 
+	# Quad filters from WFC3 (e.g. FQ422M) are also removed.
+	filters = [filt for filt in df.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
+	filters.sort()
+
+	# Calculating the wavelengths in nanometers
+	wavelengths = [int(re.sub('\D', '', h.replace('W2','W')))*wav2nm for h in filters]
+
+	Avs = np.linspace(0.0,Av_max,Av_num)
+	
+	df_ext = df.copy()
+	df_ext["Av"] = 0
+	
+	# For each possible extinction parameter, modify the measured magnitudes of each filter according to	
+	# the extinction model. Add these new measurements to the full DataFrame df_ext.
+	for Av in Avs: 
+		df_temp = df.copy()
+		for i,filt in enumerate(filters): 
+			df_temp[filt] = df_temp[filt] + Av*(wavelengths[i]/550)**(beta)
+		df_temp["Av"] = Av
+		df_ext = pd.concat([df_ext, df_temp], ignore_index=True)
+
+	return df_ext
+
+###-----------------------------------------------------------------------------------------------------
+
 # PLANNED FUNCTIONS, UPDATE TBD
 #
 #def FitCCD(): 
