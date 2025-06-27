@@ -1004,7 +1004,7 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2",
 	if modelheads == False: 
 		modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
 		modelheads.sort()
-	print(modelheads) 
+	#print(modelheads) 
 
 	# Figure out the source headers to pull the photometry from df_sources. If not given, assume they match the modelheads format
 	if sourceheads == False: sourceheads = [h for h in modelheads if h in df_sources.columns.tolist()]
@@ -1015,8 +1015,8 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2",
 	modelwavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in modelheads]
 	sourcewavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in sourceheads]
 
-	print(modelwavs)
-	print(sourcewavs)
+	#print(modelwavs)
+	#print(sourcewavs)
 
 	if not instrument: instrument = "Instrument"
 	else: instrument = instrument.upper()
