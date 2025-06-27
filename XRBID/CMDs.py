@@ -657,7 +657,7 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 		else: yage = TempAge[y0]
 
 		plt.scatter(xage,yage, marker="v", color=model_color, s=75, zorder=5)
-		plt.annotate("10 Myrs", (xage, yage), zorder=999)
+		plt.annotate("10 Myrs", (xage, yage), zorder=900)
 
 		TempAge = Find(model, "log-age-yr = 8.606543") # ~400 Myr
 
@@ -667,7 +667,7 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 		else: yage = TempAge[y0]
 
 		plt.scatter(xage, yage, marker="v", color=model_color, s=75, zorder=5)
-		plt.annotate("400 Myrs", (xage, yage), zorder=999)
+		plt.annotate("400 Myrs", (xage, yage), zorder=900)
 
 	# Plotting the reddening arrow
 	print("Plotting reddening arrow for", colors[0], "vs.", colors[1])
@@ -684,7 +684,7 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 		if isinstance(ycolor, list): yvals = clusters[ycolor[0]] - clusters[ycolor[1]]+Ey_clust
 		else: yvals = clusters[ycolor] + Ey_clust
 
-		plt.scatter(xvals, yvals, s=size, color=color, label=label)
+		plt.scatter(xvals, yvals, s=size, color=color, label=label, zorder=999)
 
 	plt.xlim(xlim)
 	plt.ylim(ylim)
@@ -894,7 +894,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					input_model. By default, this is line 13. This parameter can be ignored in input_model is the name 
 					of a CSV DataFrame.  
 	plotSED		[bool]	:	If True, shows the plot of the best-fit SED(s) using PlotSED, using default values.
-	showHR		[bool]	:	If True, shows the HR diagram from the best-fit SED(s).
+	showHR		[bool]	:	If True and plotSED = True, shows the HR diagram from the best-fit SED(s) via PlotSED.
 
 	RETURNS: 
 	---------
@@ -944,8 +944,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 		fitheader = "Reduced Chi2 - 1"
 	else: print("Invalid model given as fittype. Returning empty DataFrame.")
 
-	if plotSED: PlotSED(df_sources=df, df_models=isoMatches, idheader=idheader, instrument=instrument, fitheader=fitheader)
-	if showHR: PlotHR(Find(isoMatches, f"{fitheader} = {np.nanmin(isoMatches[fitheader])}"), figsize=(4,4))
+	if plotSED: PlotSED(df_sources=df, df_models=isoMatches, idheader=idheader, instrument=instrument, fitheader=fitheader, showHR=showHR)
 
 	return isoMatches
 	
