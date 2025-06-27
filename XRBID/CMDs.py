@@ -919,7 +919,8 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 
 
 	# Tries to find the filter headers in isoTemp, assuming they all start with "F" and no other headers do. 
-	filters = [filt for filt in isoTemp.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+	# Quad filters from WFC3 (e.g. FQ422M) are also removed.
+	filters = [filt for filt in isoTemp.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
 	filters.sort()
 	
 	# Figure out the source headers to pull the photometry from df. If not given, assume they match the model header format
@@ -1001,9 +1002,10 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2",
 
 	# If no model headers are given, tries to find the photometry headers in df_models, assuming they all start with "F" and no other headers do. 
 	if modelheads == False: 
-		modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt]
+		modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
 		modelheads.sort()
-	
+	print(modelheads) 
+
 	# Figure out the source headers to pull the photometry from df_sources. If not given, assume they match the modelheads format
 	if sourceheads == False: sourceheads = [h for h in modelheads if h in df_sources.columns.tolist()]
 	if errorheads == False: errorheads = [f"{h} Err" for h in sourceheads]
@@ -1013,8 +1015,8 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Chi2",
 	modelwavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in modelheads]
 	sourcewavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in sourceheads]
 
-	#print(modelwavs)
-	#print(sourcewavs)
+	print(modelwavs)
+	print(sourcewavs)
 
 	if not instrument: instrument = "Instrument"
 	else: instrument = instrument.upper()
