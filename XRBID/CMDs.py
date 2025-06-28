@@ -895,10 +895,10 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	model_ext [bool, list]	:	Determines whether to add dust extinction as a free parameter in the model fitting. 
 					Default is False, meaning no intrinsic dust extinction is assumed. If True, creates additional isochrone
 					models with an applied extinction between 0.0 and 2.0 (see XRBID.CMDs.AddExtinction). 
-					May also define the maximum modeled Av and the number of Av values between 0.0 and Av_max to model,
-					the wavelength conversion factor to convert from the instrument wavelengths to nanometers (HST), and 
-					the index defining the dust extinction profile; e.g. model_ext=[<Av_max>, <Av_num>, <wav2nm>, <beta>] in 
-					AddExtinction().  
+					May also call model_ext as a list to define the maximum modeled Av, the number of Av values between 
+					0.0 and Av_max to model, the wavelength conversion factor to convert from the instrument wavelengths 
+					to nanometers (HST), and the index defining the dust extinction profile; 
+					e.g. model_ext=[<Av_max>, <Av_num>, <wav2nm>, <beta>]  
 
 	RETURNS: 
 	---------
