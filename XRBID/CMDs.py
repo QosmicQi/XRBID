@@ -1002,7 +1002,9 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 	# Finding all unique sources from df_sources, to find their corresponding models in df_models 
 	sourceids = FindUnique(df_sources, header=idheader)[idheader].values.tolist()
 	
-	if modelparams == False: modelparams = ["Mass", "logAge", "logL", "logTe", fitheader]
+	if modelparams == False: 
+		if "Av" in df_models.columns.tolist(): modelparams = ["Mass", "Av", "logAge", "logL", "logTe", fitheader]
+		else: modelparams = ["Mass", "logAge", "logL", "logTe", fitheader]
 
 	# Setting up all of the headers
 
