@@ -1067,6 +1067,7 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 			# NOTE: if reading in JWST data, the units should be in nanometers, not angstroms
 			plt.xlabel(f"{instrument} Filter")
 			plt.ylabel("Absolute Magnitude")
+			plt.gca().invert_yaxis()
 
 			# Plotting all models with low opacity
 			for mod in modelmags_all: 
@@ -1088,9 +1089,18 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 				# On the right or bottom of plot, plot a table of model parameters
 				# Setting table position/size, where bbox = [xmin, ymin, width, height] of table
 				bbox = [1,1-max(0.2,0.1*len(TempModel)),1+(.25*len(modelparams)),max(0.2,0.1*len(TempModel))]
-
+				
+				# If min and max mass are plotted, edit color of table rows accordingly
+				cell_colors = [['white']*len(modelparams)]*len(TempModel)
+				if len(TempModel) > 1: 
+					modelmass_sorted = [round(TempModel[massheader][m[0]],8) for m in chisort]
+					minmassind_sorted = sorted(enumerate(modelmass_sorted), key=lambda i: i[1])[0][0]
+					maxmassind_sorted = sorted(enumerate(modelmass_sorted), key=lambda i: i[1])[-1][0]					
+					cell_colors[minmassind_sorted] = ['pink']*len(modelparams)
+					cell_colors[maxmassind_sorted] = ['lightblue']*len(modelparams)
+	
 				# Plotting table
-				the_table = plt.table(cellText=modelparams_all, colLabels=modelparams, bbox=bbox)
+				the_table = plt.table(cellText=modelparams_all, colLabels=modelparams, cellColours=cell_colors, bbox=bbox)
 				the_table.auto_set_font_size(False)
 				the_table.set_fontsize(10)
 			
