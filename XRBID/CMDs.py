@@ -51,7 +51,9 @@ acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Ms
 
 isoacs = pd.read_csv("isoACS_all.frame")
 isowfc3 = pd.read_csv("isoWFC3_all.frame")
-# isonircam = pd.read_csv("isoNIRCAM_all.frame") # not yet active
+isonircam = pd.read_csv("isoNIRCAM_all.frame")
+isoacs_nircam = pd.read_csv("isoACS+NIRCAM_all.frame")
+isowfc3_nircam = pd.read_csv("isoWFC3+NIRCAM_all.frame")
 
 # Calling in model for creating the cluster color-color diagrams
 # As of version 1.7.0, no longer using BC03 models. Instead use CB07 models (Bruzual 2007, arXiv:astro-ph/0703052)
@@ -860,7 +862,11 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	PARAMETERS: 
 	-----------
 	df	[pd.DataFrame]	:	DataFrame containing the magnitudes and photometric errors of the source(s) of interest. 
-	instrument 	[str]	:	Instrument with which the measurements were taken. Currently accepts "acs" and "wfc3", but 
+	instrument 	[str]	:	Instrument with which the measurements were taken. Currently accepts: "acs" for HST ACS/WFC only, 
+					"acs+nircam" for models combining HST ACS/WFC and JWST NIRCAM/IMAGE, "wfc3" for HST WFC3/UVIS only, 
+					and "wfc3+nircam" for models combining HST WFC3/UVIS and JWST NIRCAM/IMAGE. 
+					NOTE: The filter headers in the acs+nircam and wfc3+nircam models give JWST wavelengths in HST units 
+					(nanometers). If using these models, one should update the headers in one's source DataFrame accordingly. 
 					will be able to take "nircam" for JWST observations in the future. 
 	idheader	[str]	:	Header under which the source ID is stored. This will be used used to indicate which best-fit model 
 					is associated with which source when df contains more than one source to fit.
@@ -918,14 +924,21 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 		else: 
 			try: isoTemp = isoTemp.drop(columns=["Unnamed: 0"])
 			except: pass;
+	elif "acs+nircam" in instrument.lower(): isoTemp = isoacs_nircam.copy()
 	elif "acs" in instrument.lower(): isoTemp = isoacs.copy()
+	elif "wfc3+nircam" in instrument.lower(): isoTemp = isowfc3_nircam.copy()
 	elif "wfc3" in instrument.lower(): isoTemp = isowfc3.copy()
-
+	elif "nircam" in instrument.lower(): isoTemp = isonircam.copy()
 
 	# Tries to find the filter headers in isoTemp, assuming they all start with "F" and no other headers do. 
 	# Quad filters from WFC3 (e.g. FQ422M) are also removed.
 	filters = [filt for filt in isoTemp.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
-	filters.sort()
+
+	# Filters must be sorted by wavelength, or PlotSED will look weird. The most reliable way is to 
+	# extract the wavelengths first, sort, and align the filters based on the sorted wavelength indices
+	waves = [int(re.sub('\D', '', f.replace('W2','W'))) for f in filters]
+	waves_sorted = sorted(enumerate(waves), key=lambda i: i[1]) # returns a sorted list as [(original index, sorted wavelength value)...]
+	filters = [filters[w[0]] for w in waves_sorted]
 	
 	# Figure out the source headers to pull the photometry from df. If not given, assume they match the model header format
 	if photheads == False: photheads = [h for h in filters if h in df.columns.tolist()]
@@ -1011,20 +1024,23 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 	# If no model headers are given, tries to find the photometry headers in df_models, assuming they all start with "F" and no other headers do. 
 	if modelheads == False: 
 		modelheads = [filt for filt in df_models.columns.tolist() if filt[0] == "F" and "ID" not in filt and "FQ" not in filt]
-		modelheads.sort()
-	#print(modelheads) 
+
+	# Setting up wavelengths of sources and models, in angstroms
+	# JWST has filters containing W2, which mess up the function below. Replacing those with X
+	modelwavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in modelheads]
+
+	# Filters must be sorted by wavelength, or PlotSED will look weird. The most reliable way is to 
+	# extract the wavelengths first, sort, and align the filters based on the sorted wavelength indices
+	modelwavs_sorted = sorted(enumerate(modelwavs), key=lambda i: i[1]) # returns a sorted list as [(original index, sorted wavelength value)...]
+	modelwavs.sort()
+	modelheads = [modelheads[w[0]] for w in modelwavs_sorted]
 
 	# Figure out the source headers to pull the photometry from df_sources. If not given, assume they match the modelheads format
 	if sourceheads == False: sourceheads = [h for h in modelheads if h in df_sources.columns.tolist()]
 	if errorheads == False: errorheads = [f"{h} Err" for h in sourceheads]
 
-	# Setting up wavelengths of sources and models, in angstroms
-	# JWST has filters containing W2, which mess up the function below. Replacing those with X
-	modelwavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in modelheads]
+	# Setting up wavelengths of sources
 	sourcewavs = [int(re.sub('\D', '', h.replace('W2','W'))) for h in sourceheads]
-
-	#print(modelwavs)
-	#print(sourcewavs)
 
 	if not instrument: instrument = "Instrument"
 	else: instrument = instrument.upper()
@@ -1064,7 +1080,6 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 
 			# On the left, plot the models and observations
 			#plt.subplot(1, 2, 1)
-			# NOTE: if reading in JWST data, the units should be in nanometers, not angstroms
 			plt.xlabel(f"{instrument} Filter")
 			plt.ylabel("Absolute Magnitude")
 			plt.gca().invert_yaxis()
@@ -1254,7 +1269,7 @@ def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids,
 
 ###-----------------------------------------------------------------------------------------------------
 	
-def AddExtinction(df, Av_max=2.0, Av_num=20, wav2nm=1, beta=-0.7): 
+def AddExtinction(df, Av_max=2.0, Av_num=25, wav2nm=1, beta=-0.7): 
 	"""
 	If an isochrone file does not include extinction as a free parameter (Av), the DataFrame read in as df
 	will be modified such that each model has an Av between 0 and 2 applied to its photometry using the 
@@ -1267,7 +1282,8 @@ def AddExtinction(df, Av_max=2.0, Av_num=20, wav2nm=1, beta=-0.7):
 	----------
 	df 	[pd.DataFrame]	:	DataFrame containing the isochrone models. 
 	Av_max	[float]		:	Maximum Av value to model. The default is 2.0, a physically reasonable max.
-	Av_num	[int]		:	Number of Av values to model between 0.0 and Av_max.
+	Av_num	[int] (25)	:	Number of Av values to model between 0.0 and Av_max. Default is 25. 
+
 	wav2nm	[int] (1)	:	Conversion factor for converting the wavelengths of the filters into
 					nanometers (default wavelength unit of HST). E.g. the conversion of 
 					JWST NIRCAM to HST wavelengths is 10, or JWST MIRI to HST = 1.
