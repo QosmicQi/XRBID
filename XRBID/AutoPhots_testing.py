@@ -45,8 +45,9 @@ long_EEFs = pd.read_csv(file_dir+"/NIRCAM_EEFs_LW.csv")  # EEFs for the long wav
 WFC3_UVIS1_zpt = pd.read_csv(file_dir+"/WFC3_UVIS1_zeropoints.txt")
 WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
 
-# JWST zeropoints
-NIRCAM_zpt = pd.read_csv(file_dir+"/NIRCAM_zeropoints.csv")
+# JWST zeropoints (02 July 2025)
+# DataFrame generated from https://jwst-docs.stsci.edu/files/154689209/154689212/1/1716319320811/NRC_ZPs_1126pmap.txt
+NIRCAM_zpt = pd.read_csv(file_dir+"/NIRCAM_zeropoints.csv", comment="#")
 
 # Filters for JWST NIRCam 
 long_filter = [ "F250M", "F277W", "F300M",
@@ -535,7 +536,7 @@ def Zeropoint(hdu, filt, instrument, date=None):
     # Zeropoint for WFC3
     elif instrument.lower() == 'wfc3': zmag = Find(WFC3_UVIS1_zpt, 'Filter = '+filt.upper())['Vega mag'][0]
 
-    # Zeropoint for NIRCAM (NEED TO CREATE FROM https://jwst-docs.stsci.edu/files/154689209/154689212/1/1716319320811/NRC_ZPs_1126pmap.txt)
+    # Zeropoint for NIRCAM
     elif instrument.lower() == 'nircam':
 	sca = hdu[0].header["DETECTOR"]
 	zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {sca}"])["zp_vega"][0]
@@ -547,13 +548,14 @@ def Zeropoint(hdu, filt, instrument, date=None):
 def RemoveExt(Ebv, wave, mag):
     
     """
-    Removes extinction from a the spectrum of a star given the reddening, E(B-V), using the
+    Removes galactic extinction from a the spectrum of a star given the reddening, E(B-V), using the
     extinction function and the Fitzpatrick & Massa 2007 extinction model. R_v is assumed to be 3.1.
 
     PARAMETERS
     ----------
     Ebv 	[float]	: The assumed reddening on the star. Can be calculated from the location of the star,
-               		  Using the online tool at https://ned.ipac.caltech.edu/forms/calculator.html
+               		  Using the online tool at https://ned.ipac.caltech.edu/forms/calculator.html. 
+			  E(B-V) can be calculated by subtracting the Landholt B & Landholt V values.
     wave 	[array] : The wavelengths at which the magnitudes are evalutated.
     mag 	[array] : The magnitudes of the star at the given wavelengths.
 
@@ -573,8 +575,8 @@ def RemoveExt(Ebv, wave, mag):
     return mag_ext
     
 ###-----------------------------------------------------------------------------------------------------
-def perform_photometry(data_sub, data, hdu, apertures, instrument, filter, phottype, gal, suffix="", calc_error=True, savefile=False):
-    '''
+def perform_photometry(data_sub, data, hdu, apertures, instrument, filter, phottype, gal, suffix="", savefile=False):
+    """
     A helper function to calculate the aperture photometry.
 	
 	PARAMETERS
@@ -588,7 +590,6 @@ def perform_photometry(data_sub, data, hdu, apertures, instrument, filter, phott
 	phottype        [str] 		: 	The type of photometry being performed -- full, extended or source.
 	gal  		[str]		: 	Name of the galaxy of interest.
 	suffix      	[str]   	: 	Suffix to be added to the name of the saved file.
-	calc_error  	[bool] (True) 	: 	Calculate the error for aperture photometry.
 	savefile    	[bool] (True) 	: 	Save the file.
 
     	RETURNS
@@ -604,21 +605,16 @@ def perform_photometry(data_sub, data, hdu, apertures, instrument, filter, phott
     	Datafile containing the 3 pixel aperture photometry of all sources in the field
         	photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_extended[SUFFIX].ecsv: 
     	Datafile containing the extended pixel aperture photometry of all sources in the field
-    '''
+    """
 
     hst_instrument = ['acs', 'wfc3']
-    if calc_error:  # If error needs to be calculated (this is mainly for extended and source photometry)
-        # If hst instrument
-        if instrument.lower() in hst_instrument: 
-            photometry = aperture_photometry(data_sub, apertures, error=calc_total_error(data, \
-                            data-data_sub, effective_gain=hdu[0].header["EXPTIME"]))
-            
-        else: # If jwst instrument
-            photometry = aperture_photometry(data_sub, apertures, error=calc_total_error(data, \
-                                            data-data_sub, effective_gain=hdu[1].header["XPOSURE"]))
-                
-    else: # if you dont need to calculate error
-        photometry = aperture_photometry(data_sub, apertures, method='center')
+
+    if instrument.lower() in hst_instrument: # If HST instrument...
+        photometry = aperture_photometry(data_sub, apertures, error=calc_total_error(data, \
+                        		 data-data_sub, effective_gain=hdu[0].header["EXPTIME"]))
+    else: # If JWST instrument
+        photometry = aperture_photometry(data_sub, apertures, error=calc_total_error(data, \
+                                         data-data_sub, effective_gain=hdu[1].header["XPOSURE"]))
             
     if savefile:
         photometry.write("photometry_"+gal+"_"+filt.lower()+"_"+instrument.lower()+"_"+phottype+suffix+".ecsv", overwrite=True)
