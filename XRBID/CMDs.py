@@ -837,7 +837,7 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	return fig
 ###-----------------------------------------------------------------------------------------------------
 
-def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="wls", min_models=1, input_model=False, model_header_index=13, plotSED=True, showHR=False, model_ext=False): 
+def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype="wls", min_models=1, min_measures=2, input_model=False, model_header_index=13, plotSED=True, showHR=False, model_ext=False): 
 
 	"""
 	Function for finding the best fit stellar SED from isochrone models. Reads in the photometric measurements from input source(s) across 
@@ -872,6 +872,10 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 					returned. If min_models >= 2, the next closest fit(s) up to min_models will be returned as well 
 					(e.g. if min_models = 3, the 2 next closest fits will also be given). If several models fit equally 
 					well, all will be included in isoMatches.
+	min_measures	[int]	:	Minimum number of valid measurements required to run the fit. Default is 2, which prevents
+					a fitting for observations containing a single valid data point. User may opt to include
+					single data point observations, which may instructive for finding a minimum mass limit in 
+					some cases (e.g. for high-mass stars), but the fit should be regarded with extreme caution.
 	input_model	[str]	:	If preferred, user can input the name of a file containing the preferred isochrone models from the 
 					Padova website. The code assumes the document is copied and pasted from the CMD output page, with 
 					the table headers on the 14th line (unless the file is a CSV DataFrame); this can be modified using 
@@ -943,7 +947,7 @@ def FitSED(df, instrument, idheader, photheads=False, errorheads=False, fittype=
 	else: pass;
 
 	if fittype.lower() == "wls" or ("weight" in fittype.lower() and "square" in fittype.lower()): 
-		isoMatches = WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models)
+		isoMatches = WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models, min_measures)
 		fitheader = "Test Statistic"
 	else: print("Invalid model given as fittype. Returning empty DataFrame.")
 
@@ -1211,7 +1215,7 @@ def PlotHR(df=False, logTeheader="logTe", logLheader="logL", idheader=False, fig
 
 ###-----------------------------------------------------------------------------------------------------
 
-def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models): 
+def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids, min_models, min_measures): 
 	"""
 	Function for calculating the weighted least squares statistic, called by fitSED. 
 	For each star in df, checks that there are at least 1 good measurement, and then calculates the residuals 
@@ -1229,8 +1233,9 @@ def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids,
 	
 	print("Finding best-fit model(s)...")
 	for star in range(len(df)): 
-		# As long as there is at least one good magnitude value associated with the star...
-		if False in [np.isnan(sourcemags[star][f]) for f in range(len(photheads))]:
+		# As long as there are at least {min_measures} good magnitude values associated with the star, run the fit
+		#if False in [np.isnan(sourcemags[star][f]) for f in range(len(photheads))]:
+		if len(photheads) - sum([np.isnan(sourcemags[star][f]) for f in range(len(photheads))]) >= min_measures:
 			# For each filter, find the difference of the (measurements - model)^2/(errors)^2 and take the sum
 			isoTemp["Test Statistic"] = np.nansum([(sourcemags[star][f]-isoTemp[photheads[f]].values)**2/sourcemag_errs[star][f]**2 if isinstance(sourcemags[star][f], float) else 0 for f in range(len(photheads))], axis=0)
 
@@ -1244,7 +1249,7 @@ def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids,
 			temp[idheader] = sourceids[star]
 
 			# Sorting isoMatches, so best-fit statistic appears first per source
-			isoMatches.sort_by(column="Test Statistic")
+			isoMatches.sort_values(by="Test Statistic", ignore_index=True, inplace=True)
 
 			# Adding the best-fit model(s) to the DataFrame to return to the user
 			isoMatches = pd.concat([isoMatches, temp], ignore_index=True)
