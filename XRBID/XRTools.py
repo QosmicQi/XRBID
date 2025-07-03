@@ -20,7 +20,6 @@ from astropy.io.votable import parse
 import pandas as pd
 pd.options.mode.chained_assignment = None
 
-#from Headers import LogL
 from XRBID.DataFrameMod import BuildFrame, Find
 
 
@@ -135,23 +134,29 @@ def MakeXLF(L, L_lo=None, L_hi=None, L_header="LogL", completeness=36.2, gal=Non
 	completeness	[float]		:	X-ray completeness limit of the X-ray observations. 
 	gal		[str]		: 	Name of the galaxy. 
 	bins		[int, array]	: 	Number of bins between which the sources will be divided, or an array of bins as they 
-						will be plotted. For an 'unbinned' plot, can also leave empty or set to 'unbinned'. Default is 50. 
+						will be plotted. For an 'unbinned' plot, can also leave empty or set to 'unbinned'. 
+						Default is 50. 
 	binlim		[list]		: 	The lower and upper limit on the bins, in luminosity units. Default is [35,39]. 
-	xlim 		[list]		: 	The lower and upper limit of the x-axis in the units of the luminosity. Defaults is [35,40].
+	xlim 		[list]		: 	The lower and upper limit of the x-axis in the units of the luminosity. 
+						Defaults is [35,40].
 	ylim		[list]		: 	The lower and upper limit of the y-axis in units counts. No default is given. 
 	scale		[str]		:	The scale of the luminosity. By default it is 'log' (for standard log luminosities), 
 						but one may also plot the XLF linearly ('linear').
-	cumul		[bool]		: 	Determines whether the XLF will be plotted as a cumulative or differential function. Defaults to True.
+	cumul		[bool]		: 	Determines whether the XLF will be plotted as a cumulative or differential function. 
+						Defaults to True.
 	color		[str]		: 	Color of the XLF line (default is black). 
 	label 		[str]		: 	Label given to the XLF being plotted, as it will appear on the legend. 
-	savehist	[str]		:	Name of file to save the results of the histogram to. If no name is given, no file will be saved. 
-	returnhist	[bool]		:	If set to True, returns the results of the histogram, the edges of the bins, and the centers of the bins.
+	savehist	[str]		:	Name of file to save the results of the histogram to. If no name is given, 
+						no file will be saved. 
+	returnhist	[bool]		:	If set to True, returns the results of the histogram, the edges of the bins, 
+						and the centers of the bins.
 	fontsize	[int]		:	Size of the font of the axes and title. Default is 20. 
 	labelsize	[int]		:	Size of the tick lables in the x and y axes. Default is half of the fontsize. 
 	legendsize	[int]		:	Size of the font of the legend. Default is 20. 
 	figsize		[tuple]		:	Size of the figure. Defaults is (8,6). 
 	lw		[int]		:	Linewidth of the XLF. Default is 2. 
-	linestyle	[str]		: 	Linestyle of the XLF. Default is a solid line, '-'. Other common styles are '--', '-.', ':', and '.'.
+	linestyle	[str]		: 	Linestyle of the XLF. Default is a solid line, '-'. Other common styles are 
+						'--', '-.', ':', and '.'.
 	title		[str]		:	Title of the figure. 
 	xlabel		[bool]		:	Sets whether or not to show the x-axis label. Defaults to True. 
 	ylabel		[bool]		:	Sets whether or not to show the y-axis label. Defaults to True.
@@ -255,20 +260,25 @@ def AddXLF(L, L_lo=None, L_hi=None, L_header="LogL", label=None, bins=50, scale=
 	
 	PARAMETERS
 	----------
-	L	[list, pd.DataFrame]	: 	Luminosity of the sources, in units ergs/s or log(ergs/s), or a pd.DataFrame in which the luminosities are stored.
+	L	[list, pd.DataFrame]	: 	Luminosity of the sources, in units ergs/s or log(ergs/s), or a 
+						pd.DataFrame in which the luminosities are stored.
 	L_lo		[list]		:	Lower limits on the source luminosities, in units ergs/s or log(ers/s). 
 	L_hi		[list]		:	Upper limits on the source luminosities, in units ergs/s or log(ers/s).
 	L_header	[str]		:	Header in which the luminosities are stored, if L is given as a pd.DataFrame.
 	label 		[str]		: 	Label given to the XLF being plotted, as it will appear on the legend. 
 	bins		[int, array]	: 	Number of bins between which the sources will be divided, or an array of bins as they 
-						will be plotted. For an 'unbinned' plot, can also leave empty or set to 'unbinned'. Default is 50. 
+						will be plotted. For an 'unbinned' plot, can also leave empty or set to 'unbinned'. 
+						Default is 50. 
 	scale		[str]		:	The scale of the luminosity. By default it is 'log' (for standard log luminosities), 
 						but one may also plot the XLF linearly ('linear').
-	cumul		[bool]		: 	Determines whether the XLF will be plotted as a cumulative or differential function. Defaults to True.
+	cumul		[bool]		: 	Determines whether the XLF will be plotted as a cumulative or differential function. 
+						Defaults to True.
 	color		[str]		: 	Color of the XLF line (default is black). 
 	lw		[int]		:	Linewidth of the XLF. Default is 2. 
-	linestyle	[str]		: 	Linestyle of the XLF. Default is a solid line, '-'. Other common styles are '--', '-.', ':', and '.'.
-	savehist	[str]		:	Name of file to save the results of the histogram to. If no name is given, no file will be saved. 
+	linestyle	[str]		: 	Linestyle of the XLF. Default is a solid line, '-'. Other common styles are 
+						'--', '-.', ':', and '.'.
+	savehist	[str]		:	Name of file to save the results of the histogram to. 
+						If no name is given, no file will be saved. 
 	legendsize	[int]		:	Size of the font of the legend. Default is 20. 
 	showlegend	[bool]		:	Sets whether or not to show the legend. Defaults to True.
 	
@@ -705,11 +715,13 @@ def fitXLF(L, N=None, Lb=None, index=None, L0=None, K=None, init_Schechter=None,
 
 	PARAMETERS
 	----------
-	L     [list, DataFrame] :	DataFrame containing the luminosities of each source, in log (base 10) units, or list containing the binned luminosities
-					of sources of interest
-	N		[list]	:	If parameter 'L' is not a DataFrame, then N is the results of a histogram on the luminosities of sources of interest.
+	L     [list, DataFrame] :	DataFrame containing the luminosities of each source, in log (base 10) units, 
+					or list containing the binned luminosities of sources of interest
+	N		[list]	:	If parameter 'L' is not a DataFrame, then N is the results of a histogram on 
+					the luminosities of sources of interest.
 	Lb		[float]	:	Inital guess at the break luminosity of the broken power-law (see Lehmer et al. 2019 for more info). 
-	init_Schechter	[list]	:	Initial guess on the Schechter function fit, defined as log(N) = logK - index*logL + index*logL0 - L/(L0*ln10). 
+	init_Schechter	[list]	:	Initial guess on the Schechter function fit, defined as 
+					log(N) = logK - index*logL + index*logL0 - L/(L0*ln10). 
 					Input should be given as [index, L0 (normalizing luminosity), and K (general normalization factor)].
 	sigma		[float]	:	Sigma of bins, given as the inverse of the bin errors. 
 	returnalpha	[bool]	:	Default is True. 
@@ -722,10 +734,12 @@ def fitXLF(L, N=None, Lb=None, index=None, L0=None, K=None, init_Schechter=None,
 	title		[str]	:	Title of the plot. 
 	figsize		[tuple]	:	Size of the figure. Default is (8,6). 
 	xlim		[tuple]	:	Limits on the x-axis (luminosity). Defaults is (35,40). 
-	ylim		[tuple]	:	Limits on the y-axis (N or dN/dL). If none is given, will attempt to calculate a reasonable limit. 
+	ylim		[tuple]	:	Limits on the y-axis (N or dN/dL). If none is given, will attempt to calculate a 
+					reasonable limit. 
 	verbose		[bool]	:	If true, will print outputs describing each step. 
 	fontsize	[int]	:	Size of font on figure. Default is 20. 
-	labelsize	[int]	:	Size of the tick labels on the XLF. If none is given, size will depend on the fontsize parameter. 
+	labelsize	[int]	:	Size of the tick labels on the XLF. If none is given, size will depend on the 
+					fontsize parameter. 
 	completeness	[float]	:	X-ray completeness limit (usually 90% or 95%) in log (base 10) units. 
 	xlabel		[bool]	:	Turns the x-axis label on (True) or off (False). Default is True.  	
 	ylabel		[bool]	:	Turns the y-axis label on (True) or off (False). Default is True. 

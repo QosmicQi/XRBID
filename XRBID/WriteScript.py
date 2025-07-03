@@ -51,23 +51,28 @@ def WriteDS9(df=None, galaxy="galaxy", colorfiles=None, regions=None, scales="zs
 	df		[pd.DataFrame]	:	DataFrame containing the sources to image.
 	galaxy		[str]		:	Name of the galaxy containing the images. This is used to name certain files. 
 	colorfiles	[list]		:	List of the FITS files used to create color images, in RGB order. Currently requires
-						all 3 channels to be filled. If an alternate order is used, it should be defined by the 'filterorder' parameter.
+						all 3 channels to be filled. If an alternate order is used, it should be defined by the 
+						'filterorder' parameter.
 	regions		[list]		: 	List of region files to include in DS9 images. 
-	scales		[list, str]	: 	Either a list of scaling parameters for each filter (e.g. ["scale name", redscale, greenscale, bluescale])
-						or, if unique_scale is set to True, the name of the file with the unique scalings output by WriteScalings. 
-	imgnames	[list, str]	:	Either a list containing the unique names of each image to be saved, or the prefix to append to each 
-						image name. If a single string is given, the images will be differentiated by image number.
+	scales		[list, str]	: 	Either a list of scaling parameters for each filter 	
+						(e.g. ["scale name", redscale, greenscale, bluescale]) or, if unique_scale is set to True, 
+						the name of the file with the unique scalings output by WriteScalings. 
+	imgnames	[list, str]	:	Either a list containing the unique names of each image to be saved, or the prefix to 
+						append to each image name. If a single string is given, the images will be differentiated by 
+						image number.
 	imgsize		[list]		:	Integer dimensions of saved images. The DS9 window will be rescaled to this size. 
 	outfile		[str]		:	Name of the bash script to save. 
-	unique_scale	[bool]		:	If True, looks for unique scale parameters for each source. These should be read in as a txt file in 'scales' parameter. 
-	coords		[list]		:	Instead of reading in a DataFrame, can instead read in a list of coordinates. Assumes the coodinate system is 'image'
-						unless otherwise given in 'coordsys'. 
+	unique_scale	[bool]		:	If True, looks for unique scale parameters for each source. These should be read in as a 
+						txt file in 'scales' parameter. 
+	coords		[list]		:	Instead of reading in a DataFrame, can instead read in a list of coordinates. 
+						Assumes the coodinate system is 'image' unless otherwise given in 'coordsys'. 
 	ids		[list]		:	List of source IDs. Only needed if only coordinates are provided (to build new DataFrame). 
 	idheader	[str]		:	Header of the ID column in the DataFrame. Defaults to "ID". 
-	filetype	[str]		: 	File format of the images to be saved. Defaults to "jpeg" to save memory, but "png" may also be used. 
-	basefilter	[str]		:	The filter/channel whose coordinates are to be used when opening region files. This is useful when there are slight 
-						coordinate differences between the filters and/or the region files were created using a specific base filter. 
-						Default is "red". 
+	filetype	[str]		: 	File format of the images to be saved. Defaults to "jpeg" to save memory, 
+						but "png" may also be used. 
+	basefilter	[str]		:	The filter/channel whose coordinates are to be used when opening region files. 
+						This is useful when there are slight coordinate differences between the filters and/or
+						the region files were created using a specific base filter. Default is "red". 
 	filterorder	[list]		:	Order in which the filters were input. The default is ["red","green","blue"]. 
 	zoom		[int]		:	DS9 zoom setting, for the closest zoom. Default is 8. 
 	env_zoom	[int]		:	DS9 zoom setting, for the farthest zoom. This allows DS9 to take an image of the 

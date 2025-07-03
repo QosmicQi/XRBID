@@ -523,24 +523,26 @@ def Zeropoint(hdu, filt, instrument, date=None):
     
     """
 
-    # Zeropoint for ACS
-    if instrument.lower() == 'acs':
-    	if date: date = date
-    	else: 
-    	    try: date = hdu[0].header['DATE-OBS']
-    	    except: date = hdu['PRIMARY'].header['DATE']
-    	q_filter = acszpt.Query(date=date, detector="WFC", filt=filt)
-    	filter_zpt = q_filter.fetch()
-    	zmag = filter_zpt['VEGAmag'][0].value
+    try:
+        # Zeropoint for ACS
+        if instrument.lower() == 'acs':
+    	    if date: date = date
+    	    else: 
+    	        try: date = hdu[0].header['DATE-OBS']
+        	    except: date = hdu['PRIMARY'].header['DATE']
+        	q_filter = acszpt.Query(date=date, detector="WFC", filt=filt)
+        	filter_zpt = q_filter.fetch()
+        	zmag = filter_zpt['VEGAmag'][0].value
 
-    # Zeropoint for WFC3
-    elif instrument.lower() == 'wfc3': zmag = Find(WFC3_UVIS1_zpt, 'Filter = '+filt.upper())['Vega mag'][0]
+        # Zeropoint for WFC3
+        elif instrument.lower() == 'wfc3': zmag = Find(WFC3_UVIS1_zpt, 'Filter = '+filt.upper())['Vega mag'][0]
 
-    # Zeropoint for NIRCAM
-    elif instrument.lower() == 'nircam':
-	sca = hdu[0].header["DETECTOR"]
-	zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {sca}"])["zp_vega"][0]
-	
+        # Zeropoint for NIRCAM
+        elif instrument.lower() == 'nircam':
+	    sca = hdu[0].header["DETECTOR"]
+	    zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {sca}"])["zp_vega"][0]
+    except: zmag = input("Zeropoint not found. Please enter manually: ")
+
     return zmag
     
 ###-----------------------------------------------------------------------------------------------------
