@@ -442,9 +442,15 @@ def CorrectMags(frame=None, phots=None, corrections=None, field=None, apertures=
 
 def CorrectMag(df=False, phots=None, correction=None, field=None, apertures=[3,20], instrument="ACS", filt="F606W", distance=False, savefile=None, idheader="ID", ID_header=False, coordheads=["X", "Y"], coord_headers=False, extinction=0): 
 
-	"""Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter (so that it doesn't require all filters to be given if only one measurement is needed). The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. (NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. 
+	"""
+	Calculating magnitude with given aperture correction, like CorrectMags, but specifically for a single input filter 
+	(so that it doesn't require all filters to be given if only one measurement is needed). 
+	The input 'instrument' can be 'ACS' or 'WFC3', which defines which EEF file to read from. 
+	Filters should be read in the order [V,B,I]. If given, 'extinction' should also be in [Av,Ab,Ai,Au] order. 
+	(NOTE: note RGB) or [V,B,I,U], if U is given. Corrections should also be read in VBI order. 
 
-	NOTE: ID_header and coord_headers have been depricated. They are now called idheader and coordheads, to match other parts of XRBID. """
+	NOTE: ID_header and coord_headers have been depricated. They are now called idheader and coordheads, 
+	to match other parts of XRBID. """
 
 	if df: frame = df.copy()
 
@@ -687,7 +693,8 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"], colors=["V-I","B-V"], instrument="acs", correct_ext=False, E_BV=0.08, label_ages=True, color="black", label="", model_color="gray", model_label="", size=15, Z=0.02, stellar_lib="BaSeL"): 
 
 	"""
-	Adds a secondary color-color diagram to one already built with MakeCCD. User must read in the object returned by MakeCCD for this to plot properly.
+	Adds a secondary color-color diagram to one already built with MakeCCD. User must read in the object returned by 
+	MakeCCD for this to plot properly.
 	
 	PARAMETERS: 
 	-----------
@@ -718,8 +725,8 @@ def AddCCD(fig, clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F55
 	Z	[float]	(0.02)	:	Stellar metallicity to compare to models. Defaults to approximately solar (Z=0.02). 
 					Other options are [0.0001, 0.0004, 0.004, 0.008, 0.05, 0.10].
 	stellar_lib [str]	:	The name of the stellar libary to use, available in CB07 (from https://www.bruzual.org/). 
-					Defaults to "BaSel" (Lastennet et al. 2001). Other options are "xmiless" (MILES, Falcón-Barroso et al. 2011)
-					or "stelib" (Le Borgne et al. 2003). 
+					Defaults to "BaSel" (Lastennet et al. 2001). Other options are "xmiless" 
+					(MILES, Falcón-Barroso et al. 2011) or "stelib" (Le Borgne et al. 2003). 
 	
 	RETURNS: 
 	----------- 
@@ -1111,7 +1118,9 @@ def PlotSED(df_sources, df_models, idheader, instrument=False, fitheader="Test S
 			plt.legend()
 			plt.show()
 
-		if showHR: PlotHR(TempModel, figsize=(4,4))
+		if showHR: 
+			try: PlotHR(TempModel, figsize=(4,4))
+			except: pass;
 
 ###-----------------------------------------------------------------------------------------------------
 
