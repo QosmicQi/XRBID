@@ -279,6 +279,8 @@ def SourceList(savefile, df=False, columns=['ID']):
 
 	""" 
 
+	if not isinstance(columns, list): columns = [columns]
+
 	if isinstance(df, pd.DataFrame): 
 		with open(savefile, 'w') as f:
 			tempstack = []
