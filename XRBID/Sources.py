@@ -254,7 +254,7 @@ def GetIDs(infile=None, verbose=True):
 
 ###-----------------------------------------------------------------------------------------------------
 
-def SourceList(savefile, df=None, columns=['ID']):
+def SourceList(savefile, df=False, columns=['ID']):
 
 	""" 
 	Creates a text file containing some input data stacked into columns. 
@@ -279,7 +279,7 @@ def SourceList(savefile, df=None, columns=['ID']):
 
 	""" 
 
-	if df: 
+	if df != False: 
 		with open(savefile, 'w') as f:
 			tempstack = []
 			for i in columns: 
