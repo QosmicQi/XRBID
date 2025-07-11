@@ -580,7 +580,7 @@ def RemoveExt(Ebv, wave, mag):
     return mag_ext
     
 ###-----------------------------------------------------------------------------------------------------
-def perform_photometry(data_sub, data, hdu, apertures, instrument, filter, phottype, gal, suffix="", savefile=False):
+def perform_photometry(data_sub, data, hdu, apertures, instrument, filt, phottype, gal, suffix="", savefile=False):
     """
     A helper function to calculate the aperture photometry.
 	
