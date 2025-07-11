@@ -539,8 +539,10 @@ def Zeropoint(hdu, filt, instrument, date=None):
 
         # Zeropoint for NIRCAM
         elif instrument.lower() == 'nircam':
-	    sca = hdu[0].header["DETECTOR"]
-	    zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {sca}"])["zp_vega"][0]
+	    try:
+	        zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {hdu[0].header["DETECTOR"]}"])["zp_vega"][0]
+	    except: 
+	        zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"PHOTMJSR = {round(hdu["SCI"].header["PHOTMJSR"],3)}"])["zp_vega"][0]
     except: zmag = input("Zeropoint not found. Please enter manually: ")
 
     return zmag
