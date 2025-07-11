@@ -43,11 +43,17 @@ U = "U"
 
 cd(file_dir)
 # Calling in tracks for future use by MakeCMD
-wfc3_masses = [pd.read_csv("isoWFC3_1Msun.frame"), pd.read_csv("isoWFC3_3Msun.frame"), pd.read_csv("isoWFC3_5Msun.frame"),
-	       pd.read_csv("isoWFC3_8Msun.frame"), pd.read_csv("isoWFC3_20Msun.frame")]
+wfc3_masses = [pd.read_csv("isoWFC3_1Msun.frame"), 
+	       pd.read_csv("isoWFC3_3Msun.frame"), 
+	       pd.read_csv("isoWFC3_5Msun.frame"),
+	       pd.read_csv("isoWFC3_8Msun.frame"), 
+	       pd.read_csv("isoWFC3_20Msun.frame")]
 
-acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), pd.read_csv("isoACS_WFC_3Msun.frame"), pd.read_csv("isoACS_WFC_5Msun.frame"),
-	      pd.read_csv("isoACS_WFC_8Msun.frame"), pd.read_csv("isoACS_WFC_20Msun.frame")]
+acs_masses = [pd.read_csv("isoACS_WFC_1Msun.frame"), 
+	      pd.read_csv("isoACS_WFC_3Msun.frame"), 
+	      pd.read_csv("isoACS_WFC_5Msun.frame"),
+	      pd.read_csv("isoACS_WFC_8Msun.frame"),
+	      pd.read_csv("isoACS_WFC_20Msun.frame")]
 
 nircam_masses = [pd.read_csv('isoNIRCAM_1Msun.frame'),
                  pd.read_csv('isoNIRCAM_3Msun.frame'),
