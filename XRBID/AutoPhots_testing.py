@@ -147,7 +147,8 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
     
     # Setting up zeropoint, if not given
     if not zeropoint: zeropoint = Zeropoint(hdu, filt, instrument)
-    
+    print(f"Using a zeropoint of {zeropoint} mag.")
+
     # Setting up EEF, if not given
     # The WFC3 EEF is going to slightly underestimate the correction, because there is no 20 pix correction
     if not EEF: 
