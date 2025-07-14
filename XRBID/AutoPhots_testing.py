@@ -245,7 +245,7 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	if aperture_correction:
 			print("Aperture corrections...")
 			apcorrections = CorrectAp(phot_full, gal=gal, filt=filt, radii=ap_rads, EEF=EEF, num_stars=num_stars, zmag=zeropoint, \
-							  		  min_rad=min_rad, max_rad=max_rad, extended_rad=extended_rad, suffix=suffix)
+						  min_rad=min_rad, max_rad=max_rad, extended_rad=extended_rad, suffix=suffix)
 			if len(apcorrections) > 0:
 				apcorr = apcorrections[0]
 				aperr = apcorrections[1]
@@ -293,8 +293,8 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	print("DONE!")
 
 	if aperture_correction:
-		print(f"Correction (source, {min_rad} px): {apcorr[0]} +/- {apcorr[1]}")
-		print(f"Correction (extended, {extended_rad} px): {apcorr[2]} +/- {apcorr[3]}")
+		print(f"Correction (source, {min_rad} px): {apcorr} +/- {aperr}")
+		print(f"Correction (extended, {extended_rad} px): {apcorr_ext} +/- {aperr_ext}")
 		return apcorr, aperr, apcorr_ext, aperr_ext
 	else: return None   
 ###-----------------------------------------------------------------------------------------------------
