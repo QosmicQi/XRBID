@@ -144,8 +144,8 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
 
 	"""
 
-	try: data = hdu['SCI',1].data
-	except: data = hdu['PRIMARY',1].data
+	try: data = hdu['SCI'].data
+	except: data = hdu['PRIMARY'].data
 	
 	# Setting up zeropoint, if not given
 	if not zeropoint: zeropoint = Zeropoint(hdu, filt, instrument)
