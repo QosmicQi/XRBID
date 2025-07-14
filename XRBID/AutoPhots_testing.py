@@ -53,7 +53,7 @@ NIRCAM_zpt = pd.read_csv(file_dir+"/NIRCAM_zeropoints.csv", comment="#")
 long_filter = [ "F2500M", "F2770W", "F3000M",
 		"F3220W2", "F3230N", "F3350M", "F3560W",
 		"F3600M", "F4050N", "F4100M", "F4300M",
-		"F4440W", "F4600M", "F4660N", "F4700N"
+		"F4440W", "F4600M", "F4660N", "F4700N",
 		"F4800M"]
 
 short_filter = ["F700W", "F900W", "F1150W", "F1400M",
