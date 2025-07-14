@@ -459,18 +459,17 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 				temp = phots[j] # full radial profile of chosen random star
 				# checking for dips and flattened ends
 				if all(k>l for k,l in zip(temp, temp[1:])): # ensures the profile always decreases
-			  		if all(k-l<0.15 for k,l in zip(temp[3:], temp[4:])): # limits the slope of the decrease
+					if all(k-l<0.15 for k,l in zip(temp[3:], temp[4:])): # limits the slope of the decrease
 						if j not in temp_select: # print the star. If good, add to the list
-				  			plt.figure(figsize=(4,2))
-				  			for k in temp_select:
-				  				plt.plot(radii, phots[k], color="gray", lw=2, alpha=0.2)
-				  			plt.plot(radii, phots[j])
-				  			plt.ylim(26,10)
-				  			plt.xlabel("Aperture radius (pixels)")
-				  			plt.ylabel("Magnitude")
-				  			plt.title("Star No. " + str(j))
-				  			plt.show()
-				  			if len(temp_select) > 0: 
+							plt.figure(figsize=(4,2))
+							for k in temp_select: plt.plot(radii, phots[k], color="gray", lw=2, alpha=0.2)
+							plt.plot(radii, phots[j])
+							plt.ylim(26,10)
+							plt.xlabel("Aperture radius (pixels)")
+							plt.ylabel("Magnitude")
+							plt.title("Star No. " + str(j))
+							plt.show()
+							if len(temp_select) > 0: 
 				  				print("Stars selected: {temp_select}")
 				  				print(f"{num_stars-len(temp_select)} more to go.")
 				  			ans = input("Keep? (yes/[n]o/quit)").lower()
