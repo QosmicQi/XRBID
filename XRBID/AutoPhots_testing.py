@@ -229,7 +229,7 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	# collected within an aperture of radius min_rad
 	starttime = time.time()
 	phot_sources = perform_photometry(data_sub, data, hdu, apertures_source, instrument, filt, \
-					  phottype='source', gal=gal, calc_error=True, suffix=suffix, savefile=False)
+					  phottype='source', gal=gal, suffix=suffix, savefile=False)
 	endtime = time.time()
 	print("Time for source photometry:", (endtime-starttime)/60., "minutes")
 
@@ -237,7 +237,7 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	# collected within an aperture of radius extended_rad
 	starttime = time.time()
 	phot_extended = perform_photometry(data_sub, data, hdu, apertures_extended, instrument, filt, \
-					   phottype='extended', gal=gal, calc_error=True, suffix=suffix, savefile=False)
+					   phottype='extended', gal=gal, suffix=suffix, savefile=False)
 	endtime = time.time()
 	print("Time for extended photometry:", (endtime-starttime)/60., "minutes")
 
