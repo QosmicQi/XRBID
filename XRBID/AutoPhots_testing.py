@@ -218,7 +218,7 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	starttime = time.time()
 	# Collects the photometry over the full range of the apertures needed for the aperture correction step
 	phot_full = perform_photometry(data_sub, data, hdu, apertures_full, instrument, filt, phottype='full', gal=gal, \
-				   suffix=suffix, calc_error=False, savefile=True)
+				   suffix=suffix, savefile=True)
 	endtime = time.time()
 	print(f"Time for full photometry: {(endtime-starttime)/60.} minutes")
 	
