@@ -530,7 +530,7 @@ def Zeropoint(hdu, filt, instrument, date=None):
     	    if date: date = date
     	    else: 
     	        try: date = hdu[0].header['DATE-OBS']
-                except: date = hdu['PRIMARY'].header['DATE']
+    	        except: date = hdu['PRIMARY'].header['DATE']
         	q_filter = acszpt.Query(date=date, detector="WFC", filt=filt)
         	filter_zpt = q_filter.fetch()
         	zmag = filter_zpt['VEGAmag'][0].value
