@@ -472,15 +472,14 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 							if len(temp_select) > 0: 
 				  				print("Stars selected: {temp_select}")
 				  				print(f"{num_stars-len(temp_select)} more to go.")
-				  			ans = input("Keep? (yes/[n]o/quit)").lower()
-				  			if "y" in ans: temp_select.append(j) # add if not already in the list
-				  			elif "q" in ans: cont = False; # allows user to quit the code
+							ans = input("Keep? (yes/[n]o/quit)").lower()
+							if "y" in ans: temp_select.append(j) # add if not already in the list
+							elif "q" in ans: cont = False; # allows user to quit the code
 			temp_select_inds = random.sample(range(0, len(tab)), num_stars-len(temp_select))
 		else: cont = False; pass;
 
 	# Plotting the radial profile of all stars
-	for i in temp_select:
-		plt.plot(radii, phots[i]) # where i is the index of the star
+	for i in temp_select: plt.plot(radii, phots[i]) # where i is the index of the star
 	plt.ylim(26,10)
 	if saveplot: 
 		plt.savefig(f"apcorr_radial_profile_{gal}_{filt}{suffix}.png", bbox_inches="tight", dpi=300)
