@@ -62,7 +62,7 @@ short_filter = ["F070W", "F090W", "F115W", "F140M",
 		"F212N"]
 ###-----------------------------------------------------------------------------------------------------
 
-def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, sharplo=0.2, sharphi=1.0, roundlo=-1.0, roundhi=1.0, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
+def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, sharplo=0.2, sharphi=1.0, roundlo=-1.0, roundhi=1.0, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
 	
 	"""
 	Generates the initial photometric files needed for the aperture currection and photometric analyses.
