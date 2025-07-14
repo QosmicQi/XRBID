@@ -50,16 +50,16 @@ WFC3_UVIS2_zpt = pd.read_csv(file_dir+"/WFC3_UVIS2_zeropoints.txt")
 NIRCAM_zpt = pd.read_csv(file_dir+"/NIRCAM_zeropoints.csv", comment="#")
 
 # Filters for JWST NIRCam 
-long_filter = [ "F250M", "F277W", "F300M",
-		"F322W2", "F323N", "F335M", "F356W",
-		"F360M", "F405N", "F410M", "F430M",
-		"F444W", "F460M", "F466N", "F470N"
-		"F480M"]
+long_filter = [ "F2500M", "F2770W", "F3000M",
+		"F3220W2", "F3230N", "F3350M", "F3560W",
+		"F3600M", "F4050N", "F4100M", "F4300M",
+		"F4440W", "F4600M", "F4660N", "F4700N"
+		"F4800M"]
 
-short_filter = ["F070W", "F090W", "F115W", "F140M",
-		"F150W2", "F150W", "F162M", "F164N",
-		"F182M", "F187N", "F200W", "F210M",
-		"F212N"]
+short_filter = ["F700W", "F900W", "F1150W", "F1400M",
+		"F1500W2", "F1500W", "F1620M", "F1640N",
+		"F1820M", "F1870N", "F2000W", "F2100M",
+		"F2120N"]
 ###-----------------------------------------------------------------------------------------------------
 
 def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, sharplo=0.2, sharphi=1.0, roundlo=-1.0, roundhi=1.0, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
