@@ -508,45 +508,45 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 
 def Zeropoint(hdu, filt, instrument, date=None):
     
-    """
-    Retrieves the zero-points for the filt of interest based on the date of the observation.
+	"""
+	Retrieves the zero-points for the filt of interest based on the date of the observation.
 
-    PARAMETERS
-    ----------
-    hdu		[fits]	: The HDU of the HST image for which the magnitudes are obtained.
-    filt 	[str]	: The name of the filter for which the zero-point is needed.
-    instrument 	[str]	: ACS or WFC3. 
-    date 	[str]	: Specify the date of the observation in "YYYY-MM-DD" format, if given by HDU.
+	PARAMETERS
+	----------
+	hdu		[fits]	: The HDU of the HST image for which the magnitudes are obtained.
+	filt 		[str]	: The name of the filter for which the zero-point is needed.
+	instrument 	[str]	: ACS or WFC3. 
+	date 		[str]	: Specify the date of the observation in "YYYY-MM-DD" format, if given by HDU.
 
-    RETURN
-    ----------
-    zmag 	[float] : The zero-point magnitude of the input filter.
+	RETURN
+	----------
+	zmag 	[float] : The zero-point magnitude of the input filter.
     
-    """
+	"""
 
-    try:
-        # Zeropoint for ACS
-        if instrument.lower() == 'acs':
-    	    if date: date = date
-    	    else: 
-    	        try: date = hdu[0].header['DATE-OBS']
-    	        except: date = hdu['PRIMARY'].header['DATE']
-        	q_filter = acszpt.Query(date=date, detector="WFC", filt=filt)
-        	filter_zpt = q_filter.fetch()
-        	zmag = filter_zpt['VEGAmag'][0].value
+	try:
+		# Zeropoint for ACS
+		if instrument.lower() == 'acs':
+			if date: date = date
+			else: 
+				try: date = hdu[0].header['DATE-OBS']
+				except: date = hdu['PRIMARY'].header['DATE']
+				q_filter = acszpt.Query(date=date, detector="WFC", filt=filt)
+				filter_zpt = q_filter.fetch()
+				zmag = filter_zpt['VEGAmag'][0].value
 
-        # Zeropoint for WFC3
-        elif instrument.lower() == 'wfc3': zmag = Find(WFC3_UVIS1_zpt, 'Filter = '+filt.upper())['Vega mag'][0]
+		# Zeropoint for WFC3
+		elif instrument.lower() == 'wfc3': zmag = Find(WFC3_UVIS1_zpt, 'Filter = '+filt.upper())['Vega mag'][0]
 
-        # Zeropoint for NIRCAM
-        elif instrument.lower() == 'nircam':
-	    try:
-	        zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {hdu[0].header["DETECTOR"]}"])["zp_vega"][0]
-	    except: 
-	        zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"PHOTMJSR = {round(hdu["SCI"].header["PHOTMJSR"],3)}"])["zp_vega"][0]
-    except: zmag = input("Zeropoint not found. Please enter manually: ")
+		# Zeropoint for NIRCAM
+		elif instrument.lower() == 'nircam':
+			try:
+				zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"SCA = {hdu[0].header["DETECTOR"]}"])["zp_vega"][0]
+			except: 
+				zmag = Find(NIRCAM_zpt, [f"Filter = {filt}", f"PHOTMJSR = {round(hdu["SCI"].header["PHOTMJSR"],3)}"])["zp_vega"][0]
+	except: zmag = input("Zeropoint not found. Please enter manually: ")
 
-    return zmag
+	return zmag
     
 ###-----------------------------------------------------------------------------------------------------
 
