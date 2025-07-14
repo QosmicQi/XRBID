@@ -51,15 +51,15 @@ NIRCAM_zpt = pd.read_csv(file_dir+"/NIRCAM_zeropoints.csv", comment="#")
 
 # Filters for JWST NIRCam 
 long_filter = [ "F250M", "F277W", "F300M",
-				"F322W2", "F323N", "F335M", "F356W",
-				"F360M", "F405N", "F410M", "F430M",
-				"F444W", "F460M", "F466N", "F470N"
-				"F480M"]
+		"F322W2", "F323N", "F335M", "F356W",
+		"F360M", "F405N", "F410M", "F430M",
+		"F444W", "F460M", "F466N", "F470N"
+		"F480M"]
 
 short_filter = ["F070W", "F090W", "F115W", "F140M",
-				"F150W2", "F150W", "F162M", "F164N",
-				"F182M", "F187N", "F200W", "F210M",
-				"F212N"]
+		"F150W2", "F150W", "F162M", "F164N",
+		"F182M", "F187N", "F200W", "F210M",
+		"F212N"]
 ###-----------------------------------------------------------------------------------------------------
 
 def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint=False, EEF=False, sigma=3, threshold=3, sharplo=0.2, sharphi=1.0, roundlo=-1.0, roundhi=1.0, apcorr=0, aperr=0, num_stars=20, min_rad=3, max_rad=20, extended_rad=10, aperture_correction=True, reg_correction=False, suffix=""):
@@ -81,51 +81,51 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
 	----------
 	hdu 		[FITS]	: 	The fits image of the HST or JWST field.
 	gal  		[str]	: 	Name of the galaxy of interest.
-	instrument 		[str]	: 	Name of the instrument (ACS, WFC3, or NIRCAM)
+	instrument 	[str]	: 	Name of the instrument (ACS, WFC3, or NIRCAM)
 	filt 		[str]	: 	Name of the hdu filter. It's recommended to put JWST filters in HST units (nm).
-	fwhm_arcs 		[float]	: 	FWHM of stars in the hdu image.
+	fwhm_arcs 	[float]	: 	FWHM of stars in the hdu image.
 	pixtoarcs   	[float] :   	Pixel to arcsecond conversion. Defaults to 0.05 for ACS, 0.03962 for WFC3, 
 					0.031 for short wavelength NIRCam, and 0.063 for long wavelength NIRCam.
-	zeropoint 		[float]	: 	Vega zeropoint magnitude, for converting photometry into Vega magnitudes. 
-							Defaults to obtaining with Zeropoint() if none is given.
+	zeropoint 	[float]	: 	Vega zeropoint magnitude, for converting photometry into Vega magnitudes. 
+					Defaults to obtaining with Zeropoint() if none is given.
 	EEF 		[float]	: 	The Encircled Energy Fraction at the maximum aperture pixel 
-				  			radius (default 20) for the instrument/filter of interest.
-				  			If none is given, will pull the ~20 pix EEF for the instrument given. 
+				  	radius (default 20) for the instrument/filter of interest.
+				  	If none is given, will pull the ~20 pix EEF for the instrument given. 
 	sigma	   	[float] (3) :	The sigma used in DaoFind, which adjusts the sensitivity
-	threshold 		[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
+	threshold 	[float] (3) :	The threshold used in DaoFind, which adjusts the sensitivity
 	sharplo		[float]	(.2):	Lower limit for object sharpness read in by DAOStarFinder. 
 	sharphi		[float]	(1) :	Upper limit for object sharpness read in by DAOStarFinder. 
 	roundlo		[float] (-1):	Lower limit for object roundness read in by DAOStarFinder.
 	roundhi		[float)	(1) :	Upper limit for object roundness read in by DAOStarFinder. 
 	apcorr		[float] (0) :	In the event that aperture_correction is set to false, 
-							user can input a manual aperture correction to the photometry, 
-								which will be saved in the photometry files.
+					user can input a manual aperture correction to the photometry, 
+					which will be saved in the photometry files.
 	aperr 		[float] (0) : 	Manual input of the error on the aperture correction 
-							(estimated as the standard deviation of the photometric 
-								difference between min_rad and max_rad in the aperture correction).
-	num_stars 		[int]		:	The number of target stars to use for the aperture correction.
-	min_rad 		[float] (3) : 	The pixel radius of the minimum aperture size for a standard star
-	max_rad 		[float] (20): 	The pixel radius of the maximum aperture size
+					(estimated as the standard deviation of the photometric 
+					difference between min_rad and max_rad in the aperture correction).
+	num_stars 	[int]	:	The number of target stars to use for the aperture correction.
+	min_rad 	[float] (3) : 	The pixel radius of the minimum aperture size for a standard star
+	max_rad 	[float] (20): 	The pixel radius of the maximum aperture size
 	extended_rad 	[float] (10):	The pixel radius of the aperture size for extended sources (i.e. clusters)
 	aperture_correction [bool]  :	If true, runs the aperture correction for the field. Defaults as True.
-	reg_correction 	[list]   :	Pixel correction on the [x,y] to add to the region file, if you find the region file 
+	reg_correction 	[list]	:	Pixel correction on the [x,y] to add to the region file, if you find the region file 
 					created from photutils source extraction coordinates is misaligned with the HST 
 					image (Typically a correction of [1,1] pixel is sufficient.) This only applies the 
 					correction to the image coordinate region file, since fk5 tends to be more reliable 
 					without a coordinate correction.
 	suffix 		[str]	:	Additional suffix to add to the end of filenames, if applicable. 
-								Good for if multiple fields are used for a single filter.
+					Good for if multiple fields are used for a single filter.
 
 	RETURNS
 	-------
-	apcorr 		[float]		: 	Magnitude correction for point sources in the given HDU field.
-						Returns only if aperture_correction = True
-	aperr 		[float]	 : 	Error on the point source aperture correction.
-						Returns only if aperture_correction = True
-	apcorr_ext 		[float]		: 	Magnitude correction for extended sources in the given HDU field.
-						Returns only if aperture_correction = True
-	aperr_ext 		[float]	 : 	Error on the extended aperture correction.
-						Returns only if aperture_correction = True
+	apcorr 		[float]	: 	Magnitude correction for point sources in the given HDU field.
+					Returns only if aperture_correction = True
+	aperr 		[float]	: 	Error on the point source aperture correction.
+					Returns only if aperture_correction = True
+	apcorr_ext 	[float]	: 	Magnitude correction for extended sources in the given HDU field.
+					Returns only if aperture_correction = True
+	aperr_ext 	[float]	: 	Error on the extended aperture correction.
+					Returns only if aperture_correction = True
 	OTHER PRODUCTS
 	--------------
 	[GALAXY]_daofind_[FILTER]_[INSTRUMENT][SUFFIX]_img.reg: 
@@ -134,11 +134,13 @@ def RunPhots(hdu, gal, instrument, filter, fwhm_arcs, pixtoarcs=False, zeropoint
 		Region file for all daofind sources in the field in fk5 coordinates.
 	photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_full[SUFFIX].ecsv: 
 		Datafile containing the full 1-30 pixel aperture photometry of all sources in the field, 
-	not including an aperture correction. 
+		not including an aperture correction. 
 	photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_sources[SUFFIX].ecsv: 
-		Datafile containing the 3 (or min_rad) pixel aperture photometry of all sources in the field, used for stars.
+		Datafile containing the 3 (or min_rad) pixel aperture photometry of all sources in the field, 
+		used for stars.
 	photometry_[GALAXY]_[FILTER]_[INSTRUMENT]_extended[SUFFIX].ecsv: 
-		Datafile containing the extended pixel aperture photometry of all sources in the field, used for clusters.
+		Datafile containing the extended pixel aperture photometry of all sources in the field, 
+		used for clusters.
 
 	"""
 
@@ -328,32 +330,32 @@ def DaoFindObjects(data, fwhm, pixtoarcs, sigma=5, threshold=5.0, sharplo=0.2, s
 
 	PARAMETERS
 	----------
-	data		[HDUImage] 	:  HDU data extracted from a FITS file. Should use the original file, 
+	data		[HDUImage]	:  HDU data extracted from a FITS file. Should use the original file, 
 					   not the background subtraction.
 	fwhm		[float]	 	:  Estimated FWHM of stars in image, in units arcseconds.
-	pixtoarcs 		[float]		:  Pixel to arcsecond conversion.
+	pixtoarcs 	[float]		:  Pixel to arcsecond conversion.
 	sigma		[float] (5)	:  Desired sigma for the sigma clipping of the data.
-	threshold		[float] (5)	:  Absolute image value above which sources are detected.
+	threshold	[float] (5)	:  Absolute image value above which sources are detected.
 	sharplo		[float]	(.2)	:  Lower limit for object sharpness read in by DAOStarFinder. 
 	sharphi		[float]	(1) 	:  Upper limit for object sharpness read in by DAOStarFinder. 
 	roundlo		[float] (-1)	:  Lower limit for object roundness read in by DAOStarFinder.
 	roundhi		[float)	(1) 	:  Upper limit for object roundness read in by DAOStarFinder. 
-	savefile 		[str] (False)	:  If sources should be saved to a region file, input should be the 
-					   name of the region file to be saved.
-	plot_aps			[bool] (False)  :  If True, plots the image with apertures around the detected sources 
+	savefile 	[str] (False)	:  If sources should be saved to a region file, input should be the 
+				   	   name of the region file to be saved.
+	plot_aps	[bool] (False)  :  If True, plots the image with apertures around the detected sources 
 					   found through the DAOfind algorithm. This should be used for testing
 					   purposes only to confirm if your threshold or fwhm are suffiecient enought 
 					   to detect all the point sources in the image. 
-	cmap			[str] ('gray_s) :  Color map used for plotting the FITS file data.
+	cmap		[str] ('gray_s) :  Color map used for plotting the FITS file data.
 	vmin, vmax  	[float](0, 0.3) :  The data range that the colormap covers.
-	ap_color 		[str]		:  The color of the apertures used in the aperture plot, if plot=True.
+	ap_color 	[str]		:  The color of the apertures used in the aperture plot, if plot=True.
 					   Default color is '#0547f9'.
 	
 
 	RETURN
 	----------
-	objects 	[QTable]	: A table of objects identified by DaoFind. 
-	AxesImage				: If plot=True, will return the plot with apertures around the detected objects.
+	objects      [QTable]	: A table of objects identified by DaoFind. 
+	AxesImage		: If plot=True, will return the plot with apertures around the detected objects.
 
 	"""
 
@@ -397,32 +399,33 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 	PARAMETERS
 	----------
 	tab 		[Table]		: The table result from running photutils.aperture_photometry on a 
-					  	  particular FITS image
+					  particular FITS image
 	radii 		[list]		: The apertures on which the photometry was run
-	gal			[str]		: Name of the galaxy, used in the output filenames.
+	gal		[str]		: Name of the galaxy, used in the output filenames.
 	filt		[str]		: Filter for which the photometry is taken.
 	EEF 		[float]		: The Encircled Energy Fraction at the maximum aperture pixel radius 
-							  		  (default 20) for the instrument/filter of interest
-	num_stars		[int] (20) 	: The number of ideal stars to use for the calculation.
-	return_err 		[bool] (True)	: When set to True (default), returns the standard deviatio of the aperture correction
+					  (default 20) for the instrument/filter of interest
+	num_stars	[int] (20) 	: The number of ideal stars to use for the calculation.
+	return_err 	[bool] (True)	: When set to True (default), returns the standard deviatio of the 
+					  aperture correction
 	zmag 		[float] (0)	: May input the zeropoint magnitude to adjust the photometry.
-	min_rad 		[int] (3)	: The pixel radius of the minimum aperture size (for point sources)
-	max_rad 		[int] (20)	: The pixel radius of the maximum aperture size
+	min_rad 	[int] (3)	: The pixel radius of the minimum aperture size (for point sources)
+	max_rad 	[int] (20)	: The pixel radius of the maximum aperture size
 	extended_rad 	[int] (10)	: The pixel radius of extended sources (i.e. clusters)
-	saveplot		[bool]		: If True, saves the radial profiles of all chosen apertures.
+	saveplot	[bool]		: If True, saves the radial profiles of all chosen apertures.
 	suffix		[str]		: Suffix to add to end of filenames (optional).
 
 	RETURN
 	---------
-	correction 	(float): The full correction to be applied to magnitude measurements,
-					  	equivalent to the median of the 3 to 20 pixel aperture correction + the EEF correction
-	err 	(float): The standard deviation of the 3 to 20 pixel aperture correction
+	correction 	(float): The full correction to be applied to magnitude measurements, equivalent 
+				 to the median of the 3 to 20 pixel aperture correction + the EEF correction
+	err 		(float): The standard deviation of the 3 to 20 pixel aperture correction
 	corr_ext 	(float): The full correction to be applied to magnitude measurements,
-					  	equivalent to the median of the extended aperture correction + the EEF correction
+				 equivalent to the median of the extended aperture correction + the EEF correction
 	err_ext 	(float): The standard deviation of the extended pixel aperture correction
 
 	if saveplot = True, saves a PNG file:
-	apcorr_radial_profile_[GALAXY]_[FILTER][SUFFIX].png
+		apcorr_radial_profile_[GALAXY]_[FILTER][SUFFIX].png
 
 	"""
 
@@ -456,23 +459,23 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 				temp = phots[j] # full radial profile of chosen random star
 				# checking for dips and flattened ends
 				if all(k>l for k,l in zip(temp, temp[1:])): # ensures the profile always decreases
-			  			if all(k-l<0.15 for k,l in zip(temp[3:], temp[4:])): # limits the slope of the decrease
-								if j not in temp_select: # print the star. If good, add to the list
-				  					plt.figure(figsize=(4,2))
-				  					for k in temp_select:
-				  						plt.plot(radii, phots[k], color="gray", lw=2, alpha=0.2)
-				  					plt.plot(radii, phots[j])
-				  					plt.ylim(26,10)
-				  					plt.xlabel("Aperture radius (pixels)")
-				  					plt.ylabel("Magnitude")
-				  					plt.title("Star No. " + str(j))
-				  					plt.show()
-				  					if len(temp_select) > 0: 
-				  						print("Stars selected: {temp_select}")
-				  						print(f"{num_stars-len(temp_select)} more to go.")
-				  					ans = input("Keep? (yes/[n]o/quit)").lower()
-				  					if "y" in ans: temp_select.append(j) # add if not already in the list
-				  					elif "q" in ans: cont = False; # allows user to quit the code
+			  		if all(k-l<0.15 for k,l in zip(temp[3:], temp[4:])): # limits the slope of the decrease
+						if j not in temp_select: # print the star. If good, add to the list
+				  			plt.figure(figsize=(4,2))
+				  			for k in temp_select:
+				  				plt.plot(radii, phots[k], color="gray", lw=2, alpha=0.2)
+				  			plt.plot(radii, phots[j])
+				  			plt.ylim(26,10)
+				  			plt.xlabel("Aperture radius (pixels)")
+				  			plt.ylabel("Magnitude")
+				  			plt.title("Star No. " + str(j))
+				  			plt.show()
+				  			if len(temp_select) > 0: 
+				  				print("Stars selected: {temp_select}")
+				  				print(f"{num_stars-len(temp_select)} more to go.")
+				  			ans = input("Keep? (yes/[n]o/quit)").lower()
+				  			if "y" in ans: temp_select.append(j) # add if not already in the list
+				  			elif "q" in ans: cont = False; # allows user to quit the code
 			temp_select_inds = random.sample(range(0, len(tab)), num_stars-len(temp_select))
 		else: cont = False; pass;
 
@@ -559,7 +562,7 @@ def RemoveExt(Ebv, wave, mag):
 	PARAMETERS
 	----------
 	Ebv 	[float]	: The assumed reddening on the star. Can be calculated from the location of the star,
-			   		  Using the online tool at https://ned.ipac.caltech.edu/forms/calculator.html. 
+			  Using the online tool at https://ned.ipac.caltech.edu/forms/calculator.html. 
 			  E(B-V) can be calculated by subtracting the Landholt B & Landholt V values.
 	wave 	[array] : The wavelengths at which the magnitudes are evalutated.
 	mag 	[array] : The magnitudes of the star at the given wavelengths.
@@ -589,13 +592,13 @@ def perform_photometry(data_sub, data, hdu, apertures, instrument, filt, phottyp
 	data_sub	[nd.array] 	: 	Background subtracted data
 	data	  	[nd.array] 	:	Data extracted from the fits file. NOT BACKGROUND SUBTRACTED
 	hdu 		[FITS]		: 	The fits image of the HST/JWST field
-	apertures	  	[int] 		:	Aperture size passed for performing the aperture photometry.
+	apertures	[int] 		:	Aperture size passed for performing the aperture photometry.
 	instrument 	[str]		: 	Name of the instrument (ACS, WFC3, or NIRCAM).
 	filt 		[str]		: 	Name of the hdu filter.
-	phottype		[str] 		: 	The type of photometry being performed -- full, extended or source.
+	phottype	[str] 		: 	The type of photometry being performed -- full, extended or source.
 	gal  		[str]		: 	Name of the galaxy of interest.
 	suffix	  	[str]   	: 	Suffix to be added to the name of the saved file.
-	savefile		[bool] (True) 	: 	Save the file.
+	savefile	[bool] (True) 	: 	Save the file.
 
 		RETURNS
 	-------
