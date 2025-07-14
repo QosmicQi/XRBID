@@ -80,24 +80,28 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 
 	"""
 	Makes a CMD from a given set of points, either from a list or an input dataframe.
-	NOTE: I have not incorporated JWST data fully yet. Will do so after extensive testing.
 	
 	PARAMETERS: 
-	sources 	[pd.dataframe, list]: 	Input may either be a pandas dataframe containing the appropriate magnitudes required for the CMD, 
-				       		or a list of coordinates in the format [[xs],[ys]]. 
-	xcolor 		[str or list]: 		The name of the color or magnitude to plot in the x-axis, as it is labeled in the dataframe. 
-						This will be the default x-axis label. If a list is given, it is assumed to contain the 
-						column names of the input dataframe to be subtracted (e.g. F555W - F814W)
-	ycolor 		[str or list]: 		The name of the color or magnitude to plot in the y-axis, as it is labeled in the dataframe. 
-						This will be the default y-axis label. If a list is given, it is assumed to contain the column 
-						names of the input dataframe to be subtracted (e.g. F555W - F814W)
+	-----------
+	sources 	[pd.dataframe, list]: 	Input may either be a pandas dataframe containing the appropriate magnitudes 
+						required for the CMD, or a list of coordinates in the format [[xs],[ys]]. 
+	xcolor 		[str or list]: 		The name of the color or magnitude to plot in the x-axis, as it is labeled
+						in the dataframe. This will be the default x-axis label. 
+						If a list is given, it is assumed to contain the column names of the input 
+						dataframe to be subtracted (e.g. F555W - F814W)
+	ycolor 		[str or list]: 		The name of the color or magnitude to plot in the y-axis, as it is labeled 
+						in the dataframe. This will be the default y-axis label. 
+						If a list is given, it is assumed to contain the column names of the input 
+						dataframe to be subtracted (e.g. F555W - F814W)
 	xmodel 		[str or list]: 		The magnitude(s) of the filter(s) to be used from the stellar models for the x-axis. 
 						If given as a list, it is assumed the color is xmodel[0] - xmodel[1] 
 	ymodel 		[str or list]: 		The magnitude(s) of the filter(s) to be used from the stellar models for the y-axis. 
 						If given as a list, it is assumed the color is ymodel[0] - ymodel[1] 
 	figsize 	[tuple] (6,4): 		The desired dimensions of the figure. 
-	xlim 		[tuple] (None):		The limits on the x-axis. If none are given, the limits are assumed to be the (xmin - 1, xmax + 1) 
-	ylim 		[tuple] (None):		The limits on the y-axis. If none are given, the limits are assumed to be (ymax + 1, ymin - 1)
+	xlim 		[tuple] (None):		The limits on the x-axis. If none are given, the limits are assumed to be the 
+						(xmin - 1, xmax + 1) 
+	ylim 		[tuple] (None):		The limits on the y-axis. If none are given, the limits are assumed to be 
+						(ymax + 1, ymin - 1)
 	color 		[str] ("black"): 	Marker color
 	size 		[int] (10): 		Marker size
 	marker 		[str] (None):		The style of the marker. Defaults to a filled point. If "o" is given, 
@@ -123,6 +127,7 @@ def MakeCMD(sources=False, xcolor=None, ycolor=None, xmodel=None, ymodel=None, f
 						prompt the user to input the directory manually. 
 
 	RETURNS: 
+	---------
 	f, ax: 		Arguments defining the figure, which can be used to add more points to the CMD after the initial plotting.
  
 	"""

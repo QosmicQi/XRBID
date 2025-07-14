@@ -80,12 +80,10 @@ def Find(df, criteria, verbose=False):
 		temp = re.split(ops, crit)	 # splitting the search by operators, but set to lowercase
 		
 		# if there are extra spaces included in the search, they should be removed. 
-		if temp[0][-1] == " ": 
-			temp[0] = temp[0][:-1]
-			raw_search[0] = raw_search[0][:-1]
-		if temp[-1][0] == " " : 
-			temp[-1] = temp[-1][1:]
-			raw_search[-1] = raw_search[-1][1:]
+		temp[0] = temp[0].strip()
+		raw_search[0] = raw_search[0].strip()
+		temp[-1] = temp[-1].strip() 
+		raw_search[-1] = raw_search[-1].strip()
 
 		# Parentheses indicate Long candidate classifications. Keep track of these! 
 		if "(" in temp[-1]: 	# AKA if candidate...
@@ -105,7 +103,6 @@ def Find(df, criteria, verbose=False):
 
 		# Setting the header based on the user input
 		search_head = raw_search[0]
-		if search_head[-1] == " ": search_head = search_head[:-1]
 		search = raw_search[-1]
 		
 		# NOTE: search is now the criteria we're searching for under the criteria.	###
