@@ -293,8 +293,8 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	print("DONE!")
 
 	if aperture_correction:
-		print(f"Correction (source, {min_rad} px): {apcorr} +/- {aperr}")
-		print(f"Correction (extended, {extended_rad} px): {apcorr_ext} +/- {aperr_ext}")
+		print(f"Correction (source, {min_rad}px): {apcorr} +/- {aperr}")
+		print(f"Correction (extended, {extended_rad}px): {apcorr_ext} +/- {aperr_ext}")
 		return apcorr, aperr, apcorr_ext, aperr_ext
 	else: return None   
 ###-----------------------------------------------------------------------------------------------------
