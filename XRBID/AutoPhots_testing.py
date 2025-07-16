@@ -170,7 +170,8 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 			elif instrument.lower() == 'nircam': 
 				if filt in long_filter: pixtoarcs = 0.063 
 				if filt in short_filter: pixtoarcs = 0.031
-		
+		print(f"Using pixel scale of {pixtoarcs} arcsec/pixel")
+
 	# Identifying point sources with DaoFind
 	print("Running DaoFind. This may take a while...")
 	objects = DaoFindObjects(data,sigma=sigma,threshold=threshold, fwhm=fwhm_arcs, pixtoarcs=pixtoarcs, \
@@ -466,7 +467,7 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 							plt.figure(figsize=(4,2))
 							for k in temp_select: plt.plot(radii, phots[k], color="gray", lw=2, alpha=0.2)
 							plt.plot(radii, phots[j])
-							plt.ylim(26,10)
+							plt.ylim(26,5)
 							plt.xlabel("Aperture radius (pixels)")
 							plt.ylabel("Magnitude")
 							plt.title("Star No. " + str(j))
