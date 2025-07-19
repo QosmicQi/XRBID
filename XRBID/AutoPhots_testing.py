@@ -294,8 +294,8 @@ def RunPhots(hdu, gal, instrument, filt, fwhm_arcs, pixtoarcs=False, zeropoint=F
 	print("DONE!")
 
 	if aperture_correction:
-		print(f"Correction (source, {min_rad}px): {apcorr} +/- {aperr}")
-		print(f"Correction (extended, {extended_rad}px): {apcorr_ext} +/- {aperr_ext}")
+		print(f"Aperture correction (source, {min_rad}px): {apcorr} +/- {aperr}")
+		print(f"Aperture correction (extended, {extended_rad}px): {apcorr_ext} +/- {aperr_ext}")
 		return apcorr, aperr, apcorr_ext, aperr_ext
 	else: return None   
 ###-----------------------------------------------------------------------------------------------------
@@ -409,7 +409,7 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 	EEF 		[float]		: The Encircled Energy Fraction at the maximum aperture pixel radius 
 					  (default 20) for the instrument/filter of interest
 	num_stars	[int] (20) 	: The number of ideal stars to use for the calculation.
-	return_err 	[bool] (True)	: When set to True (default), returns the standard deviatio of the 
+	return_err 	[bool] (True)	: When set to True (default), returns the standard deviation of the 
 					  aperture correction
 	zmag 		[float] (0)	: May input the zeropoint magnitude to adjust the photometry.
 	min_rad 	[int] (3)	: The pixel radius of the minimum aperture size (for point sources)
@@ -506,7 +506,7 @@ def CorrectAp(tab, radii, gal, filt, EEF=False, num_stars=20, return_err=True, z
 		else: return correction, corr_ext
 	else:
 		print("Rerun function to calculate aperture correction.")
-		return None
+		return 0, 0
 	
 ###-----------------------------------------------------------------------------------------------------
 
@@ -519,7 +519,7 @@ def Zeropoint(hdu, filt, instrument, date=None):
 	----------
 	hdu		[fits]	: The HDU of the HST image for which the magnitudes are obtained.
 	filt 		[str]	: The name of the filter for which the zero-point is needed.
-	instrument 	[str]	: ACS or WFC3. 
+	instrument 	[str]	: ACS, WFC3, or NIRCAM. 
 	date 		[str]	: Specify the date of the observation in "YYYY-MM-DD" format, if given by HDU.
 
 	RETURN
@@ -527,6 +527,10 @@ def Zeropoint(hdu, filt, instrument, date=None):
 	zmag 	[float] : The zero-point magnitude of the input filter.
 	
 	"""
+	
+	# If the hdu is read in as a filename, pull the hdu 
+	if isinstance(hdu, str): hdu = fits.open(hdu)
+	else: pass; 
 
 	try:
 		# Zeropoint for ACS

@@ -858,7 +858,7 @@ def CalcXRBs(Lb=2.16e38, Lnorm=1e38, Lc=6.31e40, L90=1.58e36, w=1, enclosed=None
 	'w' is the L19 normalization factor for the specific galaxy of interest, obtained from Table 5. 
 	'K' is the normalization from L19 Table 4. 'alpha1' may refer to the first slope for the LMXB BPL case, 
 	or equivalent to gamma in the HMXB PL case in Table 4. 
-	NOTE: I did not include a doubly-broken PL here as it is irrelevant for my case. May include in later updates (v1.6.1+). 
+	NOTE: I did not include a doubly-broken PL here as it is irrelevant for my case. May include in later updates (v1.10.7+). 
 	"""
 
 	if not K: K = input("Normalization constant: ")
