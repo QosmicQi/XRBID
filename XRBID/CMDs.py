@@ -1268,6 +1268,31 @@ def WLS(df, isoTemp, photheads, sourcemags, sourcemag_errs, idheader, sourceids,
 
 ###-----------------------------------------------------------------------------------------------------
 	
+def IsoConvert(filename, outfile, headerline=13, show_df=True): 
+
+	"""
+	Converts an isochrone textfile from the Padova CMD website (https://stev.oapd.inaf.it/cgi-bin/cmd) into a DataFrame, 
+	allowing for new isochrone model files to be built and used. 
+
+	PARAMETERS: 
+	-----------
+	filename	[str]	:	Name of the file containing the isochrone model. 
+	outfile		[str]	:	Name of the file to save the isochrone DataFrame to. 
+	headerline	[int]	:	Index of the line containing the headers for the DataFrame. Default is 13.
+	show_df		[bool]	:	If True, displays the resulting DataFrame before saving. 
+
+	"""
+
+	f = open(filename)
+	isoheaders = f.readlines()[headerline].strip("#").split()
+	isotemp = pd.read_csv(filename, comment="#", delim_whitespace=True, names=isoheaders)
+
+	if show_df: display(isotemp)
+
+	isotemp.to_csv(outfile, index=False) 
+
+###-----------------------------------------------------------------------------------------------------
+	
 # PLANNED FUNCTIONS, UPDATE TBD
 #
 #def FitCCD(): 
