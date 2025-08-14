@@ -528,10 +528,16 @@ def MakeCCD(clusters=False, xcolor=["F555W", "F814W"], ycolor=["F435W", "F555W"]
 
 	"""
 	Creates a color-color diagram for comparing the photometric properties of input sources 
-	to the cluster color evolutionary models of Bruzual & Charlot (2003), assuming solar metallicity.
-	The ACS/WFC models contain the filters F220W, F250W, F330W, F410W, F435W, F475W, F555W, F606W, 
-	F625W, F775W, F814W. The WFC3/UVIS models contain F225W, F336W,  F438W, F547M, F555W, F606W, 
-	F625W, F656N, F658N, and F814W. These are stored in the file CB07_models_*.csv.
+	to the cluster color evolutionary models of Bruzual & Charlot (2003, https://www.bruzual.org/bc03/doc/bc03.pdf), 
+	assuming solar metallicity. The ACS/WFC models contain the filters F220W, F250W, F330W, F410W, 
+	F435W, F475W, F555W, F606W, F625W, F775W, F814W. 
+	The WFC3/UVIS models contain F225W, F336W,  F438W, F547M, F555W, F606W, F625W, F656N, F658N, and F814W. 
+	These are stored in the file CB07_models_*.csv.
+	Other headers in these models include: 
+	log Nly:  log rate of H-ionizing photons (per second)
+	Mt/Lb: Stellar mass-to-B(14) light ratio in solar units (M/L)
+	Mt/Lv: Stellar mass-to-V(15) light ratio in solar units (M/L)
+	Mt/Lk: Stellar mass-to-VK(57) light ratio in solar units (M/L)
 	
 	PARAMETERS: 
 	-----------
